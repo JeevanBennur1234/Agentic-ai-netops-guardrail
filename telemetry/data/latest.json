@@ -1,0 +1,39 @@
+{
+    "switches": {
+        "1": {
+            "ports": {
+                "4294967294": {
+                    "rx_packets": 0,
+                    "tx_packets": 0,
+                    "rx_bytes": 0,
+                    "tx_bytes": 0
+                },
+                "1": {
+                    "rx_packets": 2,
+                    "tx_packets": 4,
+                    "rx_bytes": 180,
+                    "tx_bytes": 356
+                },
+                "2": {
+                    "rx_packets": 3,
+                    "tx_packets": 5,
+                    "rx_bytes": 266,
+                    "tx_bytes": 446
+                },
+                "3": {
+                    "rx_packets": 2,
+                    "tx_packets": 5,
+                    "rx_bytes": 180,
+                    "tx_bytes": 446
+                }
+            },
+            "flows": [
+                {
+                    "priority": 0,
+                    "packet_count": 3,
+                    "byte_count": 270
+                }
+            ]
+        }
+    }
+}
