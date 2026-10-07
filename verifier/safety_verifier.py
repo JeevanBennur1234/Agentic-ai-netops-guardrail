@@ -16,7 +16,7 @@ def load_telemetry(path=None):
 def build_topology(telemetry):
     graph = nx.Graph()
 
-    for switch_id, switch_data in telemetry["switches"].items():
+    for switch_id, switch_data in telemetry.get("switches", {}).items():
 
         switch_node = f"s{switch_id}"
 
@@ -25,10 +25,10 @@ def build_topology(telemetry):
             type="switch"
         )
 
-        for port_id in switch_data["ports"]:
+        for port_id in switch_data.get("ports", {}):
 
             # Ignore OpenFlow LOCAL port
-            if port_id == "4294967294":
+            if str(port_id) == "4294967294":
                 continue
 
             port_node = f"s{switch_id}-p{port_id}"
@@ -42,6 +42,27 @@ def build_topology(telemetry):
                 switch_node,
                 port_node
             )
+
+    for link in telemetry.get("links", []):
+        src_sw = str(link.get("src_switch", "")).strip()
+        src_pt = str(link.get("src_port", "")).strip()
+        dst_sw = str(link.get("dst_switch", "")).strip()
+        dst_pt = str(link.get("dst_port", "")).strip()
+
+        if not src_sw or not src_pt or not dst_sw or not dst_pt:
+            continue
+        if src_pt == "4294967294" or dst_pt == "4294967294":
+            continue
+
+        src_node = f"s{src_sw}-p{src_pt}"
+        dst_node = f"s{dst_sw}-p{dst_pt}"
+
+        if src_node not in graph:
+            graph.add_node(src_node, type="port")
+        if dst_node not in graph:
+            graph.add_node(dst_node, type="port")
+
+        graph.add_edge(src_node, dst_node)
 
     return graph
 

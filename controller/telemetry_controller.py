@@ -10,12 +10,20 @@ from ryu.controller.handler import (
 )
 from ryu.ofproto import ofproto_v1_3
 from ryu.lib import hub
-from ryu.lib.packet import packet, ethernet
+from ryu.lib.packet import packet, ethernet, ether_types
+from ryu.topology import switches, api, event
+from ryu import cfg
+
+CONF = cfg.CONF
+CONF.set_default('observe_links', True)
 
 
 class TelemetryController(app_manager.RyuApp):
 
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
+    _CONTEXTS = {
+        'switches': switches.Switches
+    }
 
     def __init__(self, *args, **kwargs):
 
@@ -29,7 +37,8 @@ class TelemetryController(app_manager.RyuApp):
 
         # Telemetry data
         self.telemetry = {
-            "switches": {}
+            "switches": {},
+            "links": []
         }
 
         # Telemetry output file
@@ -73,6 +82,9 @@ class TelemetryController(app_manager.RyuApp):
             "SWITCH CONNECTED: datapath_id=%s",
             datapath.id
         )
+
+        # Request initial stats on connection
+        self._request_stats(datapath)
 
         # ------------------------------------------------------
         # Install table-miss flow.
@@ -158,6 +170,10 @@ class TelemetryController(app_manager.RyuApp):
             return
 
         eth = eth_packets[0]
+
+        # Ignore LLDP packets in L2 learning (handled by switches.Switches)
+        if eth.ethertype == ether_types.ETH_TYPE_LLDP:
+            return
 
         dst = eth.dst
         src = eth.src
@@ -255,11 +271,13 @@ class TelemetryController(app_manager.RyuApp):
 
         while True:
 
-            for datapath in self.datapaths.values():
+            for datapath in list(self.datapaths.values()):
 
                 self._request_stats(
                     datapath
                 )
+
+            self._update_links()
 
             hub.sleep(5)
 
@@ -386,3 +404,44 @@ class TelemetryController(app_manager.RyuApp):
                 file,
                 indent=4
             )
+
+    # ==========================================================
+    # LINK DISCOVERY / TOPOLOGY UPDATE
+    # ==========================================================
+
+    @set_ev_cls(
+        [event.EventLinkAdd, event.EventLinkDelete],
+        MAIN_DISPATCHER
+    )
+    def link_change_handler(self, ev):
+        self._update_links()
+
+    def _update_links(self):
+        try:
+            links = api.get_all_link(self)
+        except Exception as e:
+            self.logger.warning("Error discovering links: %s", e)
+            return
+
+        discovered_links = []
+        for link in links:
+            src_sw = str(link.src.dpid)
+            src_port = str(link.src.port_no)
+            dst_sw = str(link.dst.dpid)
+            dst_port = str(link.dst.port_no)
+
+            if src_port == "4294967294" or dst_port == "4294967294":
+                continue
+
+            entry = {
+                "src_switch": src_sw,
+                "src_port": src_port,
+                "dst_switch": dst_sw,
+                "dst_port": dst_port
+            }
+
+            if entry not in discovered_links:
+                discovered_links.append(entry)
+
+        self.telemetry["links"] = discovered_links
+        self._write_telemetry()

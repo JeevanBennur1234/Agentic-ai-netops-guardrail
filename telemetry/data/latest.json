@@ -9,31 +9,127 @@
                     "tx_bytes": 0
                 },
                 "1": {
-                    "rx_packets": 2,
-                    "tx_packets": 4,
-                    "rx_bytes": 180,
-                    "tx_bytes": 356
+                    "rx_packets": 255,
+                    "tx_packets": 74088,
+                    "rx_bytes": 21938,
+                    "tx_bytes": 6367242
                 },
                 "2": {
-                    "rx_packets": 3,
-                    "tx_packets": 5,
-                    "rx_bytes": 266,
-                    "tx_bytes": 446
+                    "rx_packets": 32217392,
+                    "tx_packets": 37294,
+                    "rx_bytes": 3156854666,
+                    "tx_bytes": 3204828
                 },
                 "3": {
-                    "rx_packets": 2,
-                    "tx_packets": 5,
-                    "rx_bytes": 180,
-                    "tx_bytes": 446
+                    "rx_packets": 37290,
+                    "tx_packets": 32217423,
+                    "rx_bytes": 3204454,
+                    "tx_bytes": 3156857654
                 }
             },
             "flows": [
                 {
+                    "priority": 65535,
+                    "packet_count": 6,
+                    "byte_count": 360
+                },
+                {
+                    "priority": 1,
+                    "packet_count": 0,
+                    "byte_count": 0
+                },
+                {
+                    "priority": 1,
+                    "packet_count": 31690717,
+                    "byte_count": 3105690266
+                },
+                {
+                    "priority": 1,
+                    "packet_count": 0,
+                    "byte_count": 0
+                },
+                {
                     "priority": 0,
-                    "packet_count": 3,
-                    "byte_count": 270
+                    "packet_count": 74175,
+                    "byte_count": 6374862
+                }
+            ]
+        },
+        "2": {
+            "ports": {
+                "4294967294": {
+                    "rx_packets": 0,
+                    "tx_packets": 0,
+                    "rx_bytes": 0,
+                    "tx_bytes": 0
+                },
+                "1": {
+                    "rx_packets": 37300,
+                    "tx_packets": 32218147,
+                    "rx_bytes": 3205348,
+                    "tx_bytes": 3156928644
+                },
+                "2": {
+                    "rx_packets": 32218198,
+                    "tx_packets": 37291,
+                    "rx_bytes": 3156933536,
+                    "tx_bytes": 3204540
+                },
+                "3": {
+                    "rx_packets": 285,
+                    "tx_packets": 74018,
+                    "rx_bytes": 24518,
+                    "tx_bytes": 6361146
+                }
+            },
+            "flows": [
+                {
+                    "priority": 65535,
+                    "packet_count": 6,
+                    "byte_count": 360
+                },
+                {
+                    "priority": 1,
+                    "packet_count": 31690723,
+                    "byte_count": 3105690854
+                },
+                {
+                    "priority": 1,
+                    "packet_count": 0,
+                    "byte_count": 0
+                },
+                {
+                    "priority": 0,
+                    "packet_count": 74205,
+                    "byte_count": 6377390
                 }
             ]
         }
-    }
+    },
+    "links": [
+        {
+            "src_switch": "2",
+            "src_port": "2",
+            "dst_switch": "1",
+            "dst_port": "3"
+        },
+        {
+            "src_switch": "2",
+            "src_port": "1",
+            "dst_switch": "1",
+            "dst_port": "2"
+        },
+        {
+            "src_switch": "1",
+            "src_port": "2",
+            "dst_switch": "2",
+            "dst_port": "1"
+        },
+        {
+            "src_switch": "1",
+            "src_port": "3",
+            "dst_switch": "2",
+            "dst_port": "2"
+        }
+    ]
 }
