@@ -17,7 +17,7 @@ GENESIS_HASH = "0" * 64
 class AuditTrail:
     """
     Cryptographic Audit Trail using SHA3-256 hash chaining and ECDSA signatures.
-    Guarantees tamper-evident logging of all guardrail decisions.
+    Guarantees tamper-evident logging of all guardrail decisions and execution results.
     """
 
     def __init__(
@@ -77,10 +77,12 @@ class AuditTrail:
         timestamp,
         decision,
         intent,
-        verifier_result
+        verifier_result,
+        execution_result=None
     ):
         """
         Compute SHA3-256 hash over canonical fields of the record.
+        Preserves backward-compatibility by only including execution_result if provided.
         """
         payload = {
             "previous_hash": previous_hash,
@@ -89,6 +91,9 @@ class AuditTrail:
             "intent": intent,
             "verifier_result": verifier_result
         }
+        if execution_result is not None:
+            payload["execution_result"] = execution_result
+
         canonical_bytes = cls.canonical_serialize(payload)
         return hashlib.sha3_256(canonical_bytes).hexdigest()
 
@@ -97,7 +102,8 @@ class AuditTrail:
         decision,
         intent,
         verifier_result,
-        timestamp=None
+        timestamp=None,
+        execution_result=None
     ):
         """
         Record an APPROVED or REJECTED decision into the hash chain,
@@ -122,7 +128,8 @@ class AuditTrail:
             timestamp=timestamp,
             decision=decision,
             intent=intent,
-            verifier_result=verifier_result
+            verifier_result=verifier_result,
+            execution_result=execution_result
         )
 
         # Generate ECDSA signature over current_hash using SHA3-256
@@ -144,6 +151,8 @@ class AuditTrail:
             "signature": signature_hex,
             "public_key": public_key_hex
         }
+        if execution_result is not None:
+            record["execution_result"] = execution_result
 
         self.chain.append(record)
         self.save_chain()
@@ -184,7 +193,8 @@ class AuditTrail:
             timestamp=record.get("timestamp"),
             decision=record.get("decision"),
             intent=record.get("intent"),
-            verifier_result=record.get("verifier_result")
+            verifier_result=record.get("verifier_result"),
+            execution_result=record.get("execution_result")
         )
 
         if recomputed_hash != record.get("current_hash"):

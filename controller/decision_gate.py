@@ -14,6 +14,10 @@ sys.path.append(
     os.path.join(os.path.dirname(__file__), "..", "audit")
 )
 
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), "..", "executor")
+)
+
 from safety_verifier import (
     load_telemetry,
     build_topology,
@@ -23,6 +27,7 @@ from safety_verifier import (
 
 from remediation_agent import propose_remediation
 from audit_trail import AuditTrail
+from remediation_executor import RemediationExecutor
 
 DEFAULT_TELEMETRY_PATH = os.path.expanduser(
     "~/netops_guardrail/telemetry/data/latest.json"
@@ -90,7 +95,9 @@ def apply_intent_to_graph(graph, intent):
 
 
 def decide(
-    telemetry_path=None
+    telemetry_path=None,
+    execute_approved=True,
+    executor=None
 ):
     if telemetry_path is None:
         telemetry_path = DEFAULT_TELEMETRY_PATH
@@ -122,19 +129,33 @@ def decide(
 
     print(f"\n3. DECISION: {decision}")
 
+    execution_res = None
+    if decision == "APPROVED" and execute_approved:
+        if executor is None:
+            executor = RemediationExecutor(telemetry_path=telemetry_path)
+        execution_res = executor.execute(
+            intent=intent,
+            decision=decision,
+            verifier_result=result
+        )
+        print("\n4. EXECUTION RESULT:")
+        print(json.dumps(execution_res, indent=2))
+
     # Minimum integration point: every decision produces a signed audit record
     record = audit_trail.record_decision(
         decision=decision,
         intent=intent,
-        verifier_result=result
+        verifier_result=result,
+        execution_result=execution_res
     )
 
-    print(f"\n4. AUDIT RECORD LOGGED: index={record['index']} hash={record['current_hash'][:16]}...")
+    print(f"\n5. AUDIT RECORD LOGGED: index={record['index']} hash={record['current_hash'][:16]}...")
 
     return {
         "intent": intent,
         "verification": result,
         "decision": decision,
+        "execution": execution_res,
         "audit_record": record
     }
 
