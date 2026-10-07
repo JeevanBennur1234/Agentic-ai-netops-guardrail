@@ -1,0 +1,13 @@
+# Prometheus configuration for Agentic AI-NetOps Guardrail
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: "netops_guardrail"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["localhost:8000"]
+        labels:
+          environment: "mininet_testbed"
+          system: "netops_guardrail"
