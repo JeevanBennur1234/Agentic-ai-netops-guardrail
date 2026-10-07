@@ -10,6 +10,10 @@ sys.path.append(
     os.path.join(os.path.dirname(__file__), "..", "agent")
 )
 
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), "..", "audit")
+)
+
 from safety_verifier import (
     load_telemetry,
     build_topology,
@@ -18,10 +22,13 @@ from safety_verifier import (
 )
 
 from remediation_agent import propose_remediation
+from audit_trail import AuditTrail
 
 DEFAULT_TELEMETRY_PATH = os.path.expanduser(
     "~/netops_guardrail/telemetry/data/latest.json"
 )
+
+audit_trail = AuditTrail()
 
 
 def build_graph_from_json(telemetry_path):
@@ -115,10 +122,20 @@ def decide(
 
     print(f"\n3. DECISION: {decision}")
 
+    # Minimum integration point: every decision produces a signed audit record
+    record = audit_trail.record_decision(
+        decision=decision,
+        intent=intent,
+        verifier_result=result
+    )
+
+    print(f"\n4. AUDIT RECORD LOGGED: index={record['index']} hash={record['current_hash'][:16]}...")
+
     return {
         "intent": intent,
         "verification": result,
-        "decision": decision
+        "decision": decision,
+        "audit_record": record
     }
 
 

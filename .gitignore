@@ -1,1 +1,5 @@
-__pycache__/n*.pycn.pytest_cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+audit/*.pem
+audit/audit_log.json
