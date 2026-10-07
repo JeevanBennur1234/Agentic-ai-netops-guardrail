@@ -93,7 +93,8 @@ def check_reachability(graph, required_hosts=None):
         unreachable = []
         for i, h1 in enumerate(hosts):
             for h2 in hosts[i + 1:]:
-                if not nx.has_path(graph, h1, h2):
+                # If either host/endpoint was removed from topology or disconnected
+                if h1 not in graph or h2 not in graph or not nx.has_path(graph, h1, h2):
                     unreachable.append((h1, h2))
 
         if unreachable:
@@ -167,6 +168,7 @@ def run_safety_checks(graph, required_hosts=None):
 def test_port_removal(graph, port_node, required_hosts=None):
     """
     Simulate removing a port without changing the real network.
+    Preserves baseline endpoints so connectivity-breaking remediation is detected.
     """
 
     if port_node not in graph:
@@ -176,13 +178,19 @@ def test_port_removal(graph, port_node, required_hosts=None):
             "reason": f"Port {port_node} does not exist"
         }
 
+    # Derive baseline endpoints from the original topology if not provided
+    endpoints = required_hosts or [
+        n for n in graph.nodes
+        if str(n).startswith("h") or graph.nodes[n].get("type") == "port"
+    ]
+
     test_graph = graph.copy()
 
     test_graph.remove_node(port_node)
 
     return run_safety_checks(
         test_graph,
-        required_hosts
+        required_hosts=endpoints
     )
 
 
@@ -198,7 +206,7 @@ if __name__ == "__main__":
 
     print(json.dumps(result, indent=4))
 
-    print("\n=== REMEDIATION SIMULATION ===")
+    print("\n=== REMEDIATION SIMULATION (Port Removal) ===")
 
     result = test_port_removal(
         graph,
