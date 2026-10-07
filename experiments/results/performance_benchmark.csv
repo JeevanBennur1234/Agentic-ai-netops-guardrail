@@ -1,0 +1,10 @@
+Component,Count,Mean (ms),Median (ms),P95 (ms),Min (ms),Max (ms)
+schema_validation,100,1.799,1.551,2.731,1.346,5.69
+safety_verification,100,0.03,0.022,0.064,0.021,0.359
+decision_gate,100,0.047,0.038,0.068,0.037,0.572
+ovs_execution,30,18.185,17.026,26.179,14.951,27.719
+post_execution_verification,30,10.642,10.414,13.554,8.542,14.717
+cryptographic_audit,50,1.224,1.119,2.129,0.536,4.428
+agent_llm_decision,3,4648.231,807.65,12467.276,669.767,12467.276
+guardrail_pipeline_latency,-,31.927,-,-,-,-
+total_end_to_end_pipeline,-,4680.158,-,-,-,-

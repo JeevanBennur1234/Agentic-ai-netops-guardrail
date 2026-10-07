@@ -1,0 +1,55 @@
+[
+  {
+    "index": 0,
+    "timestamp": "2026-10-07T14:15:30.955667+00:00",
+    "decision": "APPROVED",
+    "intent": {
+      "action": "no_action"
+    },
+    "verifier_result": {
+      "safe": true
+    },
+    "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "current_hash": "429248e65ca7a122359e1e8ce9720dd1b70cc916b0602cb06890637192537b60",
+    "signature": "ca4f1455856e95c524e3556cf5e69907b01a9581318095bda2c92d7eb6e43cc1de8b7ffd99bdc5789419f80f13b6213c37375ff7f98132d1b927c868cf66851b",
+    "public_key": "398149df9a030c82c198766770ac9e6ba4e7a129ce9c483c6ddbcc6e570ded50b76c5c03829a03d83c582c40842f8e2a1fb3d51764c7fffd9254e9211d90e12d"
+  },
+  {
+    "index": 1,
+    "timestamp": "2026-10-07T14:15:30.956402+00:00",
+    "decision": "APPROVED",
+    "intent": {
+      "action": "block",
+      "target_switch": "1",
+      "from_port": "2"
+    },
+    "verifier_result": {
+      "safe": true
+    },
+    "previous_hash": "429248e65ca7a122359e1e8ce9720dd1b70cc916b0602cb06890637192537b60",
+    "current_hash": "41815583abda666b0c522ce2302a1808fa1b7bb46244ae8e5dab3de93827c761",
+    "signature": "4b183bb7099405ef9a136d5d8573c1902cd64ccca206118cd1c72bbbcaba2f58fba7e4d9f292e4228def67b8273a832069fe35f5cb9f6d5b34359939ef9e8c8e",
+    "public_key": "398149df9a030c82c198766770ac9e6ba4e7a129ce9c483c6ddbcc6e570ded50b76c5c03829a03d83c582c40842f8e2a1fb3d51764c7fffd9254e9211d90e12d",
+    "execution_result": {
+      "success": true,
+      "action": "block",
+      "change_verified": true
+    }
+  },
+  {
+    "index": 2,
+    "timestamp": "2026-10-07T14:15:30.957007+00:00",
+    "decision": "REJECTED",
+    "intent": {
+      "action": "block",
+      "from_port": "99"
+    },
+    "verifier_result": {
+      "safe": false
+    },
+    "previous_hash": "41815583abda666b0c522ce2302a1808fa1b7bb46244ae8e5dab3de93827c761",
+    "current_hash": "8dc357bdad3e938db6103c770a5c4ea73dbcd8d68b9b3c0d31edbeff9f739d29",
+    "signature": "e2dabc0721677cc34dde1bdaf2c21f9f62d9c821a9159d70fb545b59aa3b98846e4882e80ec91f1f96d6dbf144b8c90e7f6efb8734124a6fa3d4f6e467f384c5",
+    "public_key": "398149df9a030c82c198766770ac9e6ba4e7a129ce9c483c6ddbcc6e570ded50b76c5c03829a03d83c582c40842f8e2a1fb3d51764c7fffd9254e9211d90e12d"
+  }
+]

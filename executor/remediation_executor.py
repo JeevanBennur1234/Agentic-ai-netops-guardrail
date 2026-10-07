@@ -34,13 +34,15 @@ class RemediationExecutor:
         self,
         telemetry_path=None,
         cmd_runner=None,
-        audit_trail=None
+        audit_trail=None,
+        topology_provider=None
     ):
         self.telemetry_path = telemetry_path or os.path.expanduser(
             "~/netops_guardrail/telemetry/data/latest.json"
         )
         self.cmd_runner = cmd_runner or self._default_cmd_runner
         self.audit_trail = audit_trail
+        self.topology_provider = topology_provider
 
     @staticmethod
     def _default_cmd_runner(args):
@@ -119,27 +121,45 @@ class RemediationExecutor:
                 return False, f"Port {to_port_int} is outside valid physical port range"
 
         # Validate that switch and ports exist in topology
+        topology, _ = self._get_topology(phase="pre")
+        if topology is not None:
+            sw_node = f"s{target_switch_str}"
+            port_node = f"s{target_switch_str}-p{from_port_str}"
+
+            if sw_node not in topology:
+                return False, f"Target switch {sw_node} does not exist in topology"
+            if port_node not in topology:
+                return False, f"Target port {port_node} does not exist in topology"
+            if action == "reroute" and to_port_str:
+                to_port_node = f"s{target_switch_str}-p{to_port_str}"
+                if to_port_node not in topology:
+                    return False, f"Target destination port {to_port_node} does not exist in topology"
+
+        return True, None
+
+    def _get_topology(self, phase="pre"):
+        """Retrieve topology graph and optional required_hosts endpoints."""
+        if self.topology_provider is not None:
+            try:
+                try:
+                    res = self.topology_provider(phase=phase)
+                except TypeError:
+                    res = self.topology_provider()
+                if isinstance(res, tuple):
+                    return res[0], res[1]
+                return res, None
+            except Exception:
+                return None, None
+
         if os.path.exists(self.telemetry_path):
             try:
                 with open(self.telemetry_path, "r") as f:
                     telem = json.load(f)
-                topology = build_topology(telem)
+                return build_topology(telem), None
+            except Exception:
+                return None, None
 
-                sw_node = f"s{target_switch_str}"
-                port_node = f"s{target_switch_str}-p{from_port_str}"
-
-                if sw_node not in topology:
-                    return False, f"Target switch {sw_node} does not exist in topology"
-                if port_node not in topology:
-                    return False, f"Target port {port_node} does not exist in topology"
-                if action == "reroute" and to_port_str:
-                    to_port_node = f"s{target_switch_str}-p{to_port_str}"
-                    if to_port_node not in topology:
-                        return False, f"Target destination port {to_port_node} does not exist in topology"
-            except Exception as e:
-                return False, f"Error inspecting topology: {e}"
-
-        return True, None
+        return None, None
 
     def execute(self, intent, decision, verifier_result):
         """
@@ -257,14 +277,12 @@ class RemediationExecutor:
 
     def _verify_topology_safety(self):
         """Run safety verifier checks against the current network topology."""
-        if not os.path.exists(self.telemetry_path):
-            return True, "No telemetry file found to inspect"
+        graph, req_hosts = self._get_topology(phase="post")
+        if graph is None:
+            return True, "No telemetry or topology available to inspect"
 
         try:
-            with open(self.telemetry_path, "r") as f:
-                telemetry = json.load(f)
-            graph = build_topology(telemetry)
-            res = run_safety_checks(graph)
+            res = run_safety_checks(graph, required_hosts=req_hosts)
             if res.get("safe"):
                 return True, "Topology safety checks passed"
             return False, f"Topology safety check reported issues: {res.get('checks')}"
