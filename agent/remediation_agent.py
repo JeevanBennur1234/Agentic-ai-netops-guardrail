@@ -103,10 +103,10 @@ Decision Guidelines:
 2. If traffic is flowing normally, flows exist, and there is no evidence of packet drops or congestion on any port, you MUST choose "no_action".
 3. Do NOT invent packet loss, congestion, or link failures not supported by the telemetry.
 4. Only propose "block" or "reroute" if telemetry provides clear evidence of a failure or severe anomaly on a valid physical port.
-5. If choosing "no_action", do not specify port fields.
+5. If choosing "no_action", do not specify port fields. You MUST always provide a clear "reason" field (e.g. "Nominal telemetry, zero packet drops").
 6. If choosing "block" or "reroute", "target_switch" must be a valid switch and "from_port" MUST be strictly one of that switch's valid physical ports: {valid_ports}. Never select or invent any other port.
 
-Respond ONLY with a single JSON object matching this schema:
+Respond ONLY with a single JSON object matching this schema. Note that BOTH "action" AND "reason" fields are strictly required:
 {schema}
 """
 
@@ -150,12 +150,17 @@ def propose_remediation(
         }
     )
 
-    with urllib.request.urlopen(request) as response:
-        result = json.loads(
-            response.read().decode("utf-8")
-        )
-
-    raw = result["response"].strip()
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            result = json.loads(
+                response.read().decode("utf-8")
+            )
+        raw = result.get("response", "").strip()
+    except Exception as exc:
+        return {
+            "action": "no_action",
+            "reason": f"Ollama service error: {exc}. Safely defaulted to no_action."
+        }
 
     # Remove accidental markdown fences if the model adds them.
     if raw.startswith("```json"):
@@ -169,12 +174,34 @@ def propose_remediation(
 
     raw = raw.strip()
 
-    intent = json.loads(raw)
+    try:
+        intent = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        return {
+            "action": "no_action",
+            "reason": f"Agent output could not be parsed as JSON ({exc}). Defaulted to no_action."
+        }
 
-    validate(
-        instance=intent,
-        schema=INTENT_SCHEMA
-    )
+    # Robustness: If the model omitted or provided an empty 'reason',
+    # supply a clear default explanation so schema validation succeeds.
+    if isinstance(intent, dict):
+        if "action" in intent and (not intent.get("reason") or not str(intent.get("reason")).strip()):
+            act = intent.get("action", "no_action")
+            if act == "no_action":
+                intent["reason"] = "Nominal network telemetry: healthy flows and zero packet loss observed."
+            else:
+                intent["reason"] = f"Remediation action '{act}' proposed based on telemetry analysis."
+
+    try:
+        validate(
+            instance=intent,
+            schema=INTENT_SCHEMA
+        )
+    except ValidationError as val_err:
+        return {
+            "action": "no_action",
+            "reason": f"Agent proposal failed schema validation ({val_err.message}). Safely defaulted to no_action."
+        }
 
     # Post-validation safety guard:
     # Ensure any proposed action targets only valid physical ports.

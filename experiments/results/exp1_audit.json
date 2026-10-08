@@ -1,7 +1,7 @@
 [
   {
     "index": 0,
-    "timestamp": "2026-10-08T05:34:47.495979+00:00",
+    "timestamp": "2026-10-08T06:24:48.185106+00:00",
     "decision": "APPROVED",
     "intent": {
       "action": "no_action",
@@ -19,8 +19,8 @@
       ]
     },
     "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-    "current_hash": "b66071f21fdd32d8d00c576785bc87a79b512d10c70318eb4395ebe6d3fdec3c",
-    "signature": "4057735c8c1883d255b25b7af0a3e803a0d520b0972164094d31fe309230ae5f7b9636bd031408a79399cf65db5525b0720b84d5ccdc9c6ff53e47adeb5b2028",
+    "current_hash": "5ec2f3d88b2a20db168cb3b579515966c1f2f562bacf79bef1e63e95e5ef92b8",
+    "signature": "8686527e4cb0d0dc6a79e7e536ebcdc9bdff78d8f58f867e87906dfbbd47a2dcddc9b60ff75f04d587c625a6927dcce3619ccf80aec6441b1a69c4999ba344bc",
     "public_key": "b35a685817d574000efb9e14aa97285b5a0e88780cf5841c1216b066a887cc36e81143e9e44a2c313ffeef2b14863a478e861c7929db0160b1973697c1023ff8",
     "execution_result": {
       "success": true,

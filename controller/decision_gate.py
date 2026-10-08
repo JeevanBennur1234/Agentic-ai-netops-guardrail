@@ -106,9 +106,15 @@ def decide(
         telemetry_path
     )
 
-    intent = propose_remediation(
-        telemetry_path
-    )
+    try:
+        intent = propose_remediation(
+            telemetry_path
+        )
+    except Exception as exc:
+        intent = {
+            "action": "no_action",
+            "reason": f"Remediation agent error: {exc}. Defaulted safely to no_action."
+        }
 
     print("1. AGENT PROPOSED:")
     print(json.dumps(intent, indent=2))
