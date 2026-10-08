@@ -5,12 +5,16 @@ from datetime import datetime, timezone
 from ecdsa import SigningKey, VerifyingKey, NIST256p, BadSignatureError
 
 
-DEFAULT_AUDIT_LOG_PATH = os.path.expanduser(
-    "~/netops_guardrail/audit/audit_log.json"
-)
-DEFAULT_KEY_PATH = os.path.expanduser(
-    "~/netops_guardrail/audit/audit_key.pem"
-)
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DEFAULT_AUDIT_LOG_PATH = os.path.join(_PROJECT_ROOT, "audit", "audit_log.json")
+DEFAULT_KEY_PATH = os.path.join(_PROJECT_ROOT, "audit", "audit_key.pem")
+# Also support the classic home layout if the project-local files do not exist yet
+_HOME_LOG = os.path.expanduser("~/netops_guardrail/audit/audit_log.json")
+_HOME_KEY = os.path.expanduser("~/netops_guardrail/audit/audit_key.pem")
+if not os.path.exists(DEFAULT_AUDIT_LOG_PATH) and os.path.exists(_HOME_LOG):
+    DEFAULT_AUDIT_LOG_PATH = _HOME_LOG
+if not os.path.exists(DEFAULT_KEY_PATH) and os.path.exists(_HOME_KEY):
+    DEFAULT_KEY_PATH = _HOME_KEY
 GENESIS_HASH = "0" * 64
 
 

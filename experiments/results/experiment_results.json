@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-08T06:24:51.492636+00:00",
+  "timestamp": "2026-10-08T07:03:29.018976+00:00",
   "overall_status": "PASS",
   "experiment_1_normal_operation": {
     "experiment": "1. NORMAL OPERATION",
@@ -27,10 +27,7 @@
     "decision": "REJECTED",
     "verifier_safe": false,
     "rejection_reason": [
-      "PASS: Topology exists",
-      "PASS: Topology is connected",
-      "PASS: Topology is loop-free",
-      "FAIL: Unreachable host pairs: [('s1-p1', 's1-p2'), ('s1-p2', 's1-p3')]"
+      "FAIL: Port s1-p2 is an access endpoint; blocking it isolates that host with no alternate path"
     ],
     "executor_blocked": true,
     "executor_error": "Refusing execution: intent was REJECTED, not APPROVED",
@@ -113,27 +110,27 @@
       {
         "attack": "decision_tamper",
         "detected": true,
-        "error_message": "Tampering detected at record 0: Hash mismatch at index 0: computed bd39f8e5c7c1456bc82674aa19bc4971c6eae79e4e822e72974a31b9d7e0115e != stored 0e5ded744712216b61e8d93349b3b331abd1f6c0ee6307b266b6d40127b163f3"
+        "error_message": "Tampering detected at record 0: Hash mismatch at index 0: computed 82d36b33e29908cb274adcdb2c069db2dfb0e55f16da13b928b48e1c81ca0d74 != stored 39b9ecd2f44e27f6f65448af86f1d9256d316caae73e924649ab8882b3b9915a"
       },
       {
         "attack": "intent_tamper",
         "detected": true,
-        "error_message": "Tampering detected at record 1: Hash mismatch at index 1: computed 5abc9b3098ca5e30bbe442c0aa5721829408ede6e28c0aefd1172e7abe9e0ad8 != stored 3a340e3eee36a50c337c1b98c6ff1b356d906c5fb35e7cf5c94faa922287cb91"
+        "error_message": "Tampering detected at record 1: Hash mismatch at index 1: computed d7ac838c3236d013a0347d111fe2048bd4ca58ae1c331690e667aefa11dbe692 != stored ea0ccb505fff07231678b72b459d3979d2da4fc07c4ca41fe48678e82989a35c"
       },
       {
         "attack": "verifier_tamper",
         "detected": true,
-        "error_message": "Tampering detected at record 0: Hash mismatch at index 0: computed 368876148c5011fcb6fd45a9cb13af2a68646793ef1f41c55d3f1004905e3560 != stored 0e5ded744712216b61e8d93349b3b331abd1f6c0ee6307b266b6d40127b163f3"
+        "error_message": "Tampering detected at record 0: Hash mismatch at index 0: computed c5cf16ef813945d1e7145902e32446fcdd50cce779bb2bc0690ae94ecb114bbe != stored 39b9ecd2f44e27f6f65448af86f1d9256d316caae73e924649ab8882b3b9915a"
       },
       {
         "attack": "execution_tamper",
         "detected": true,
-        "error_message": "Tampering detected at record 1: Hash mismatch at index 1: computed bc2b04edc90e2a1bac190515619728605c15e3e132b4e5b8e1e5a3dd74c8bf1b != stored 3a340e3eee36a50c337c1b98c6ff1b356d906c5fb35e7cf5c94faa922287cb91"
+        "error_message": "Tampering detected at record 1: Hash mismatch at index 1: computed e5e87c7e85158dd9df42a57c5be31962d28f632ed8a5ef0ca2e11e7652b9e0f0 != stored ea0ccb505fff07231678b72b459d3979d2da4fc07c4ca41fe48678e82989a35c"
       },
       {
         "attack": "previous_hash_tamper",
         "detected": true,
-        "error_message": "Tampering detected at record 2: Broken chain at index 2: previous_hash 0000000000000000000000000000000000000000000000000000000000000000 != expected 3a340e3eee36a50c337c1b98c6ff1b356d906c5fb35e7cf5c94faa922287cb91"
+        "error_message": "Tampering detected at record 2: Broken chain at index 2: previous_hash 0000000000000000000000000000000000000000000000000000000000000000 != expected ea0ccb505fff07231678b72b459d3979d2da4fc07c4ca41fe48678e82989a35c"
       },
       {
         "attack": "signature_tamper",
@@ -147,66 +144,66 @@
   "experiment_6_performance_benchmarks": {
     "schema_validation": {
       "count": 100,
-      "mean": 1.39,
-      "median": 1.357,
-      "p95": 1.636,
-      "min": 1.297,
-      "max": 1.948
+      "mean": 1.447,
+      "median": 1.4,
+      "p95": 1.776,
+      "min": 1.319,
+      "max": 1.942
     },
     "safety_verification": {
       "count": 100,
       "mean": 0.023,
-      "median": 0.021,
-      "p95": 0.037,
-      "min": 0.02,
-      "max": 0.106
+      "median": 0.022,
+      "p95": 0.028,
+      "min": 0.021,
+      "max": 0.11
     },
     "decision_gate": {
       "count": 100,
-      "mean": 0.047,
-      "median": 0.037,
-      "p95": 0.068,
-      "min": 0.035,
-      "max": 0.586
+      "mean": 0.049,
+      "median": 0.038,
+      "p95": 0.061,
+      "min": 0.036,
+      "max": 0.872
     },
     "ovs_execution": {
       "count": 30,
-      "mean": 17.528,
-      "median": 16.553,
-      "p95": 23.543,
-      "min": 13.845,
-      "max": 24.333
+      "mean": 16.738,
+      "median": 15.752,
+      "p95": 21.623,
+      "min": 13.829,
+      "max": 24.817
     },
     "post_execution_verification": {
       "count": 30,
-      "mean": 8.305,
-      "median": 8.187,
-      "p95": 9.632,
-      "min": 7.58,
-      "max": 9.662
+      "mean": 10.225,
+      "median": 9.865,
+      "p95": 14.713,
+      "min": 7.554,
+      "max": 14.724
     },
     "cryptographic_audit": {
       "count": 50,
-      "mean": 0.928,
-      "median": 0.822,
-      "p95": 1.365,
-      "min": 0.566,
-      "max": 3.497
+      "mean": 0.902,
+      "median": 0.903,
+      "p95": 1.349,
+      "min": 0.523,
+      "max": 1.454
     },
     "agent_llm_decision": {
       "count": 3,
-      "mean": 515.115,
-      "median": 561.482,
-      "p95": 656.088,
-      "min": 327.775,
-      "max": 656.088
+      "mean": 382.522,
+      "median": 330.514,
+      "p95": 487.261,
+      "min": 329.79,
+      "max": 487.261
     },
     "guardrail_pipeline_latency": {
-      "mean": 28.221,
+      "mean": 29.384,
       "description": "Total guardrail safety layer execution without LLM inference time"
     },
     "total_end_to_end_pipeline": {
-      "mean": 543.336,
+      "mean": 411.906,
       "description": "Full end-to-end pipeline: Telemetry -> Ollama LLM -> Schema -> Verifier -> Gate -> OVS -> Audit"
     }
   },

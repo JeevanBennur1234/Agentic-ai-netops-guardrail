@@ -9,39 +9,49 @@
                     "tx_bytes": 0
                 },
                 "1": {
-                    "rx_packets": 1389,
-                    "tx_packets": 2006321,
-                    "rx_bytes": 119078,
-                    "tx_bytes": 171885148
+                    "rx_packets": 255,
+                    "tx_packets": 74088,
+                    "rx_bytes": 21938,
+                    "tx_bytes": 6367242
                 },
                 "2": {
-                    "rx_packets": 1004464,
-                    "tx_packets": 1146227,
-                    "rx_bytes": 86051162,
-                    "tx_bytes": 92018892
+                    "rx_packets": 32217392,
+                    "tx_packets": 37294,
+                    "rx_bytes": 3156854666,
+                    "tx_bytes": 3204828
                 },
                 "3": {
-                    "rx_packets": 1146189,
-                    "tx_packets": 1004493,
-                    "rx_bytes": 92016032,
-                    "tx_bytes": 86053220
+                    "rx_packets": 37290,
+                    "tx_packets": 32217423,
+                    "rx_bytes": 3204454,
+                    "tx_bytes": 3156857654
                 }
             },
             "flows": [
                 {
                     "priority": 65535,
-                    "packet_count": 58,
-                    "byte_count": 3480
+                    "packet_count": 6,
+                    "byte_count": 360
                 },
                 {
                     "priority": 1,
-                    "packet_count": 141586,
-                    "byte_count": 5946724
+                    "packet_count": 0,
+                    "byte_count": 0
+                },
+                {
+                    "priority": 1,
+                    "packet_count": 31690717,
+                    "byte_count": 3105690266
+                },
+                {
+                    "priority": 1,
+                    "packet_count": 0,
+                    "byte_count": 0
                 },
                 {
                     "priority": 0,
-                    "packet_count": 2010329,
-                    "byte_count": 172230118
+                    "packet_count": 74175,
+                    "byte_count": 6374862
                 }
             ]
         },
@@ -54,44 +64,44 @@
                     "tx_bytes": 0
                 },
                 "1": {
-                    "rx_packets": 6697,
-                    "tx_packets": 2006169,
-                    "rx_bytes": 344502,
-                    "tx_bytes": 171872428
+                    "rx_packets": 37300,
+                    "tx_packets": 32218147,
+                    "rx_bytes": 3205348,
+                    "tx_bytes": 3156928644
                 },
                 "2": {
-                    "rx_packets": 1146227,
-                    "tx_packets": 1004472,
-                    "rx_bytes": 92018892,
-                    "tx_bytes": 86051850
+                    "rx_packets": 32218198,
+                    "tx_packets": 37291,
+                    "rx_bytes": 3156933536,
+                    "tx_bytes": 3204540
                 },
                 "3": {
-                    "rx_packets": 1004493,
-                    "tx_packets": 1146199,
-                    "rx_bytes": 86053220,
-                    "tx_bytes": 92016892
+                    "rx_packets": 285,
+                    "tx_packets": 74018,
+                    "rx_bytes": 24518,
+                    "tx_bytes": 6361146
                 }
             },
             "flows": [
                 {
                     "priority": 65535,
-                    "packet_count": 58,
-                    "byte_count": 3480
+                    "packet_count": 6,
+                    "byte_count": 360
                 },
                 {
                     "priority": 1,
-                    "packet_count": 5258,
-                    "byte_count": 220948
+                    "packet_count": 31690723,
+                    "byte_count": 3105690854
                 },
                 {
                     "priority": 1,
-                    "packet_count": 141584,
-                    "byte_count": 5946640
+                    "packet_count": 0,
+                    "byte_count": 0
                 },
                 {
                     "priority": 0,
-                    "packet_count": 2010447,
-                    "byte_count": 172239514
+                    "packet_count": 74205,
+                    "byte_count": 6377390
                 }
             ]
         }
@@ -99,25 +109,25 @@
     "links": [
         {
             "src_switch": "2",
-            "src_port": "3",
+            "src_port": "2",
             "dst_switch": "1",
             "dst_port": "3"
         },
         {
             "src_switch": "2",
-            "src_port": "2",
+            "src_port": "1",
             "dst_switch": "1",
             "dst_port": "2"
         },
         {
             "src_switch": "1",
-            "src_port": "3",
+            "src_port": "2",
             "dst_switch": "2",
-            "dst_port": "3"
+            "dst_port": "1"
         },
         {
             "src_switch": "1",
-            "src_port": "2",
+            "src_port": "3",
             "dst_switch": "2",
             "dst_port": "2"
         }

@@ -1,10 +1,10 @@
 Component,Count,Mean (ms),Median (ms),P95 (ms),Min (ms),Max (ms)
-schema_validation,100,1.39,1.357,1.636,1.297,1.948
-safety_verification,100,0.023,0.021,0.037,0.02,0.106
-decision_gate,100,0.047,0.037,0.068,0.035,0.586
-ovs_execution,30,17.528,16.553,23.543,13.845,24.333
-post_execution_verification,30,8.305,8.187,9.632,7.58,9.662
-cryptographic_audit,50,0.928,0.822,1.365,0.566,3.497
-agent_llm_decision,3,515.115,561.482,656.088,327.775,656.088
-guardrail_pipeline_latency,-,28.221,-,-,-,-
-total_end_to_end_pipeline,-,543.336,-,-,-,-
+schema_validation,100,1.447,1.4,1.776,1.319,1.942
+safety_verification,100,0.023,0.022,0.028,0.021,0.11
+decision_gate,100,0.049,0.038,0.061,0.036,0.872
+ovs_execution,30,16.738,15.752,21.623,13.829,24.817
+post_execution_verification,30,10.225,9.865,14.713,7.554,14.724
+cryptographic_audit,50,0.902,0.903,1.349,0.523,1.454
+agent_llm_decision,3,382.522,330.514,487.261,329.79,487.261
+guardrail_pipeline_latency,-,29.384,-,-,-,-
+total_end_to_end_pipeline,-,411.906,-,-,-,-

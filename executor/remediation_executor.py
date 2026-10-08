@@ -37,9 +37,13 @@ class RemediationExecutor:
         audit_trail=None,
         topology_provider=None
     ):
-        self.telemetry_path = telemetry_path or os.path.expanduser(
-            "~/netops_guardrail/telemetry/data/latest.json"
-        )
+        if telemetry_path is not None:
+            self.telemetry_path = telemetry_path
+        else:
+            _root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            _local = os.path.join(_root, "telemetry", "data", "latest.json")
+            _home = os.path.expanduser("~/netops_guardrail/telemetry/data/latest.json")
+            self.telemetry_path = _local if os.path.exists(_local) else _home
         self.cmd_runner = cmd_runner or self._default_cmd_runner
         self.audit_trail = audit_trail
         self.topology_provider = topology_provider

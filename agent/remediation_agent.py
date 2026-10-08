@@ -13,8 +13,11 @@ MODEL = os.environ.get(
     "OLLAMA_MODEL",
     "qwen2.5-coder:1.5b"
 )
-DEFAULT_TELEMETRY_PATH = os.path.expanduser(
-    "~/netops_guardrail/telemetry/data/latest.json"
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+_LOCAL_TELEMETRY = os.path.join(_PROJECT_ROOT, "telemetry", "data", "latest.json")
+_HOME_TELEMETRY = os.path.expanduser("~/netops_guardrail/telemetry/data/latest.json")
+DEFAULT_TELEMETRY_PATH = (
+    _LOCAL_TELEMETRY if os.path.exists(_LOCAL_TELEMETRY) else _HOME_TELEMETRY
 )
 
 INTENT_SCHEMA = {
