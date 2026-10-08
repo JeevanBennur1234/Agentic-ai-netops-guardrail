@@ -162,7 +162,7 @@ def check_reachability(graph, required_hosts=None):
     return True, "PASS: All required endpoints mutually reachable"
 
 
-def run_safety_checks(graph, required_hosts=None, require_loop_free=False):
+def run_safety_checks(graph, required_hosts=None, require_loop_free=True):
     """
     Run safety checks and aggregate results.
 

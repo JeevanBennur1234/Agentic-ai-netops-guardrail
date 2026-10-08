@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import json
 import sys
 import os
@@ -30,6 +31,9 @@ _HOME_TELEMETRY = os.path.expanduser("~/netops_guardrail/telemetry/data/latest.j
 DEFAULT_TELEMETRY_PATH = (
     _LOCAL_TELEMETRY if os.path.exists(_LOCAL_TELEMETRY) else _HOME_TELEMETRY
 )
+_TRACE_DIR = os.path.join(_PROJECT_ROOT, "observability", "data")
+_TRACE_FILE = os.path.join(_TRACE_DIR, "pipeline_trace.jsonl")
+
 
 audit_trail = AuditTrail()
 
@@ -135,13 +139,24 @@ def decide(
         f"index={record['index']} hash={record['current_hash'][:16]}..."
     )
 
-    return {
+    res = {
         "intent": intent,
         "verification": result,
         "decision": decision,
         "execution": execution_res,
         "audit_record": record
     }
+
+    try:
+        os.makedirs(_TRACE_DIR, exist_ok=True)
+        trace_entry = dict(res)
+        trace_entry["timestamp"] = datetime.now(timezone.utc).isoformat()
+        with open(_TRACE_FILE, "a", encoding="utf-8") as f:
+            f.write(json.dumps(trace_entry) + "\n")
+    except Exception as e:
+        print(f"Warning: Failed to write to pipeline trace log ({e})")
+
+    return res
 
 
 if __name__ == "__main__":

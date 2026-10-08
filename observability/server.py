@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from flask import Flask, Response, jsonify, request, render_template_string
+from flask import Flask, Response, jsonify, request, render_template_string, send_file
 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 for subdir in ["verifier", "audit", "agent", "controller", "executor", "observability"]:
@@ -483,7 +483,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 """
 
 
-def create_metrics_app(telemetry_path=None, audit_log_path=None):
+def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=None):
     """
     Factory function for the Flask Observability & Metrics server.
     Provides Prometheus metrics on /metrics, JSON on /metrics/json,
@@ -495,6 +495,7 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None):
         audit_log_path=audit_log_path
     )
     audit = AuditTrail(log_path=audit_log_path, auto_load=True)
+    trace_file = trace_log_path or os.path.join(base_dir, "observability", "data", "pipeline_trace.jsonl")
 
     @app.route("/health", methods=["GET"])
     def health():
@@ -517,6 +518,9 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None):
 
     @app.route("/dashboard", methods=["GET"])
     def dashboard():
+        dash_path = os.path.join(base_dir, "dashboard", "index.html")
+        if os.path.exists(dash_path):
+            return send_file(dash_path)
         return render_template_string(DASHBOARD_HTML)
 
     @app.route("/api/status", methods=["GET"])
@@ -598,11 +602,102 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None):
             "audit_record": record
         }), 200
 
+
+    @app.route("/api/topology", methods=["GET"])
+    def api_topology():
+        telem_path = collector.telemetry_path
+        if not os.path.exists(telem_path):
+            return jsonify({"nodes": [], "edges": []}), 200
+        try:
+            with open(telem_path, "r", encoding="utf-8") as f:
+                telem = json.load(f)
+            if not isinstance(telem, dict):
+                return jsonify({"nodes": [], "edges": []}), 200
+            graph = build_topology(telem)
+            nodes = [
+                {"id": str(n), "type": graph.nodes[n].get("type", "unknown")}
+                for n in graph.nodes
+            ]
+            edges = [
+                {"source": str(u), "target": str(v)}
+                for u, v in graph.edges
+            ]
+            return jsonify({"nodes": nodes, "edges": edges}), 200
+        except Exception:
+            return jsonify({"nodes": [], "edges": []}), 200
+
+    @app.route("/api/pipeline/trace", methods=["GET"])
+    def api_pipeline_trace():
+        try:
+            limit = int(request.args.get("limit", 20))
+            if limit < 1:
+                limit = 20
+        except (ValueError, TypeError):
+            limit = 20
+
+        if not os.path.exists(trace_file):
+            return jsonify([]), 200
+
+        try:
+            with open(trace_file, "r", encoding="utf-8") as f:
+                lines = [line.strip() for line in f if line.strip()]
+            records = []
+            for line in lines[-limit:]:
+                try:
+                    records.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+            return jsonify(records), 200
+        except Exception:
+            return jsonify([]), 200
+
+    @app.route("/api/audit/chain", methods=["GET"])
+    def api_audit_chain():
+        try:
+            limit = int(request.args.get("limit", 20))
+            if limit < 1:
+                limit = 20
+        except (ValueError, TypeError):
+            limit = 20
+
+        log_path = collector.audit_log_path
+        if not os.path.exists(log_path):
+            return jsonify([]), 200
+
+        try:
+            with open(log_path, "r", encoding="utf-8") as f:
+                records = json.load(f)
+            if not isinstance(records, list):
+                return jsonify([]), 200
+
+            chain_summary = []
+            for r in records[-limit:]:
+                intent = r.get("intent") or {}
+                action = (
+                    intent.get("action", "unknown")
+                    if isinstance(intent, dict)
+                    else str(intent)
+                )
+                curr_hash = str(r.get("current_hash", ""))
+                chain_summary.append({
+                    "index": r.get("index"),
+                    "decision": r.get("decision"),
+                    "action": action,
+                    "current_hash": curr_hash[:16] if len(curr_hash) >= 16 else curr_hash,
+                    "timestamp": r.get("timestamp")
+                })
+            return jsonify(chain_summary), 200
+        except Exception:
+            return jsonify([]), 200
+
     @app.route("/", methods=["GET"])
     def index():
         # If requested by a web browser, serve the interactive visual dashboard
         accept_header = request.headers.get("Accept", "")
         if "text/html" in accept_header:
+            dash_path = os.path.join(base_dir, "dashboard", "index.html")
+            if os.path.exists(dash_path):
+                return send_file(dash_path)
             return render_template_string(DASHBOARD_HTML)
         # Default API response for automated tests / API clients
         return jsonify({
@@ -613,7 +708,10 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None):
                 "/metrics/json",
                 "/dashboard",
                 "/api/status",
-                "/api/simulate"
+                "/api/simulate",
+                "/api/topology",
+                "/api/pipeline/trace",
+                "/api/audit/chain"
             ]
         }), 200
 
