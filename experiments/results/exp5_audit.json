@@ -1,7 +1,7 @@
 [
   {
     "index": 0,
-    "timestamp": "2026-10-07T14:15:30.955667+00:00",
+    "timestamp": "2026-10-08T05:34:48.001251+00:00",
     "decision": "APPROVED",
     "intent": {
       "action": "no_action"
@@ -10,13 +10,13 @@
       "safe": true
     },
     "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-    "current_hash": "429248e65ca7a122359e1e8ce9720dd1b70cc916b0602cb06890637192537b60",
-    "signature": "ca4f1455856e95c524e3556cf5e69907b01a9581318095bda2c92d7eb6e43cc1de8b7ffd99bdc5789419f80f13b6213c37375ff7f98132d1b927c868cf66851b",
+    "current_hash": "9fd1c1dcf85e5f4b99358d5398251105a63638f73ccfed6116000ee07956bbba",
+    "signature": "437f0e4180862ab85a783c7433ac99510496b2ae8bce8347e8459ba945023791bf91f1f010ffd7ea1bbd5a535d1645ef86bb6f9273269443345f3145ab04b866",
     "public_key": "398149df9a030c82c198766770ac9e6ba4e7a129ce9c483c6ddbcc6e570ded50b76c5c03829a03d83c582c40842f8e2a1fb3d51764c7fffd9254e9211d90e12d"
   },
   {
     "index": 1,
-    "timestamp": "2026-10-07T14:15:30.956402+00:00",
+    "timestamp": "2026-10-08T05:34:48.002928+00:00",
     "decision": "APPROVED",
     "intent": {
       "action": "block",
@@ -26,9 +26,9 @@
     "verifier_result": {
       "safe": true
     },
-    "previous_hash": "429248e65ca7a122359e1e8ce9720dd1b70cc916b0602cb06890637192537b60",
-    "current_hash": "41815583abda666b0c522ce2302a1808fa1b7bb46244ae8e5dab3de93827c761",
-    "signature": "4b183bb7099405ef9a136d5d8573c1902cd64ccca206118cd1c72bbbcaba2f58fba7e4d9f292e4228def67b8273a832069fe35f5cb9f6d5b34359939ef9e8c8e",
+    "previous_hash": "9fd1c1dcf85e5f4b99358d5398251105a63638f73ccfed6116000ee07956bbba",
+    "current_hash": "fc07c8b8549a55a39f543390368bd5ad2068b97e0e058479273e96e0e5475fea",
+    "signature": "fe3122e8033968e265b82f66b5a2a2c38df251672b6d954cab7aa6cb00e67d3008dca04762af44f4feda33a29ca219e86699edf317692ab9f23d7f44dfa07ec2",
     "public_key": "398149df9a030c82c198766770ac9e6ba4e7a129ce9c483c6ddbcc6e570ded50b76c5c03829a03d83c582c40842f8e2a1fb3d51764c7fffd9254e9211d90e12d",
     "execution_result": {
       "success": true,
@@ -38,7 +38,7 @@
   },
   {
     "index": 2,
-    "timestamp": "2026-10-07T14:15:30.957007+00:00",
+    "timestamp": "2026-10-08T05:34:48.004775+00:00",
     "decision": "REJECTED",
     "intent": {
       "action": "block",
@@ -47,9 +47,9 @@
     "verifier_result": {
       "safe": false
     },
-    "previous_hash": "41815583abda666b0c522ce2302a1808fa1b7bb46244ae8e5dab3de93827c761",
-    "current_hash": "8dc357bdad3e938db6103c770a5c4ea73dbcd8d68b9b3c0d31edbeff9f739d29",
-    "signature": "e2dabc0721677cc34dde1bdaf2c21f9f62d9c821a9159d70fb545b59aa3b98846e4882e80ec91f1f96d6dbf144b8c90e7f6efb8734124a6fa3d4f6e467f384c5",
+    "previous_hash": "fc07c8b8549a55a39f543390368bd5ad2068b97e0e058479273e96e0e5475fea",
+    "current_hash": "c102f23c753cd9eb279bf668046a2f78c0be2dce8ba5c5a6c0eecee63095cab0",
+    "signature": "edfc19b1b892c617a8fcb8f83a6add117a394b06a193e1ff646494d19b6343ecbefabb201f546908136e69c865a260856a0bee52b9d8236a67dd0d09f7889e5f",
     "public_key": "398149df9a030c82c198766770ac9e6ba4e7a129ce9c483c6ddbcc6e570ded50b76c5c03829a03d83c582c40842f8e2a1fb3d51764c7fffd9254e9211d90e12d"
   }
 ]

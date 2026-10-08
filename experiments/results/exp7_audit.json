@@ -1,7 +1,7 @@
 [
   {
     "index": 0,
-    "timestamp": "2026-10-07T14:15:49.713392+00:00",
+    "timestamp": "2026-10-08T05:35:05.288404+00:00",
     "decision": "APPROVED",
     "intent": {
       "action": "no_action"
@@ -10,8 +10,8 @@
       "safe": true
     },
     "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-    "current_hash": "2be12ac51fbb782fbb5c3b16cb6b86ba08245cb8ba054771b704bc701f810f37",
-    "signature": "b8d696e0311172c8f0fafc1768e50b23b807ed5d8267baab9f21038db6f931cc425e38a3dc2a777e236969ca123a610745ad916285bd3400e7618ff585571862",
+    "current_hash": "0742bd863f7cefa6a5f10d4e945456d957c424169f9f24f62945f538cfef5bf8",
+    "signature": "cf28c8c1fa98694454709e895f4d9a8ac67dad5a3149136608a544f32663090cb57e841cb23890100d65f097e5ac47086012879d8f637d74341ee74dfd8511d9",
     "public_key": "f11166fdc23f2f8c792759b89411d7e251d036f82f193d9eac4ad60345cf4fc1407f268fe3e397fca4324a3f50fea4796f50c84410b594ae40c3eb7120e86ff3",
     "execution_result": {
       "success": true,
@@ -21,7 +21,7 @@
   },
   {
     "index": 1,
-    "timestamp": "2026-10-07T14:15:49.714211+00:00",
+    "timestamp": "2026-10-08T05:35:05.290616+00:00",
     "decision": "REJECTED",
     "intent": {
       "action": "block",
@@ -30,9 +30,9 @@
     "verifier_result": {
       "safe": false
     },
-    "previous_hash": "2be12ac51fbb782fbb5c3b16cb6b86ba08245cb8ba054771b704bc701f810f37",
-    "current_hash": "b9461714a0b8f27a6a88449e00e75b3d8433bbf4fc0abd925e914370f8b7bfd5",
-    "signature": "4b23faf48c8eee6db5f3d3ec2f115697c1db390a7d526370995e037b6f5eb4505f7af98234e39b8a39ea3d13138528c553cc9f3b2ce0489090731d18b9497c50",
+    "previous_hash": "0742bd863f7cefa6a5f10d4e945456d957c424169f9f24f62945f538cfef5bf8",
+    "current_hash": "75fd529db0c501769cdb2258f1c5306df243811f2fc76b25232d178221904dd9",
+    "signature": "47bd0dac6383d0700f557d2e4a4e9835213e8eddbf401d628ab96a36a38d16d8174147aa82bb3df447bc8b1e3eaed8ddd89e3a3094a32ad596f24ce40a41b7d1",
     "public_key": "f11166fdc23f2f8c792759b89411d7e251d036f82f193d9eac4ad60345cf4fc1407f268fe3e397fca4324a3f50fea4796f50c84410b594ae40c3eb7120e86ff3"
   }
 ]
