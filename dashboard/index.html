@@ -488,9 +488,66 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    /* Chaos Fault Injection Button (Distinct Amber/Red) */
+    .chaos-btn {
+      background: linear-gradient(135deg, #b45309, #dc2626);
+      color: #ffffff;
+      border: 1px solid #f87171;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chaos-btn:hover {
+      background: linear-gradient(135deg, #d97706, #ef4444);
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .chaos-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Chaos Notification Toast */
+    .toast {
+      position: fixed;
+      top: 68px;
+      right: 24px;
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid #f59e0b;
+      color: #fef3c7;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: monospace;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      max-width: 480px;
+      word-break: break-all;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
   </style>
 </head>
 <body>
+  <div id="toast" class="toast"></div>
 
   <!-- Top Banner -->
   <header>
@@ -501,6 +558,9 @@
       </div>
     </div>
     <div class="system-status">
+      <button id="chaos-btn" class="chaos-btn" onclick="triggerChaosLoop()">
+        ⚠ Inject Fault (Restore Redundant Loop)
+      </button>
       <div class="status-badge">
         <span class="pulsing-dot"></span>
         <span>GUARDRAIL ACTIVE</span>
@@ -853,6 +913,35 @@
     setInterval(updateTopology, 2000);
     setInterval(updatePipelineTrace, 2000);
     setInterval(updateAuditChain, 2000);
+  
+    // =========================================================================
+    // Chaos Fault Injection Handler
+    // =========================================================================
+    async function triggerChaosLoop() {
+      const ok = confirm("This will reintroduce a physical network loop for demonstration. Continue?");
+      if (!ok) return;
+
+      try {
+        const resp = await fetch('/api/chaos/inject-loop?confirm=true', {
+          method: 'POST'
+        });
+        const data = await resp.json();
+        showToast(JSON.stringify(data));
+      } catch (err) {
+        showToast("Error: " + err.message);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => {
+        t.classList.remove('show');
+      }, 3000);
+    }
+
   </script>
 </body>
 </html>

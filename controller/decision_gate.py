@@ -75,8 +75,7 @@ def apply_intent_to_graph(graph, intent):
         return test_port_removal(sim_graph, port_node)
 
     elif action == "no_action":
-        # Baseline topology check — cycles from redundancy are allowed
-        return run_safety_checks(sim_graph, require_loop_free=False)
+        return run_safety_checks(sim_graph)
 
     else:
         return {

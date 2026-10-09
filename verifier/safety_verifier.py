@@ -203,7 +203,7 @@ def run_safety_checks(graph, required_hosts=None, require_loop_free=True):
     }
 
 
-def test_port_removal(graph, port_node, required_hosts=None):
+def test_port_removal(graph, port_node, required_hosts=None, require_loop_free=True):
     """
     Simulate removing a port and re-check safety invariants.
 
@@ -251,7 +251,7 @@ def test_port_removal(graph, port_node, required_hosts=None):
     return run_safety_checks(
         test_graph,
         required_hosts=endpoints,
-        require_loop_free=False
+        require_loop_free=require_loop_free
     )
 
 

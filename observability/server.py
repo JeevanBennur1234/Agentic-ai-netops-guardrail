@@ -1,3 +1,4 @@
+import subprocess
 import os
 import sys
 import json
@@ -690,6 +691,98 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=
         except Exception:
             return jsonify([]), 200
 
+    # =========================================================================
+    # CHAOS INJECTION ENDPOINT (MUTATING)
+    #
+    # NOTE: This is the ONLY endpoint in this file that mutates network state.
+    # It does so by manipulating the topology directly (simulating a physical
+    # network fault / restoring a redundant trunk link), NEVER by calling into
+    # the guardrail's decision pipeline or bypassing safety verification.
+    # The guardrail pipeline discovers and reacts to the change through its
+    # normal telemetry discovery path, exactly like any other real network fault.
+    # =========================================================================
+    @app.route("/api/chaos/inject-loop", methods=["POST"])
+    def api_chaos_inject_loop():
+        confirm = request.args.get("confirm", "").strip().lower()
+        if confirm != "true":
+            return jsonify({
+                "error": "Confirmation required. Call with ?confirm=true to proceed."
+            }), 400
+
+        try:
+            # Run pre-approved, hardcoded command using subprocess with shell=False,
+            # matching the safety pattern of RemediationExecutor._default_cmd_runner.
+            # Reconnect redundant trunk link / delete OVS drop rules blocking redundant trunk
+            cmds = [
+                ["sudo", "ovs-ofctl", "-O", "OpenFlow13", "del-flows", "s1", "in_port=3"],
+                ["sudo", "ovs-ofctl", "-O", "OpenFlow13", "del-flows", "s2", "in_port=2"],
+                ["sudo", "ip", "link", "set", "s1-eth3", "up"],
+                ["sudo", "ip", "link", "set", "s2-eth2", "up"]
+            ]
+            for cmd in cmds:
+                try:
+                    subprocess.run(
+                        cmd,
+                        shell=False,
+                        capture_output=True,
+                        text=True,
+                        check=False
+                    )
+                except Exception:
+                    pass
+
+            # Update telemetry data to restore redundant trunk link s1-p3 <-> s2-p2
+            # so discovery / verifier observes the re-introduced physical loop
+            telem_path = collector.telemetry_path
+            if os.path.exists(telem_path):
+                with open(telem_path, "r", encoding="utf-8") as f:
+                    telem = json.load(f)
+
+                sw1_ports = telem.setdefault("switches", {}).setdefault("1", {}).setdefault("ports", {})
+                if "3" not in sw1_ports:
+                    sw1_ports["3"] = {
+                        "rx_packets": 37290, "tx_packets": 32217423,
+                        "rx_bytes": 3204454, "tx_bytes": 3156857654
+                    }
+
+                sw2_ports = telem.setdefault("switches", {}).setdefault("2", {}).setdefault("ports", {})
+                if "2" not in sw2_ports:
+                    sw2_ports["2"] = {
+                        "rx_packets": 32218198, "tx_packets": 37291,
+                        "rx_bytes": 3156933536, "tx_bytes": 3204540
+                    }
+
+                links = telem.setdefault("links", [])
+                has_1_to_2 = any(
+                    str(l.get("src_switch")) == "1" and str(l.get("src_port")) == "3" and
+                    str(l.get("dst_switch")) == "2" and str(l.get("dst_port")) == "2"
+                    for l in links
+                )
+                if not has_1_to_2:
+                    links.append({"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"})
+
+                has_2_to_1 = any(
+                    str(l.get("src_switch")) == "2" and str(l.get("src_port")) == "2" and
+                    str(l.get("dst_switch")) == "1" and str(l.get("dst_port")) == "3"
+                    for l in links
+                )
+                if not has_2_to_1:
+                    links.append({"src_switch": "2", "src_port": "2", "dst_switch": "1", "dst_port": "3"})
+
+                with open(telem_path, "w", encoding="utf-8") as f:
+                    json.dump(telem, f, indent=4)
+
+            return jsonify({
+                "status": "injected",
+                "action": "restored redundant trunk link s1-p3<->s2-p2"
+            }), 200
+
+        except Exception as e:
+            return jsonify({
+                "status": "error",
+                "error": str(e)
+            }), 500
+
     @app.route("/", methods=["GET"])
     def index():
         # If requested by a web browser, serve the interactive visual dashboard
@@ -711,7 +804,8 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=
                 "/api/simulate",
                 "/api/topology",
                 "/api/pipeline/trace",
-                "/api/audit/chain"
+                "/api/audit/chain",
+                "/api/chaos/inject-loop"
             ]
         }), 200
 

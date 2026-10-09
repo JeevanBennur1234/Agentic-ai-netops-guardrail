@@ -141,3 +141,37 @@ def test_json_schema_validation():
     }
     with pytest.raises(ValidationError):
         validate(instance=invalid_intent, schema=INTENT_SCHEMA)
+
+
+def _build_redundant_dual_trunk_graph():
+    """Build the known 2-switch, dual-trunk topology (s1-p2<->s2-p1, s1-p3<->s2-p2)."""
+    import networkx as nx
+    graph = nx.Graph()
+    graph.add_node("s1", type="switch")
+    graph.add_node("s2", type="switch")
+    for p in ["1", "2", "3"]:
+        graph.add_node(f"s1-p{p}", type="port")
+        graph.add_edge("s1", f"s1-p{p}")
+        graph.add_node(f"s2-p{p}", type="port")
+        graph.add_edge("s2", f"s2-p{p}")
+    graph.add_edge("s1-p2", "s2-p1")
+    graph.add_edge("s1-p3", "s2-p2")
+    return graph
+
+
+def test_redundant_topology_loop_detected_as_unsafe():
+    # Build the known 2-switch, dual-trunk topology (s1-p2<->s2-p1,
+    # s1-p3<->s2-p2) exactly as used in the live redundant-topology demo
+    graph = _build_redundant_dual_trunk_graph()
+    result = run_safety_checks(graph)
+    assert result["safe"] is False
+    assert any("Loop" in c and "FAIL" in c for c in result["checks"])
+
+
+def test_no_action_rejected_when_loop_present():
+    # Same topology, through the full decision_gate.py path
+    graph = _build_redundant_dual_trunk_graph()
+    intent = {"action": "no_action", "reason": "test"}
+    result = apply_intent_to_graph(graph, intent)
+    assert result["safe"] is False
+    assert any("Loop" in c and "FAIL" in c for c in result["checks"])
