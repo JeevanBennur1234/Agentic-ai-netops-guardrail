@@ -95,6 +95,26 @@
       border: 1px solid var(--border-color);
     }
 
+    .approval-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border: 1px solid rgba(6, 182, 212, 0.65);
+      border-radius: 8px;
+      background: rgba(6, 182, 212, 0.10);
+      color: #a5f3fc;
+      text-decoration: none;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+    .approval-link:hover, .approval-link:focus-visible {
+      background: rgba(6, 182, 212, 0.20);
+      border-color: var(--accent-cyan);
+      outline: none;
+    }
+
     .pulsing-dot {
       width: 8px;
       height: 8px;
@@ -175,6 +195,17 @@
       box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.2), 0 0 25px rgba(239, 68, 68, 0.25);
     }
 
+    /* Lifecycle states must not look like a successful safety/execution result. */
+    #panel-topology.tint-pending {
+      border: 2px solid #f59e0b;
+      box-shadow: inset 0 0 40px rgba(245, 158, 11, 0.10), 0 0 20px rgba(245, 158, 11, 0.20);
+    }
+
+    #panel-topology.tint-human-approved {
+      border: 2px solid #60a5fa;
+      box-shadow: inset 0 0 40px rgba(96, 165, 250, 0.10), 0 0 20px rgba(96, 165, 250, 0.20);
+    }
+
     #topology-canvas {
       flex: 1;
       width: 100%;
@@ -232,6 +263,18 @@
       background-color: var(--rejected-bg);
       color: var(--rejected-red);
       border: 1px solid var(--rejected-red);
+    }
+
+    .tag-pending-state {
+      background-color: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      border: 1px solid #f59e0b;
+    }
+
+    .tag-human-approved {
+      background-color: rgba(96, 165, 250, 0.12);
+      color: #93c5fd;
+      border: 1px solid #60a5fa;
     }
 
     /* Right Column: Split Panels */
@@ -516,6 +559,26 @@
       transform: translateY(1px);
     }
 
+    .scenario-btn {
+      background: linear-gradient(135deg, #1d4ed8, #6d28d9);
+      color: #ffffff;
+      border: 1px solid #818cf8;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .scenario-btn:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+    .scenario-btn:disabled { opacity: 0.6; cursor: wait; }
+    @media (max-width: 1250px) {
+      .system-status { flex-wrap: wrap; justify-content: flex-end; }
+    }
+
     /* Chaos Notification Toast */
     .toast {
       position: fixed;
@@ -558,8 +621,14 @@
       </div>
     </div>
     <div class="system-status">
+      <a class="approval-link" href="/approvals" target="_blank" rel="noopener noreferrer" aria-label="Open Human Verifier approval queue">
+        👤 Human Verifier
+      </a>
       <button id="chaos-btn" class="chaos-btn" onclick="triggerChaosLoop()">
-        ⚠ Inject Fault (Restore Redundant Loop)
+        ⚠ Inject Fault -> AI Proposal
+      </button>
+      <button id="issue2-btn" class="scenario-btn" title="Issue 2 controlled demo signal; does not modify switch or STP state" onclick="triggerStandbyAnomaly()">
+        ◈ Issue 2: Standby Forwarding
       </button>
       <div class="status-badge">
         <span class="pulsing-dot"></span>
@@ -580,8 +649,9 @@
         <div class="panel-title">
           <span>Topology Graph</span>
         </div>
-        <div id="tint-badge" class="tint-status-tag tag-safe">
-          ● VERIFIER: EVALUATING
+        <div id="tint-badge" class="tint-status-tag tag-pending-state"
+             title="Loading latest status. Safety verification, human approval, and execution are separate stages.">
+          ● STATUS: LOADING
         </div>
       </div>
       <div id="topology-canvas">
@@ -741,21 +811,82 @@
       }
     }
 
-    // Apply Red / Green tint to topology based on most recent pipeline verification.safe
-    function applyTopologyTint(isSafe) {
+    function approvalInfoForTrace(record) {
+      return record?.human_approval ||
+        record?.audit_record?.execution_result?.human_approval ||
+        {};
+    }
+
+    // Status precedence is intentional:
+    // real execution success > active human approval state > safety result.
+    function applyTopologyStatus(record) {
       const panel = document.getElementById('panel-topology');
       const tintBadge = document.getElementById('tint-badge');
+      if (!record || !panel || !tintBadge) return;
 
-      if (isSafe === null) return;
+      const approval = approvalInfoForTrace(record);
+      const decision = String(record.decision || '').toUpperCase();
+      const approvalStatus = String(approval.status || '').toLowerCase();
+      const execution = record.execution ||
+        record.audit_record?.execution_result?.execution ||
+        record.execution_result || {};
+      const executionSucceeded = execution.success === true ||
+        ['success', 'succeeded'].includes(String(execution.status || '').toLowerCase());
 
-      if (isSafe === true) {
-        panel.className = 'panel tint-safe';
-        tintBadge.className = 'tint-status-tag tag-safe';
-        tintBadge.innerText = '● VERIFIER: SAFE (APPROVED)';
+      const setState = (panelClass, badgeClass, label, explanation) => {
+        panel.className = 'panel ' + panelClass;
+        tintBadge.className = 'tint-status-tag ' + badgeClass;
+        tintBadge.innerText = label;
+        tintBadge.title = explanation;
+      };
+
+      if (executionSucceeded) {
+        setState('tint-safe', 'tag-safe', '● EXECUTION: SUCCESS',
+          'The executor reported success. Check the pipeline trace and connectivity result for details.');
+        return;
+      }
+
+      if (decision === 'PENDING_HUMAN_APPROVAL' || approvalStatus === 'pending') {
+        const expiry = Date.parse(approval.expires_at || '');
+        const isExpired = Number.isFinite(expiry) && expiry <= Date.now();
+        setState('tint-pending', 'tag-pending-state',
+          isExpired ? '● APPROVAL: EXPIRED' : '● HUMAN APPROVAL: PENDING',
+          isExpired
+            ? 'This proposal has expired and cannot be approved for execution.'
+            : 'Safety checks are separate from approval. A human decision is still required; remediation has not executed.');
+        return;
+      }
+
+      if (decision === 'REJECTED' || approvalStatus === 'rejected') {
+        setState('tint-unsafe', 'tag-unsafe', '● HUMAN DECISION: REJECTED',
+          'The human reviewer rejected this proposal. It must not be executed.');
+        return;
+      }
+
+      if (decision === 'CHANGES_REQUESTED' || approvalStatus === 'changes_requested') {
+        setState('tint-pending', 'tag-pending-state', '● HUMAN REVIEW: CHANGES REQUESTED',
+          'The reviewer requested changes. This proposal has not been authorized for execution.');
+        return;
+      }
+
+      if (decision === 'APPROVED' || approvalStatus === 'approved') {
+        setState('tint-human-approved', 'tag-human-approved',
+          '● HUMAN APPROVAL: APPROVED · NOT EXECUTED',
+          'Approval was recorded, but that alone does not mean remediation executed successfully.');
+        return;
+      }
+
+      const safe = record.verification?.safe ??
+        record.audit_record?.verifier_result?.safe;
+      if (safe === true) {
+        setState('tint-safe', 'tag-safe', '● SAFETY CHECK: PASS',
+          'Automated safety verification passed. This is not human approval or execution status.');
+      } else if (safe === false) {
+        setState('tint-unsafe', 'tag-unsafe', '● SAFETY CHECK: FAIL (BLOCKED)',
+          'Automated safety verification failed; remediation should remain blocked.');
       } else {
-        panel.className = 'panel tint-unsafe';
-        tintBadge.className = 'tint-status-tag tag-unsafe';
-        tintBadge.innerText = '● VERIFIER: UNSAFE (FAIL-CLOSED)';
+        setState('', 'tag-pending-state', '● STATUS: NOT AVAILABLE',
+          'No safety, human approval, or execution result is available in the latest trace record.');
       }
     }
 
@@ -779,11 +910,32 @@
           return;
         }
 
-        // Most recent trace entry drives topology tint
-        const latest = records[records.length - 1];
-        if (latest && latest.verification) {
-          applyTopologyTint(latest.verification.safe);
+        // Resolve the newest human decision per proposal first. A pending proposal
+        // remains visible even if a different, older proposal was approved later.
+        const chronological = records.slice().sort((a, b) => {
+          const aTime = Date.parse(a.timestamp || '') || 0;
+          const bTime = Date.parse(b.timestamp || '') || 0;
+          return aTime - bTime;
+        });
+        const latestByProposal = new Map();
+        for (const item of chronological) {
+          const approval = approvalInfoForTrace(item);
+          if (approval.proposal_id) latestByProposal.set(approval.proposal_id, item);
         }
+        const activePending = chronological.filter(item => {
+          const approval = approvalInfoForTrace(item);
+          if (!approval.proposal_id) return false;
+          const current = latestByProposal.get(approval.proposal_id);
+          if (current !== item) return false;
+          const pending = item.decision === 'PENDING_HUMAN_APPROVAL' ||
+            String(approval.status || '').toLowerCase() === 'pending';
+          const expiry = Date.parse(approval.expires_at || '');
+          return pending && (!Number.isFinite(expiry) || expiry > Date.now());
+        });
+        const latest = activePending.length
+          ? activePending[activePending.length - 1]
+          : chronological[chronological.length - 1];
+        if (latest) applyTopologyStatus(latest);
 
         // Display list with most recent at top
         const reversed = records.slice().reverse();
@@ -802,7 +954,16 @@
             checkMsg = item.verification.reason;
           }
 
-          const reason = item.intent?.reason ? `Reason: ${item.intent.reason}` : '';
+          const isHumanDecision = item.event_type === 'human_approval_decision';
+          const decisionLabel = isHumanDecision
+            ? 'Human decision recorded: ' + decision.replaceAll('_', ' ')
+            : checkMsg;
+          const reason = isHumanDecision && item.decision_reason
+            ? 'Operator reason: ' + item.decision_reason
+            : (item.intent?.reason ? 'Reason: ' + item.intent.reason : '');
+          const verifierDetail = isHumanDecision
+            ? '<div class="trace-check">Proposal-time safety result: ' + checkMsg + '</div>'
+            : '';
 
           return `
             <div class="trace-card">
@@ -813,7 +974,8 @@
                 </span>
                 <span class="trace-badge ${badgeClass}">${decision}</span>
               </div>
-              <div class="trace-check">${checkMsg}</div>
+              <div class="trace-check">${decisionLabel}</div>
+              ${verifierDetail}
               ${reason ? `<div class="trace-reason">${reason}</div>` : ''}
               <div class="trace-timestamp">${timeDisplay} ${rawTime ? `(${rawTime.split('T')[0]})` : ''}</div>
             </div>
@@ -918,17 +1080,81 @@
     // Chaos Fault Injection Handler
     // =========================================================================
     async function triggerChaosLoop() {
-      const ok = confirm("This will reintroduce a physical network loop for demonstration. Continue?");
+      const ok = confirm(
+        "This restores the known redundant trunk in the local Mininet lab, then runs the AI proposal and safety-verification pipeline. STP stays enabled. No remediation runs until a human approves and separately clicks Execute. Continue?"
+      );
       if (!ok) return;
+      const token = prompt("Enter the local lab operator token:");
+      if (!token) return;
 
+      const button = document.getElementById('chaos-btn');
+      if (button) { button.disabled = true; button.textContent = 'Analyzing fault...'; }
       try {
         const resp = await fetch('/api/chaos/inject-loop?confirm=true', {
-          method: 'POST'
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: '{}'
         });
         const data = await resp.json();
-        showToast(JSON.stringify(data));
+        if (!resp.ok) {
+          showToast((data.error || 'Fault pipeline failed') + (data.pipeline ? ' | ' + JSON.stringify(data.pipeline) : ''));
+          return;
+        }
+        const pipeline = data.pipeline || {};
+        const intent = pipeline.intent || {};
+        const checks = pipeline.verification && pipeline.verification.checks || [];
+        showToast('AI proposal: ' + data.proposal_id + ' | ' + intent.action + ' ' +
+          (intent.target_switch ? 's' + intent.target_switch + '-p' + intent.from_port : '') +
+          ' | ' + checks.join('; '));
+        window.setTimeout(() => window.open('/approvals', '_blank', 'noopener'), 500);
       } catch (err) {
         showToast("Error: " + err.message);
+      } finally {
+        if (button) { button.disabled = false; button.textContent = 'Inject Fault -> AI Proposal'; }
+      }
+    }
+
+    async function triggerStandbyAnomaly() {
+      const ok = confirm(
+        "Issue 2: check live Ryu telemetry for both standby endpoints unexpectedly forwarding. If the live anomaly is not present, this creates an explicitly labeled controlled demo alert only. It does NOT change OVS, switch ports, STP state, or create a real loop. The AI proposal still uses live topology evidence and must pass the safety verifier. Continue?"
+      );
+      if (!ok) return;
+      const token = prompt("Enter the local lab operator token:");
+      if (!token) return;
+
+      const button = document.getElementById('issue2-btn');
+      if (button) { button.disabled = true; button.textContent = 'Checking standby state...'; }
+      try {
+        const resp = await fetch('/api/chaos/standby-forwarding?confirm=true', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ allow_controlled_simulation: true })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          showToast((data.error || 'Issue 2 analysis failed') +
+            (data.observation ? ' | ' + JSON.stringify(data.observation) : ''));
+          return;
+        }
+        if (data.status === 'no_live_anomaly') {
+          showToast(data.message || 'No live standby-forwarding anomaly detected.');
+          return;
+        }
+        const isSimulation = data.detection_mode === 'controlled_simulation';
+        const pipeline = data.pipeline || {};
+        const intent = pipeline.intent || {};
+        const decision = pipeline.decision || 'PENDING_HUMAN_APPROVAL';
+        const text = isSimulation
+          ? 'CONTROLLED SIMULATION | ' + decision + ' (no switch/STP state changed) | '
+          : 'LIVE ANOMALY DETECTED | ' + decision + ' | ';
+        showToast(text + 'AI proposal ' + data.proposal_id + ': ' +
+          intent.action + ' ' + (intent.target_switch ? 's' + intent.target_switch + '-p' + intent.from_port : '') +
+          ' | ' + ((pipeline.verification || {}).checks || []).join('; '));
+        window.setTimeout(() => window.open('/approvals', '_blank', 'noopener'), 500);
+      } catch (err) {
+        showToast('Issue 2 error: ' + err.message);
+      } finally {
+        if (button) { button.disabled = false; button.textContent = 'Issue 2: Standby Forwarding'; }
       }
     }
 

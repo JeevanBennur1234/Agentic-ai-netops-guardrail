@@ -175,3 +175,97 @@ def test_no_action_rejected_when_loop_present():
     result = apply_intent_to_graph(graph, intent)
     assert result["safe"] is False
     assert any("Loop" in c and "FAIL" in c for c in result["checks"])
+
+
+def test_decision_gate_fails_closed_on_reroute(sample_telemetry):
+    graph = build_topology(sample_telemetry)
+    intent = {
+        "action": "reroute",
+        "target_switch": "1",
+        "from_port": "2",
+        "to_port": "3",
+        "reason": "reroute requires forwarding-aware verification"
+    }
+    result = apply_intent_to_graph(graph, intent)
+    assert result["safe"] is False
+    assert "Reroute is disabled" in result["reason"]
+
+
+def _build_stp_aware_redundant_telemetry():
+    counters = {"rx_packets": 10, "tx_packets": 10, "rx_bytes": 100, "tx_bytes": 100}
+    return {
+        "switches": {
+            "1": {
+                "ports": {"1": dict(counters), "2": dict(counters), "3": dict(counters)},
+                "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"},
+                "flows": [],
+            },
+            "2": {
+                "ports": {"1": dict(counters), "2": dict(counters), "3": dict(counters)},
+                "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"},
+                "flows": [],
+            },
+        },
+        "links": [
+            {"src_switch": "1", "src_port": "2", "dst_switch": "2", "dst_port": "1"},
+            {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+        ],
+    }
+
+
+def test_stp_blocked_redundant_trunk_is_not_counted_as_live_path():
+    telemetry = _build_stp_aware_redundant_telemetry()
+    graph = build_topology(telemetry)
+
+    # The physical edge remains available for discovering its peer, but it must
+    # not be treated as a data-plane path when either endpoint is STP-blocked.
+    assert graph.has_edge("s1-p3", "s2-p2")
+    assert graph.edges["s1-p3", "s2-p2"]["forwarding"] is False
+
+    active_trunk_block = sim_port_removal(graph, "s1-p2")
+    assert active_trunk_block["safe"] is False
+    assert any("disconnected" in message.lower() or "unreachable" in message.lower()
+               for message in active_trunk_block.get("checks", []))
+
+    already_blocked_trunk_block = sim_port_removal(graph, "s1-p3")
+    assert already_blocked_trunk_block["safe"] is True
+
+
+def test_incomplete_stp_state_fails_closed_for_alternate_path():
+    telemetry = _build_stp_aware_redundant_telemetry()
+    del telemetry["switches"]["2"]["stp_port_states"]["2"]
+    graph = build_topology(telemetry)
+
+    # Since STP telemetry exists but the alternate trunk's peer state is
+    # unknown, it cannot be used as proof that the alternate path forwards.
+    assert graph.edges["s1-p3", "s2-p2"]["forwarding"] is False
+    result = sim_port_removal(graph, "s1-p2")
+    assert result["safe"] is False
+
+
+def test_gate_uses_stp_forwarding_state_for_block_decisions():
+    graph = build_topology(_build_stp_aware_redundant_telemetry())
+    active = apply_intent_to_graph(graph, {
+        "action": "block", "target_switch": "1", "from_port": "2",
+        "reason": "active trunk would disconnect hosts while alternate is STP-blocked",
+    })
+    standby = apply_intent_to_graph(graph, {
+        "action": "block", "target_switch": "1", "from_port": "3",
+        "reason": "standby trunk is already STP-blocked",
+    })
+    assert active["safe"] is False
+    assert standby["safe"] is True
+
+
+def test_openflow_port_down_status_removes_link_from_forwarding_graph():
+    telemetry = _build_stp_aware_redundant_telemetry()
+    telemetry["switches"]["1"]["port_status"] = {
+        "2": {"state": "DOWN", "link_down": True, "admin_down": False, "reason": "MODIFY"}
+    }
+    graph = build_topology(telemetry)
+
+    # Keep the physical edge for peer discovery, but never count a reported
+    # down endpoint as a usable forwarding path even if stale STP telemetry says FORWARD.
+    assert graph.has_edge("s1-p2", "s2-p1")
+    assert graph.edges["s1-p2", "s2-p1"]["forwarding"] is False
+    assert graph.edges["s1-p2", "s2-p1"]["src_port_status"] == "DOWN"

@@ -1,0 +1,44 @@
+{
+  "started_at_utc": "2026-10-27T12:34:50.060018+00:00",
+  "test": "physical active-trunk failure and STP failover",
+  "active_trunk_interfaces": [
+    "s1-eth2",
+    "s2-eth1"
+  ],
+  "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+  "initial_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "BLOCK",
+    "s2-p3": "FORWARD"
+  },
+  "baseline_ping_loss_percent": 0.0,
+  "failover_recovered": false,
+  "failover_recovery_time_seconds": null,
+  "post_failure_ping_loss_percent": 100.0,
+  "post_failure_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "BLOCK",
+    "s2-p3": "FORWARD"
+  },
+  "failover_failure_reason": "STP did not converge the alternate trunk to FORWARD with 0% pingall loss within 25 seconds after the physical link failure.",
+  "rollback_recovered": true,
+  "rollback_recovery_time_seconds": 0.014,
+  "rollback_ping_loss_percent": 0.0,
+  "rollback_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "BLOCK",
+    "s2-p3": "FORWARD"
+  },
+  "finished_at_utc": "2026-10-27T12:35:26.320776+00:00",
+  "failure_injection": "Mininet Linux interface ifconfig down; not proven to emit OpenFlow LINK_DOWN",
+  "evidence_qualification": "This run demonstrates packet loss after interface-down and successful restoration; it does not establish physical-link-down STP failover."
+}

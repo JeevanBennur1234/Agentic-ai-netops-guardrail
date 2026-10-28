@@ -1,0 +1,533 @@
+{
+  "generated_at_utc": "2026-10-27T14:57:06.125248+00:00",
+  "labelled_safety_evaluation": {
+    "type": "synthetic_labelled_safety_cases",
+    "case_count": 12,
+    "safe_case_count": 3,
+    "unsafe_case_count": 9,
+    "correct_count": 12,
+    "incorrect_count": 0,
+    "false_accept_count": 0,
+    "false_reject_count": 0,
+    "false_accept_rate": 0.0,
+    "false_reject_rate": 0.0,
+    "accuracy": 1.0,
+    "cases": [
+      {
+        "name": "healthy-star-no-action",
+        "expected_safe": true,
+        "predicted_safe": true,
+        "correct": true,
+        "rationale": "Healthy no-op.",
+        "verifier_result": {
+          "safe": true,
+          "nodes": 4,
+          "edges": 3,
+          "checks": [
+            "PASS: Topology exists",
+            "PASS: Topology is connected",
+            "PASS: Topology is loop-free",
+            "PASS: All ports mutually reachable"
+          ]
+        }
+      },
+      {
+        "name": "block-access-port-2",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Access isolation.",
+        "verifier_result": {
+          "safe": false,
+          "nodes": 4,
+          "edges": 3,
+          "checks": [
+            "FAIL: Port s1-p2 is an access endpoint; blocking it isolates that host with no alternate path"
+          ]
+        }
+      },
+      {
+        "name": "nonexistent-port",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Missing port.",
+        "verifier_result": {
+          "safe": false,
+          "reason": "Port s1-p99 does not exist"
+        }
+      },
+      {
+        "name": "unsupported-reroute",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Reroute is fail-closed.",
+        "verifier_result": {
+          "safe": false,
+          "reason": "Reroute is disabled: topology-only reachability checks cannot prove OpenFlow forwarding safety"
+        }
+      },
+      {
+        "name": "block-redundant-trunk",
+        "expected_safe": true,
+        "predicted_safe": true,
+        "correct": true,
+        "rationale": "Alternate physical path is forwarding in synthetic graph.",
+        "verifier_result": {
+          "safe": true,
+          "nodes": 7,
+          "edges": 6,
+          "checks": [
+            "PASS: Topology exists",
+            "PASS: Topology is connected",
+            "PASS: Topology is loop-free",
+            "PASS: All required endpoints mutually reachable"
+          ]
+        }
+      },
+      {
+        "name": "block-active-while-backup-stp-blocked",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Alternate trunk has a STP-blocked endpoint.",
+        "verifier_result": {
+          "safe": false,
+          "nodes": 7,
+          "edges": 6,
+          "checks": [
+            "PASS: Topology exists",
+            "FAIL: Topology is disconnected",
+            "PASS: Topology is loop-free",
+            "FAIL: Unreachable host pairs: [('s1-p1', 's2-p3')]"
+          ]
+        }
+      },
+      {
+        "name": "block-already-stp-blocked-trunk",
+        "expected_safe": true,
+        "predicted_safe": true,
+        "correct": true,
+        "rationale": "Active trunk A remains forwarding.",
+        "verifier_result": {
+          "safe": true,
+          "nodes": 7,
+          "edges": 6,
+          "checks": [
+            "PASS: Topology exists",
+            "PASS: Topology is connected",
+            "PASS: Topology is loop-free",
+            "PASS: All required endpoints mutually reachable"
+          ]
+        }
+      },
+      {
+        "name": "block-only-trunk",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Removing sole trunk disconnects switches.",
+        "verifier_result": {
+          "safe": false,
+          "nodes": 7,
+          "edges": 5,
+          "checks": [
+            "PASS: Topology exists",
+            "FAIL: Topology is disconnected",
+            "PASS: Topology is loop-free",
+            "FAIL: Unreachable host pairs: [('s1-p1', 's2-p2'), ('s1-p1', 's2-p3'), ('s1-p3', 's2-p2'), ('s1-p3', 's2-p3')]"
+          ]
+        }
+      },
+      {
+        "name": "invalid-action",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Unsupported action.",
+        "verifier_result": {
+          "safe": false,
+          "reason": "Unhandled action type: flush_everything"
+        }
+      },
+      {
+        "name": "missing-block-target",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Missing target details.",
+        "verifier_result": {
+          "safe": false,
+          "reason": "Missing target_switch or from_port for remediation action"
+        }
+      },
+      {
+        "name": "disconnected-no-action",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Current topology is disconnected.",
+        "verifier_result": {
+          "safe": false,
+          "nodes": 6,
+          "edges": 4,
+          "checks": [
+            "PASS: Topology exists",
+            "FAIL: Topology is disconnected",
+            "PASS: Topology is loop-free",
+            "FAIL: Unreachable host pairs: [('s1-p1', 's2-p1'), ('s1-p2', 's2-p1'), ('s1-p3', 's2-p1')]"
+          ]
+        }
+      },
+      {
+        "name": "block-access-port-3",
+        "expected_safe": false,
+        "predicted_safe": false,
+        "correct": true,
+        "rationale": "Second access-port negative control.",
+        "verifier_result": {
+          "safe": false,
+          "nodes": 4,
+          "edges": 3,
+          "checks": [
+            "FAIL: Port s1-p3 is an access endpoint; blocking it isolates that host with no alternate path"
+          ]
+        }
+      }
+    ],
+    "caveat": "Manually labelled synthetic cases only; not a representative dataset or a measurement of LLM decision quality."
+  },
+  "executor_transaction_benchmark": {
+    "type": "simulated_executor_transaction",
+    "repetitions_requested": 30,
+    "stats": {
+      "count": 30,
+      "mean_ms": 0.277,
+      "median_ms": 0.221,
+      "p95_ms": 0.38,
+      "min_ms": 0.212,
+      "max_ms": 1.279
+    },
+    "success_count": 30,
+    "failure_count": 0,
+    "real_ovs_commands_executed": false,
+    "live_connectivity_tested": false,
+    "what_is_measured": "Current RemediationExecutor logic with an in-memory command runner: preflight, paired adds, cookie verification, topology post-check, and a stub connectivity callback.",
+    "caveat": "Software-path timing only; not real OVS latency or proof of live data-plane recovery.",
+    "failures": []
+  },
+  "live_failure_experiments": {
+    "live_active_failover_latest.json": {
+      "started_at_utc": "2026-10-27T12:34:50.060018+00:00",
+      "test": "physical active-trunk failure and STP failover",
+      "active_trunk_interfaces": [
+        "s1-eth2",
+        "s2-eth1"
+      ],
+      "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "initial_stp_states": {
+        "s1-p1": "FORWARD",
+        "s1-p2": "FORWARD",
+        "s1-p3": "FORWARD",
+        "s2-p1": "FORWARD",
+        "s2-p2": "BLOCK",
+        "s2-p3": "FORWARD"
+      },
+      "baseline_ping_loss_percent": 0.0,
+      "failover_recovered": false,
+      "failover_recovery_time_seconds": null,
+      "post_failure_ping_loss_percent": 100.0,
+      "post_failure_stp_states": {
+        "s1-p1": "FORWARD",
+        "s1-p2": "FORWARD",
+        "s1-p3": "FORWARD",
+        "s2-p1": "FORWARD",
+        "s2-p2": "BLOCK",
+        "s2-p3": "FORWARD"
+      },
+      "failover_failure_reason": "STP did not converge the alternate trunk to FORWARD with 0% pingall loss within 25 seconds after the physical link failure.",
+      "rollback_recovered": true,
+      "rollback_recovery_time_seconds": 0.014,
+      "rollback_ping_loss_percent": 0.0,
+      "rollback_stp_states": {
+        "s1-p1": "FORWARD",
+        "s1-p2": "FORWARD",
+        "s1-p3": "FORWARD",
+        "s2-p1": "FORWARD",
+        "s2-p2": "BLOCK",
+        "s2-p3": "FORWARD"
+      },
+      "finished_at_utc": "2026-10-27T12:35:26.320776+00:00",
+      "failure_injection": "Mininet Linux interface ifconfig down; not proven to emit OpenFlow LINK_DOWN",
+      "evidence_qualification": "This run demonstrates packet loss after interface-down and successful restoration; it does not establish physical-link-down STP failover."
+    },
+    "live_triangle_failover_latest.json": {
+      "started_at_utc": "2026-10-27T14:38:52.550021+00:00",
+      "test": "three-switch ring active-path failure with host on opposite trunk endpoint",
+      "failure_injection": "Mininet configLinkStatus interface link-down; emulated failure, not a physical cable unplug",
+      "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "rollback_recovered": true,
+      "initial_stp_states": {
+        "s1-p1": "FORWARD",
+        "s1-p2": "FORWARD",
+        "s1-p3": "FORWARD",
+        "s2-p1": "FORWARD",
+        "s2-p2": "FORWARD",
+        "s2-p3": "FORWARD",
+        "s3-p1": "BLOCK",
+        "s3-p2": "FORWARD"
+      },
+      "baseline_ping_loss_percent": 0.0,
+      "failed_trunk_interfaces": [
+        "s1-eth2",
+        "s2-eth1"
+      ],
+      "failed_trunk_ports": [
+        [
+          "1",
+          "2"
+        ],
+        [
+          "2",
+          "1"
+        ]
+      ],
+      "failure_injection_diagnostics": {
+        "ovs_show_s1": {
+          "command": [
+            "ovs-ofctl",
+            "-O",
+            "OpenFlow13",
+            "show",
+            "s1"
+          ],
+          "returncode": 0,
+          "stdout": "OFPT_FEATURES_REPLY (OF1.3) (xid=0x2): dpid:0000000000000001\nn_tables:254, n_buffers:0\ncapabilities: FLOW_STATS TABLE_STATS PORT_STATS GROUP_STATS QUEUE_STATS\nOFPST_PORT_DESC reply (OF1.3) (xid=0x3):\n 1(s1-eth1): addr:1e:aa:18:a1:ff:3a\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s1-eth2): addr:da:a3:c0:fd:53:b2\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s1-eth3): addr:d2:b1:74:32:a4:7f\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s1): addr:7a:67:2d:7b:79:45\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\nOFPT_GET_CONFIG_REPLY (OF1.3) (xid=0x5): frags=normal miss_send_len=0",
+          "stderr": ""
+        },
+        "ovs_show_s2": {
+          "command": [
+            "ovs-ofctl",
+            "-O",
+            "OpenFlow13",
+            "show",
+            "s2"
+          ],
+          "returncode": 0,
+          "stdout": "OFPT_FEATURES_REPLY (OF1.3) (xid=0x2): dpid:0000000000000002\nn_tables:254, n_buffers:0\ncapabilities: FLOW_STATS TABLE_STATS PORT_STATS GROUP_STATS QUEUE_STATS\nOFPST_PORT_DESC reply (OF1.3) (xid=0x3):\n 1(s2-eth1): addr:2e:da:43:c1:da:b1\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s2-eth2): addr:c6:c9:89:94:3c:b6\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s2-eth3): addr:d6:41:52:a0:c8:9e\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s2): addr:be:2a:56:4a:01:49\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\nOFPT_GET_CONFIG_REPLY (OF1.3) (xid=0x5): frags=normal miss_send_len=0",
+          "stderr": ""
+        },
+        "s1_link_state": {
+          "command": [
+            "ovs-vsctl",
+            "get",
+            "Interface",
+            "s1-eth2",
+            "link_state"
+          ],
+          "returncode": 0,
+          "stdout": "down",
+          "stderr": ""
+        },
+        "s1_admin_state": {
+          "command": [
+            "ovs-vsctl",
+            "get",
+            "Interface",
+            "s1-eth2",
+            "admin_state"
+          ],
+          "returncode": 0,
+          "stdout": "up",
+          "stderr": ""
+        },
+        "s2_link_state": {
+          "command": [
+            "ovs-vsctl",
+            "get",
+            "Interface",
+            "s2-eth1",
+            "link_state"
+          ],
+          "returncode": 0,
+          "stdout": "down",
+          "stderr": ""
+        },
+        "s2_admin_state": {
+          "command": [
+            "ovs-vsctl",
+            "get",
+            "Interface",
+            "s2-eth1",
+            "admin_state"
+          ],
+          "returncode": 0,
+          "stdout": "down",
+          "stderr": ""
+        },
+        "s1_linux_link": {
+          "command": [
+            "ip",
+            "-details",
+            "link",
+            "show",
+            "s1-eth2"
+          ],
+          "returncode": 0,
+          "stdout": "171: s1-eth2@s2-eth1: <NO-CARRIER,BROADCAST,MULTICAST,UP,M-DOWN> mtu 1500 qdisc noqueue master ovs-system state LOWERLAYERDOWN mode DEFAULT group default qlen 1000\n    link/ether da:a3:c0:fd:53:b2 brd ff:ff:ff:ff:ff:ff promiscuity 1 minmtu 68 maxmtu 65535 \n    veth \n    openvswitch_slave addrgenmode eui64 numtxqueues 8 numrxqueues 8 gso_max_size 65536 gso_max_segs 65535",
+          "stderr": ""
+        },
+        "s2_linux_link": {
+          "command": [
+            "ip",
+            "-details",
+            "link",
+            "show",
+            "s2-eth1"
+          ],
+          "returncode": 0,
+          "stdout": "170: s2-eth1@s1-eth2: <BROADCAST,MULTICAST> mtu 1500 qdisc noqueue master ovs-system state DOWN mode DEFAULT group default qlen 1000\n    link/ether 2e:da:43:c1:da:b1 brd ff:ff:ff:ff:ff:ff promiscuity 1 minmtu 68 maxmtu 65535 \n    veth \n    openvswitch_slave addrgenmode eui64 numtxqueues 8 numrxqueues 8 gso_max_size 65536 gso_max_segs 65535",
+          "stderr": ""
+        }
+      },
+      "failover_recovered": false,
+      "failover_recovery_seconds": null,
+      "post_failure_stp_states": {
+        "s1-p1": "FORWARD",
+        "s1-p2": "FORWARD",
+        "s1-p3": "FORWARD",
+        "s2-p1": "FORWARD",
+        "s2-p2": "FORWARD",
+        "s2-p3": "FORWARD",
+        "s3-p1": "BLOCK",
+        "s3-p2": "FORWARD"
+      },
+      "post_failure_ping_loss_percent": 100.0,
+      "post_failure_openflow_port_status": {
+        "s1-p2": {
+          "state": "UP",
+          "reason": "MODIFY",
+          "link_down": false,
+          "admin_down": false
+        },
+        "s2-p1": {
+          "state": "UP",
+          "reason": "MODIFY",
+          "link_down": false,
+          "admin_down": false
+        }
+      },
+      "controller_observed_failed_port": false,
+      "failure_reason": "Alternate ring edge did not become forwarding with 0% ping loss within 30 seconds. The controller telemetry did not record an OpenFlow port DOWN/MISSING event for the failed trunk.",
+      "rollback_recovery_seconds": 0.017,
+      "rollback_ping_loss_percent": 0.0,
+      "rollback_stp_states": {
+        "s1-p1": "FORWARD",
+        "s1-p2": "FORWARD",
+        "s1-p3": "FORWARD",
+        "s2-p1": "FORWARD",
+        "s2-p2": "FORWARD",
+        "s2-p3": "FORWARD",
+        "s3-p1": "BLOCK",
+        "s3-p2": "FORWARD"
+      },
+      "finished_at_utc": "2026-10-27T14:39:37.518205+00:00"
+    }
+  },
+  "live_integration_summary": {
+    "generated_at_utc": "2026-10-27T13:07:40.998798+00:00",
+    "date": "2026-10-27",
+    "scope": "Fresh live Ryu/Mininet/OVS validation run; only isolated Mininet bridges created by each test were modified.",
+    "tests": [
+      {
+        "name": "redundant_topology_baseline",
+        "script": "testbed/validate_redundant_topology.py",
+        "status": "PASS",
+        "runtime_seconds": 11.06,
+        "observed_stp_states": {
+          "s1-p1": "FORWARD",
+          "s1-p2": "FORWARD",
+          "s1-p3": "FORWARD",
+          "s2-p1": "FORWARD",
+          "s2-p2": "BLOCK",
+          "s2-p3": "FORWARD"
+        },
+        "baseline_pingall_loss_percent": 0.0,
+        "meaning": "Redundant two-switch topology converged with one STP-blocked trunk and working host connectivity."
+      },
+      {
+        "name": "paired_trunk_remediation_and_access_rejection",
+        "script": "testbed/validate_trunk_remediation.py",
+        "status": "PASS",
+        "runtime_seconds": 11.4,
+        "baseline_pingall_loss_percent": 0.0,
+        "blocked_trunk_ports": [
+          [
+            "1",
+            "3"
+          ],
+          [
+            "2",
+            "2"
+          ]
+        ],
+        "executor_success": true,
+        "change_verified": true,
+        "topology_safety_verified": true,
+        "live_connectivity_verified": true,
+        "post_change_pingall_loss_percent": 0.0,
+        "access_port_block_rejected": true,
+        "flow_rules_unchanged_after_access_rejection": true,
+        "audit_chain_verified": true,
+        "audit_record_count": 2,
+        "meaning": "Verified two-ended rule installation on standby trunk B (already STP-blocked), plus live rejection of an active-trunk block when its alternate is STP-blocked. Gate and executor both rejected the active-trunk request without flow changes; host connectivity remained intact. This is safe refusal, not automatic failover.",
+        "active_trunk_block_rejected_by_gate": true,
+        "active_trunk_forged_approval_rejected_by_executor": true,
+        "flow_rules_unchanged_after_active_rejection": true,
+        "host_connectivity_after_active_rejection_loss_percent": 0.0
+      },
+      {
+        "name": "two_switch_active_trunk_admin_down",
+        "evidence_file": "experiments/results/live_active_failover_latest.json",
+        "status": "FAILOVER_FAILED_ROLLBACK_PASS",
+        "failure_injection": "Mininet Linux interface ifconfig down; not proven to emit OpenFlow LINK_DOWN",
+        "baseline_pingall_loss_percent": 0.0,
+        "post_failure_pingall_loss_percent": 100.0,
+        "rollback_recovered": true,
+        "rollback_recovery_seconds": 0.014,
+        "rollback_pingall_loss_percent": 0.0,
+        "meaning": "Active-trunk failure did not fail over; explicitly restoring the original link restored connectivity."
+      },
+      {
+        "name": "three_switch_ring_active_route_admin_down",
+        "evidence_file": "experiments/results/live_triangle_failover_latest.json",
+        "status": "FAILOVER_FAILED_ROLLBACK_PASS",
+        "failure_injection": "ovs-ofctl mod-port administrative down; not a physical cable unplug",
+        "baseline_pingall_loss_percent": 0.0,
+        "failed_trunk_interfaces": [
+          "s2-eth2",
+          "s3-eth1"
+        ],
+        "post_failure_pingall_loss_percent": 100.0,
+        "alternate_path_stp_port_state_after_failure": "BLOCK",
+        "rollback_recovered": true,
+        "rollback_recovery_seconds": 0.014,
+        "rollback_pingall_loss_percent": 0.0,
+        "meaning": "The corrected host placement requires the alternate s1-s3-s2 route. Admin-down did not promote the STP-blocked direct link; restoring the trunk restored connectivity."
+      }
+    ],
+    "limitations": [
+      "The live trunk-remediation pass blocks a standby trunk and validates paired rule installation, not active-link recovery.",
+      "The active-route fault injectors used Linux interface down or OpenFlow admin-down, not a physical cable unplug.",
+      "An attempt to emulate a physical unplug by deleting OVS bridge ports was blocked by remote safety controls and was not executed.",
+      "Automatic active-trunk failover remains unproven and must not be described as passed."
+    ],
+    "cleanup": {
+      "ryu_stopped": true,
+      "mininet_bridges_remaining": [],
+      "ryu_openflow_listener_remaining": false,
+      "telemetry_snapshot_restored": true
+    }
+  }
+}

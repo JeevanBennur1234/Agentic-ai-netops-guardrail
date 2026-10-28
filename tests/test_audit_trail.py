@@ -205,3 +205,16 @@ class TestAuditTamperDetection:
         valid, msg = tmp_audit_trail.verify_chain(chain_copy)
         assert valid is False
         assert "Tampering detected" in msg
+
+
+    def test_corrupt_existing_signing_key_fails_closed(self, tmp_path):
+        key_file = tmp_path / "corrupt_key.pem"
+        key_file.write_text("not a valid private key")
+        with pytest.raises(RuntimeError, match="refusing to generate a replacement"):
+            AuditTrail(log_path=str(tmp_path / "log.json"), key_path=str(key_file), auto_load=False)
+
+    @pytest.mark.skipif(os.name != "posix", reason="POSIX file permissions only")
+    def test_generated_signing_key_is_owner_only(self, tmp_path):
+        key_file = tmp_path / "secure_key.pem"
+        AuditTrail(log_path=str(tmp_path / "log.json"), key_path=str(key_file), auto_load=False)
+        assert key_file.stat().st_mode & 0o777 == 0o600

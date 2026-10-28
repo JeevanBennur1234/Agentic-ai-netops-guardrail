@@ -50,19 +50,26 @@ class AuditTrail:
         """Load persistent ECDSA signing key or generate a new NIST256p key."""
         if os.path.exists(self.key_path):
             try:
-                with open(self.key_path, "r") as f:
-                    return SigningKey.from_pem(f.read(), hashfunc=hashlib.sha3_256)
-            except Exception:
-                pass
+                with open(self.key_path, "r", encoding="utf-8") as f:
+                    key = SigningKey.from_pem(f.read(), hashfunc=hashlib.sha3_256)
+                # The signing key is private material; restrict local filesystem access.
+                try:
+                    os.chmod(self.key_path, 0o600)
+                except OSError:
+                    pass
+                return key
+            except Exception as exc:
+                raise RuntimeError(
+                    f"Existing audit signing key is unreadable or invalid at {self.key_path}; "
+                    "refusing to generate a replacement because that would break audit continuity."
+                ) from exc
 
-        # Generate new key with SHA3-256 digest
+        # Generate a persistent key with owner-only permissions from creation.
         key = SigningKey.generate(curve=NIST256p, hashfunc=hashlib.sha3_256)
         os.makedirs(os.path.dirname(self.key_path), exist_ok=True)
-        try:
-            with open(self.key_path, "wb") as f:
-                f.write(key.to_pem())
-        except Exception:
-            pass
+        fd = os.open(self.key_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "wb") as f:
+            f.write(key.to_pem())
         return key
 
     @staticmethod
@@ -110,11 +117,14 @@ class AuditTrail:
         execution_result=None
     ):
         """
-        Record an APPROVED or REJECTED decision into the hash chain,
+        Record an approval lifecycle decision into the hash chain,
         sign it with ECDSA, and append to the persistent audit log.
         """
-        if decision not in ("APPROVED", "REJECTED"):
-            raise ValueError(f"Invalid decision: {decision}. Must be APPROVED or REJECTED.")
+        if decision not in ("APPROVED", "REJECTED", "PENDING_HUMAN_APPROVAL", "CHANGES_REQUESTED"):
+            raise ValueError(
+                f"Invalid decision: {decision}. Must be APPROVED, REJECTED, "
+                "PENDING_HUMAN_APPROVAL, or CHANGES_REQUESTED."
+            )
 
         if timestamp is None:
             timestamp = datetime.now(timezone.utc).isoformat()

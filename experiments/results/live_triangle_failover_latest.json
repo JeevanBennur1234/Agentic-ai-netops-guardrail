@@ -1,0 +1,172 @@
+{
+  "started_at_utc": "2026-10-27T14:38:52.550021+00:00",
+  "test": "three-switch ring active-path failure with host on opposite trunk endpoint",
+  "failure_injection": "Mininet configLinkStatus interface link-down; emulated failure, not a physical cable unplug",
+  "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+  "rollback_recovered": true,
+  "initial_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "FORWARD",
+    "s2-p3": "FORWARD",
+    "s3-p1": "BLOCK",
+    "s3-p2": "FORWARD"
+  },
+  "baseline_ping_loss_percent": 0.0,
+  "failed_trunk_interfaces": [
+    "s1-eth2",
+    "s2-eth1"
+  ],
+  "failed_trunk_ports": [
+    [
+      "1",
+      "2"
+    ],
+    [
+      "2",
+      "1"
+    ]
+  ],
+  "failure_injection_diagnostics": {
+    "ovs_show_s1": {
+      "command": [
+        "ovs-ofctl",
+        "-O",
+        "OpenFlow13",
+        "show",
+        "s1"
+      ],
+      "returncode": 0,
+      "stdout": "OFPT_FEATURES_REPLY (OF1.3) (xid=0x2): dpid:0000000000000001\nn_tables:254, n_buffers:0\ncapabilities: FLOW_STATS TABLE_STATS PORT_STATS GROUP_STATS QUEUE_STATS\nOFPST_PORT_DESC reply (OF1.3) (xid=0x3):\n 1(s1-eth1): addr:1e:aa:18:a1:ff:3a\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s1-eth2): addr:da:a3:c0:fd:53:b2\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s1-eth3): addr:d2:b1:74:32:a4:7f\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s1): addr:7a:67:2d:7b:79:45\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\nOFPT_GET_CONFIG_REPLY (OF1.3) (xid=0x5): frags=normal miss_send_len=0",
+      "stderr": ""
+    },
+    "ovs_show_s2": {
+      "command": [
+        "ovs-ofctl",
+        "-O",
+        "OpenFlow13",
+        "show",
+        "s2"
+      ],
+      "returncode": 0,
+      "stdout": "OFPT_FEATURES_REPLY (OF1.3) (xid=0x2): dpid:0000000000000002\nn_tables:254, n_buffers:0\ncapabilities: FLOW_STATS TABLE_STATS PORT_STATS GROUP_STATS QUEUE_STATS\nOFPST_PORT_DESC reply (OF1.3) (xid=0x3):\n 1(s2-eth1): addr:2e:da:43:c1:da:b1\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s2-eth2): addr:c6:c9:89:94:3c:b6\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s2-eth3): addr:d6:41:52:a0:c8:9e\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s2): addr:be:2a:56:4a:01:49\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\nOFPT_GET_CONFIG_REPLY (OF1.3) (xid=0x5): frags=normal miss_send_len=0",
+      "stderr": ""
+    },
+    "s1_link_state": {
+      "command": [
+        "ovs-vsctl",
+        "get",
+        "Interface",
+        "s1-eth2",
+        "link_state"
+      ],
+      "returncode": 0,
+      "stdout": "down",
+      "stderr": ""
+    },
+    "s1_admin_state": {
+      "command": [
+        "ovs-vsctl",
+        "get",
+        "Interface",
+        "s1-eth2",
+        "admin_state"
+      ],
+      "returncode": 0,
+      "stdout": "up",
+      "stderr": ""
+    },
+    "s2_link_state": {
+      "command": [
+        "ovs-vsctl",
+        "get",
+        "Interface",
+        "s2-eth1",
+        "link_state"
+      ],
+      "returncode": 0,
+      "stdout": "down",
+      "stderr": ""
+    },
+    "s2_admin_state": {
+      "command": [
+        "ovs-vsctl",
+        "get",
+        "Interface",
+        "s2-eth1",
+        "admin_state"
+      ],
+      "returncode": 0,
+      "stdout": "down",
+      "stderr": ""
+    },
+    "s1_linux_link": {
+      "command": [
+        "ip",
+        "-details",
+        "link",
+        "show",
+        "s1-eth2"
+      ],
+      "returncode": 0,
+      "stdout": "171: s1-eth2@s2-eth1: <NO-CARRIER,BROADCAST,MULTICAST,UP,M-DOWN> mtu 1500 qdisc noqueue master ovs-system state LOWERLAYERDOWN mode DEFAULT group default qlen 1000\n    link/ether da:a3:c0:fd:53:b2 brd ff:ff:ff:ff:ff:ff promiscuity 1 minmtu 68 maxmtu 65535 \n    veth \n    openvswitch_slave addrgenmode eui64 numtxqueues 8 numrxqueues 8 gso_max_size 65536 gso_max_segs 65535",
+      "stderr": ""
+    },
+    "s2_linux_link": {
+      "command": [
+        "ip",
+        "-details",
+        "link",
+        "show",
+        "s2-eth1"
+      ],
+      "returncode": 0,
+      "stdout": "170: s2-eth1@s1-eth2: <BROADCAST,MULTICAST> mtu 1500 qdisc noqueue master ovs-system state DOWN mode DEFAULT group default qlen 1000\n    link/ether 2e:da:43:c1:da:b1 brd ff:ff:ff:ff:ff:ff promiscuity 1 minmtu 68 maxmtu 65535 \n    veth \n    openvswitch_slave addrgenmode eui64 numtxqueues 8 numrxqueues 8 gso_max_size 65536 gso_max_segs 65535",
+      "stderr": ""
+    }
+  },
+  "failover_recovered": false,
+  "failover_recovery_seconds": null,
+  "post_failure_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "FORWARD",
+    "s2-p3": "FORWARD",
+    "s3-p1": "BLOCK",
+    "s3-p2": "FORWARD"
+  },
+  "post_failure_ping_loss_percent": 100.0,
+  "post_failure_openflow_port_status": {
+    "s1-p2": {
+      "state": "UP",
+      "reason": "MODIFY",
+      "link_down": false,
+      "admin_down": false
+    },
+    "s2-p1": {
+      "state": "UP",
+      "reason": "MODIFY",
+      "link_down": false,
+      "admin_down": false
+    }
+  },
+  "controller_observed_failed_port": false,
+  "failure_reason": "Alternate ring edge did not become forwarding with 0% ping loss within 30 seconds. The controller telemetry did not record an OpenFlow port DOWN/MISSING event for the failed trunk.",
+  "rollback_recovery_seconds": 0.017,
+  "rollback_ping_loss_percent": 0.0,
+  "rollback_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "FORWARD",
+    "s2-p3": "FORWARD",
+    "s3-p1": "BLOCK",
+    "s3-p2": "FORWARD"
+  },
+  "finished_at_utc": "2026-10-27T14:39:37.518205+00:00"
+}

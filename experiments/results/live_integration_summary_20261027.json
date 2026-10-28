@@ -1,0 +1,95 @@
+{
+  "generated_at_utc": "2026-10-27T13:07:40.998798+00:00",
+  "date": "2026-10-27",
+  "scope": "Fresh live Ryu/Mininet/OVS validation run; only isolated Mininet bridges created by each test were modified.",
+  "tests": [
+    {
+      "name": "redundant_topology_baseline",
+      "script": "testbed/validate_redundant_topology.py",
+      "status": "PASS",
+      "runtime_seconds": 11.06,
+      "observed_stp_states": {
+        "s1-p1": "FORWARD",
+        "s1-p2": "FORWARD",
+        "s1-p3": "FORWARD",
+        "s2-p1": "FORWARD",
+        "s2-p2": "BLOCK",
+        "s2-p3": "FORWARD"
+      },
+      "baseline_pingall_loss_percent": 0.0,
+      "meaning": "Redundant two-switch topology converged with one STP-blocked trunk and working host connectivity."
+    },
+    {
+      "name": "paired_trunk_remediation_and_access_rejection",
+      "script": "testbed/validate_trunk_remediation.py",
+      "status": "PASS",
+      "runtime_seconds": 11.4,
+      "baseline_pingall_loss_percent": 0.0,
+      "blocked_trunk_ports": [
+        [
+          "1",
+          "3"
+        ],
+        [
+          "2",
+          "2"
+        ]
+      ],
+      "executor_success": true,
+      "change_verified": true,
+      "topology_safety_verified": true,
+      "live_connectivity_verified": true,
+      "post_change_pingall_loss_percent": 0.0,
+      "access_port_block_rejected": true,
+      "flow_rules_unchanged_after_access_rejection": true,
+      "audit_chain_verified": true,
+      "audit_record_count": 2,
+      "meaning": "Verified two-ended rule installation on standby trunk B (already STP-blocked), plus live rejection of an active-trunk block when its alternate is STP-blocked. Gate and executor both rejected the active-trunk request without flow changes; host connectivity remained intact. This is safe refusal, not automatic failover.",
+      "active_trunk_block_rejected_by_gate": true,
+      "active_trunk_forged_approval_rejected_by_executor": true,
+      "flow_rules_unchanged_after_active_rejection": true,
+      "host_connectivity_after_active_rejection_loss_percent": 0.0
+    },
+    {
+      "name": "two_switch_active_trunk_admin_down",
+      "evidence_file": "experiments/results/live_active_failover_latest.json",
+      "status": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "failure_injection": "Mininet Linux interface ifconfig down; not proven to emit OpenFlow LINK_DOWN",
+      "baseline_pingall_loss_percent": 0.0,
+      "post_failure_pingall_loss_percent": 100.0,
+      "rollback_recovered": true,
+      "rollback_recovery_seconds": 0.014,
+      "rollback_pingall_loss_percent": 0.0,
+      "meaning": "Active-trunk failure did not fail over; explicitly restoring the original link restored connectivity."
+    },
+    {
+      "name": "three_switch_ring_active_route_admin_down",
+      "evidence_file": "experiments/results/live_triangle_failover_latest.json",
+      "status": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "failure_injection": "ovs-ofctl mod-port administrative down; not a physical cable unplug",
+      "baseline_pingall_loss_percent": 0.0,
+      "failed_trunk_interfaces": [
+        "s2-eth2",
+        "s3-eth1"
+      ],
+      "post_failure_pingall_loss_percent": 100.0,
+      "alternate_path_stp_port_state_after_failure": "BLOCK",
+      "rollback_recovered": true,
+      "rollback_recovery_seconds": 0.014,
+      "rollback_pingall_loss_percent": 0.0,
+      "meaning": "The corrected host placement requires the alternate s1-s3-s2 route. Admin-down did not promote the STP-blocked direct link; restoring the trunk restored connectivity."
+    }
+  ],
+  "limitations": [
+    "The live trunk-remediation pass blocks a standby trunk and validates paired rule installation, not active-link recovery.",
+    "The active-route fault injectors used Linux interface down or OpenFlow admin-down, not a physical cable unplug.",
+    "An attempt to emulate a physical unplug by deleting OVS bridge ports was blocked by remote safety controls and was not executed.",
+    "Automatic active-trunk failover remains unproven and must not be described as passed."
+  ],
+  "cleanup": {
+    "ryu_stopped": true,
+    "mininet_bridges_remaining": [],
+    "ryu_openflow_listener_remaining": false,
+    "telemetry_snapshot_restored": true
+  }
+}

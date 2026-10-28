@@ -17,20 +17,27 @@ def load_telemetry(path=None):
 
 def build_topology(telemetry):
     """
-    Build an undirected NetworkX graph from telemetry.
-    Switch nodes: s{id}
-    Port nodes:   s{id}-p{port}
-    Inter-switch links connect the corresponding port nodes.
-    OpenFlow LOCAL / reserved ports are ignored.
+    Build a physical NetworkX topology from Ryu telemetry.
+
+    Physical inter-switch edges are retained for peer-port discovery, but each
+    edge also records whether both ends are currently STP-forwarding. Safety
+    checks use only forwarding edges whenever STP state telemetry is present.
+    Incomplete STP state is treated conservatively as non-forwarding.
     """
     graph = nx.Graph()
+    switches = telemetry.get("switches", {})
+    stp_present = any(
+        isinstance(switch_data.get("stp_port_states"), dict)
+        and bool(switch_data.get("stp_port_states"))
+        for switch_data in switches.values()
+    )
+    graph.graph["stp_telemetry_present"] = stp_present
 
-    for switch_id, switch_data in telemetry.get("switches", {}).items():
+    for switch_id, switch_data in switches.items():
         switch_node = f"s{switch_id}"
         graph.add_node(switch_node, type="switch")
 
         for port_id in switch_data.get("ports", {}):
-            # Ignore OpenFlow LOCAL and reserved ports
             try:
                 if int(port_id) >= 4294967040:
                     continue
@@ -39,17 +46,18 @@ def build_topology(telemetry):
                     continue
 
             port_node = f"s{switch_id}-p{port_id}"
-            graph.add_node(port_node, type="port")
-            graph.add_edge(switch_node, port_node)
+            graph.add_node(port_node, type="port", switch_id=str(switch_id),
+                           port_id=str(port_id))
+            graph.add_edge(switch_node, port_node, kind="attachment")
 
     for link in telemetry.get("links", []):
         src_sw = str(link.get("src_switch", "")).strip()
         src_pt = str(link.get("src_port", "")).strip()
         dst_sw = str(link.get("dst_switch", "")).strip()
         dst_pt = str(link.get("dst_port", "")).strip()
-
         if not src_sw or not src_pt or not dst_sw or not dst_pt:
             continue
+
         try:
             if int(src_pt) >= 4294967040 or int(dst_pt) >= 4294967040:
                 continue
@@ -59,15 +67,60 @@ def build_topology(telemetry):
 
         src_node = f"s{src_sw}-p{src_pt}"
         dst_node = f"s{dst_sw}-p{dst_pt}"
-
         if src_node not in graph:
-            graph.add_node(src_node, type="port")
+            graph.add_node(src_node, type="port", switch_id=src_sw, port_id=src_pt)
         if dst_node not in graph:
-            graph.add_node(dst_node, type="port")
+            graph.add_node(dst_node, type="port", switch_id=dst_sw, port_id=dst_pt)
 
-        graph.add_edge(src_node, dst_node)
+        src_state = str(
+            switches.get(src_sw, {}).get("stp_port_states", {}).get(src_pt, "")
+        ).upper()
+        dst_state = str(
+            switches.get(dst_sw, {}).get("stp_port_states", {}).get(dst_pt, "")
+        ).upper()
+        src_status = switches.get(src_sw, {}).get("port_status", {}).get(src_pt, {})
+        dst_status = switches.get(dst_sw, {}).get("port_status", {}).get(dst_pt, {})
+
+        def port_is_live(status):
+            if not isinstance(status, dict):
+                return True
+            state = str(status.get("state", "")).upper()
+            if state in {"DOWN", "MISSING", "LINK_DOWN", "ADMIN_DOWN"}:
+                return False
+            if status.get("link_down") is True or status.get("admin_down") is True:
+                return False
+            return True
+
+        endpoints_live = port_is_live(src_status) and port_is_live(dst_status)
+        stp_forwarding = (
+            src_state == "FORWARD" and dst_state == "FORWARD"
+            if stp_present else True
+        )
+        forwarding = endpoints_live and stp_forwarding
+        graph.add_edge(
+            src_node,
+            dst_node,
+            kind="inter_switch",
+            forwarding=forwarding,
+            src_stp_state=src_state or "UNKNOWN",
+            dst_stp_state=dst_state or "UNKNOWN",
+            src_port_status=str(src_status.get("state", "UNKNOWN")).upper(),
+            dst_port_status=str(dst_status.get("state", "UNKNOWN")).upper(),
+        )
 
     return graph
+
+
+def _forwarding_graph(graph):
+    """Return the effective data-plane graph, respecting observed STP blocks."""
+    effective = nx.Graph()
+    effective.graph.update(graph.graph)
+    effective.add_nodes_from((node, dict(data)) for node, data in graph.nodes(data=True))
+    for src, dst, data in graph.edges(data=True):
+        if data.get("kind") == "inter_switch" and data.get("forwarding") is False:
+            continue
+        effective.add_edge(src, dst, **dict(data))
+    return effective
 
 
 def get_access_endpoints(graph):
@@ -95,6 +148,7 @@ def get_access_endpoints(graph):
 
 
 def check_topology_exists(graph):
+    graph = _forwarding_graph(graph)
     """Verify that the topology is not empty."""
     if graph.number_of_nodes() == 0:
         return False, "FAIL: Empty topology"
@@ -102,6 +156,7 @@ def check_topology_exists(graph):
 
 
 def check_connectivity(graph):
+    graph = _forwarding_graph(graph)
     """Verify that the topology is connected (or empty)."""
     if graph.number_of_nodes() == 0:
         return False, "FAIL: Empty topology"
@@ -111,6 +166,7 @@ def check_connectivity(graph):
 
 
 def check_loop_freedom(graph):
+    graph = _forwarding_graph(graph)
     """
     Report whether the topology contains cycles.
 
@@ -125,6 +181,7 @@ def check_loop_freedom(graph):
 
 
 def check_reachability(graph, required_hosts=None):
+    graph = _forwarding_graph(graph)
     """
     Verify mutual reachability among the required endpoints.
     If required_hosts is None, use all port nodes present in the graph.

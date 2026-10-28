@@ -3,4 +3,10 @@ __pycache__/
 .pytest_cache/
 audit/*.pem
 audit/audit_log.json
+audit/human_approvals.json
+audit/human_approvals.json.lock
 observability/data/
+
+# Local private signing keys must never be committed
+experiments/results/*_key.pem
+observability/server_runtime.log

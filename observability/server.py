@@ -2,10 +2,13 @@ import subprocess
 import os
 import sys
 import json
+import hmac
+import importlib
+from datetime import datetime, timezone
 from flask import Flask, Response, jsonify, request, render_template_string, send_file
 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-for subdir in ["verifier", "audit", "agent", "controller", "executor", "observability"]:
+for subdir in ["verifier", "audit", "agent", "controller", "executor", "observability", "testbed"]:
     path = os.path.join(base_dir, subdir)
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -13,8 +16,10 @@ for subdir in ["verifier", "audit", "agent", "controller", "executor", "observab
 from prometheus_client import CollectorRegistry, generate_latest, CONTENT_TYPE_LATEST
 from metrics import NetOpsMetricsCollector
 from safety_verifier import build_topology, run_safety_checks, test_port_removal
-from decision_gate import apply_intent_to_graph
+from decision_gate import apply_intent_to_graph, decide
 from audit_trail import AuditTrail
+from human_verifier import HumanApprovalStore, ApprovalError
+from standby_anomaly import inspect_standby_forwarding
 
 DASHBOARD_HTML = """<!DOCTYPE html>
 <html lang="en">
@@ -484,7 +489,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 """
 
 
-def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=None):
+def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=None, approval_path=None):
     """
     Factory function for the Flask Observability & Metrics server.
     Provides Prometheus metrics on /metrics, JSON on /metrics/json,
@@ -497,6 +502,7 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=
     )
     audit = AuditTrail(log_path=audit_log_path, auto_load=True)
     trace_file = trace_log_path or os.path.join(base_dir, "observability", "data", "pipeline_trace.jsonl")
+    approval_store = HumanApprovalStore(path=approval_path)
 
     @app.route("/health", methods=["GET"])
     def health():
@@ -604,6 +610,404 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=
         }), 200
 
 
+    def _authenticated_approver():
+        """Authenticate a human operator using an explicit token-to-identity map."""
+        raw_tokens = os.environ.get("NETOPS_APPROVER_TOKENS", "")
+        try:
+            token_map = json.loads(raw_tokens) if raw_tokens else {}
+        except json.JSONDecodeError:
+            token_map = {}
+        if not isinstance(token_map, dict) or not token_map:
+            return None, (jsonify({
+                "error": "Human approval API is disabled. Configure NETOPS_APPROVER_TOKENS as a JSON object mapping approver IDs to strong tokens."
+            }), 503)
+        header = request.headers.get("Authorization", "")
+        scheme, _, supplied = header.partition(" ")
+        if scheme.lower() != "bearer" or not supplied:
+            return None, (jsonify({"error": "Bearer authentication required"}), 401)
+        for approver_id, configured_token in token_map.items():
+            if isinstance(configured_token, str) and hmac.compare_digest(supplied, configured_token):
+                return str(approver_id), None
+        return None, (jsonify({"error": "Unauthorized"}), 401)
+
+    @app.route("/approvals", methods=["GET"])
+    def human_approval_page():
+        # The token stays in this page's session storage and is never returned by the server.
+        return render_template_string("""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NetOps Human Verifier</title><style>
+body{font:16px system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem;background:#0f172a;color:#e2e8f0}
+input,textarea,button{font:inherit;padding:.65rem;border-radius:8px;border:1px solid #475569}
+input,textarea{background:#111827;color:#e2e8f0;width:min(95%,650px)}button{cursor:pointer;margin:.25rem;background:#1e293b;color:#f8fafc}
+.card{border:1px solid #334155;padding:1rem;border-radius:12px;margin:1rem 0;background:#1e293b}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1120;padding:.75rem;border-radius:8px}
+small{color:#94a3b8}.approve{border-color:#22c55e}.reject{border-color:#ef4444}
+.proposal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
+.status-chip{display:inline-block;padding:.3rem .65rem;border-radius:999px;font-weight:700;font-size:.85rem;border:1px solid #64748b;background:#334155;color:#e2e8f0}
+.status-pending{border-color:#f59e0b;background:#78350f;color:#fde68a}
+.status-approved{border-color:#60a5fa;background:#1e3a8a;color:#dbeafe}
+.status-rejected{border-color:#f87171;background:#7f1d1d;color:#fee2e2}
+.status-consumed{border-color:#a78bfa;background:#4c1d95;color:#ede9fe}
+.status-safe{color:#86efac}.status-unsafe{color:#fca5a5}
+.proposal-section{margin:.65rem 0;padding:.8rem;background:#111827;border:1px solid #334155;border-radius:10px}
+.proposal-section h3{margin:.1rem 0 .5rem;font-size:1rem}
+.proposal-summary{font-size:1rem;line-height:1.45;margin:.25rem 0}
+.issue-kicker{font-size:.76rem;letter-spacing:.04em;text-transform:uppercase;color:#93c5fd;font-weight:700}
+.change-list{margin:.4rem 0;padding-left:1.25rem}
+.change-list li{margin:.35rem 0;line-height:1.45}
+.check-list{list-style:none;padding:0;margin:.4rem 0}
+.check-list li{margin:.3rem 0;line-height:1.4}
+.check-pass{color:#86efac}.check-fail{color:#fca5a5}
+.explainer{color:#cbd5e1;line-height:1.55;margin:.5rem 0}
+.meta{color:#94a3b8;font-size:.9rem;line-height:1.6}
+details{margin-top:1rem}summary{cursor:pointer;color:#93c5fd;font-weight:600}
+textarea.reason-box{box-sizing:border-box;width:min(95%,650px);margin:.5rem 0}
+.action-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}
+button:disabled{opacity:.6;cursor:wait}
+@media(max-width:600px){body{margin:1rem auto}.card{padding:.75rem}.proposal-section{padding:.75rem}}
+</style></head><body>
+<h1>Human Verifier</h1>
+<p>Review the exact proposed action and its topology binding. Approval is single-use and expires. Automated verification still runs before execution.</p>
+<label>Operator bearer token<br><input id="token" type="password" autocomplete="current-password"></label>
+<button onclick="connect()">Connect</button><button onclick="loadApprovals()">Refresh</button>
+<p id="status" role="status">Enter an operator token configured by the administrator.</p><main id="items"></main>
+<script>
+const tokenInput=document.getElementById('token');tokenInput.value=sessionStorage.getItem('netops_approver_token')||'';
+function auth(){return {'Authorization':'Bearer '+tokenInput.value,'Content-Type':'application/json'};}
+function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined&&text!==null)el.textContent=String(text);return el;}
+function formatDate(value){if(!value)return 'Not recorded';const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString();}
+function humanStatus(p){
+  const states={
+    pending:{label:'Waiting for your decision',className:'status-pending',summary:'The proposal has not been approved, and no remediation has been executed.'},
+    approved:{label:'Approved — not executed yet',className:'status-approved',summary:'A human approved this action. The network has not necessarily changed; execution is a separate step.'},
+    rejected:{label:'Rejected',className:'status-rejected',summary:'The reviewer rejected this proposal. It must not be executed.'},
+    changes_requested:{label:'Changes requested',className:'status-pending',summary:'The reviewer asked for changes. A revised proposal is needed before execution.'},
+    consumed:{label:'Approval used — check execution result',className:'status-consumed',summary:'This approval has been used. Check the execution result and connectivity test to determine whether the change succeeded.'}
+  };
+  return states[String(p.status||'').toLowerCase()]||{label:String(p.status||'Unknown status').replaceAll('_',' '),className:'',summary:'Review the technical details before taking action.'};
+}
+function issuePresentation(p){
+  const intent=p.intent||{};
+  const raw=String(intent.reason||'');
+  const action=String(intent.action||'review').toLowerCase();
+  const sw=String(intent.target_switch||'?');
+  const port=String(intent.from_port||'?');
+  const isDemo2=/CONTROLLED DEMO SIGNAL/i.test(raw);
+  const isIssue2=isDemo2||/standby.forwarding.anomaly|standby_forwarding_anomaly|unexpected standby forwarding/i.test(raw);
+  const isIssue1=!isIssue2&&/re.isolate|restored standby trunk|redundant_trunk_restored/i.test(raw);
+  const status=String(p.status||'').toLowerCase();
+  let title='Network remediation proposal';
+  let summary=raw||'The AI proposed a network change. Review the target, impact, and safety checks below.';
+  let changes=[];
+  if(isIssue2){
+    title='Issue 2 — Unexpected standby forwarding';
+    summary=isDemo2
+      ?'This proposal was created from a controlled demo signal. Live telemetry did not confirm both ends of the standby link forwarding, and the demo did not change switch or STP state.'
+      :'The issue is unexpected forwarding on the standby connection. Review the current link states and safety evidence before approving the proposed isolation.';
+    changes=[
+      action==='block'&&sw==='1'&&port==='3'?'Proposed change: isolate backup link s1-p3 ↔ s2-p2 with guardrail block rules.':action==='block'?'Proposed change: block traffic on s'+sw+'-p'+port+'.':'Proposed action: '+action+' on switch s'+sw+', port '+port+'.',
+      'Keep the primary connection s1-p2 ↔ s2-p1 available.',
+      'After execution, check host connectivity and confirm the actual flow-rule result.'
+    ];
+  }else if(isIssue1){
+    title='Issue 1 — Standby trunk re-isolation';
+    summary='The primary connection s1-p2 ↔ s2-p1 is reported as forwarding. At least one end of the backup connection s1-p3 ↔ s2-p2 is blocked by STP. This proposal aims to explicitly isolate the restored backup path.';
+    changes=[
+      action==='block'&&sw==='1'&&port==='3'?'Proposed change: isolate backup link s1-p3 ↔ s2-p2 with guardrail block rules.':action==='block'?'Proposed change: block traffic on s'+sw+'-p'+port+'.':'Proposed action: '+action+' on switch s'+sw+', port '+port+'.',
+      'Preserve the primary connection s1-p2 ↔ s2-p1 for normal traffic.',
+      'After execution, verify host connectivity and confirm the rule was installed.'
+    ];
+  }else{
+    title='Network remediation proposal';
+    summary=raw||'The AI has suggested a network action. Review it carefully before deciding.';
+    changes=[
+      'Proposed action: '+action+' on switch s'+sw+', port '+port+'.',
+      'Review how this affects traffic using that port.',
+      'After execution, verify connectivity and inspect the actual execution result.'
+    ];
+  }
+
+  let stage='Proposed only — not applied to the network yet.';
+  if(status==='approved') stage='Approved by a human reviewer; execution is a separate step and is not confirmed yet.';
+  else if(status==='rejected') stage='Rejected by the human reviewer. This proposal is not authorized for execution.';
+  else if(status==='changes_requested') stage='Changes requested. A revised proposal is needed; this proposal is not authorized for execution.';
+  else if(status==='consumed') stage='Execution was attempted using this approval. Check the executor result and connectivity test to determine whether it succeeded.';
+  else if(status==='expired') stage='This proposal expired before a decision. Generate a fresh proposal to continue.';
+  return {title,summary,changes,stage,isDemo2,isIssue2,isIssue1};
+}
+function humanStatus(p){
+  const states={
+    pending:{label:'Waiting for your decision',className:'status-pending',summary:'No human approval has been recorded. The proposed network change has not been executed.'},
+    approved:{label:'Approved — not executed yet',className:'status-approved',summary:'A human approved this action. Approval does not mean the network has changed.'},
+    rejected:{label:'Rejected',className:'status-rejected',summary:'The reviewer rejected this proposal. It must not be executed.'},
+    changes_requested:{label:'Changes requested',className:'status-pending',summary:'The reviewer asked for changes. A revised proposal is needed.'},
+    consumed:{label:'Execution attempted — verify result',className:'status-consumed',summary:'The approval has been used. Check execution and connectivity evidence before claiming success.'},
+    expired:{label:'Expired',className:'status-rejected',summary:'This proposal expired and cannot be approved.'}
+  };
+  return states[String(p.status||'').toLowerCase()]||{label:String(p.status||'Unknown status').replaceAll('_',' '),className:'',summary:'Review the proposal details before taking action.'};
+}
+async function connect(){sessionStorage.setItem('netops_approver_token',tokenInput.value);await loadApprovals();}
+async function loadApprovals(){const status=document.getElementById('status'),items=document.getElementById('items');
+if(!tokenInput.value){status.textContent='Enter operator token.';return;}
+status.textContent='Loading proposals…';items.replaceChildren();
+try{const r=await fetch('/api/approvals',{headers:auth()});const data=await r.json();
+if(!r.ok)throw new Error(data.error||'Request failed');status.textContent='Connected as '+(data.authenticated_approver||'authorized operator')+'. Review each proposal before deciding.';
+for(const p of data.proposals||[]){
+  const card=node('section','card');
+  const head=node('div','proposal-head');
+  const title=node('h2','', 'Proposal '+p.proposal_id);
+  const state=humanStatus(p);
+  const chip=node('span','status-chip '+state.className,state.label);
+  head.append(title,chip);card.append(head);
+  card.append(node('p','explainer',state.summary));
+
+  const presentation=issuePresentation(p);
+  const issueSection=node('section','proposal-section');
+  issueSection.append(node('div','issue-kicker','Issue details'));
+  issueSection.append(node('h3','',presentation.title));
+  issueSection.append(node('p','explainer',presentation.summary));
+  card.append(issueSection);
+
+  const changeSection=node('section','proposal-section');
+  changeSection.append(node('h3','','Changes to address the issue'));
+  changeSection.append(node('p','meta',presentation.stage));
+  const changeList=node('ul','change-list');
+  for(const change of presentation.changes)changeList.append(node('li','',change));
+  changeSection.append(changeList);
+  card.append(changeSection);
+
+  const verifier=p.verifier_result||{};
+  const checkSection=node('section','proposal-section');
+  const safe=verifier.safe===true;
+  checkSection.append(node('h3','', 'Automated safety checks'));
+  checkSection.append(node('p',safe?'status-safe':'status-unsafe',safe?'Safety checker: PASS':'Safety checker: FAIL — review before taking action'));
+  checkSection.append(node('p','explainer',safe
+    ?'The automated checks passed for this proposal. This does not equal human approval and does not prove that the network change was executed.'
+    :'One or more required checks did not pass. Review the failures before considering this action.'));
+  const checks=node('ul','check-list');
+  const checkValues=Array.isArray(verifier.checks)?verifier.checks:[];
+  if(checkValues.length){
+    for(const check of checkValues){
+      const passed=/^PASS:/i.test(String(check));
+      checks.append(node('li',passed?'check-pass':'check-fail',(passed?'✓ ':'✕ ')+String(check).replace(/^(PASS|FAIL):\s*/i,'')));
+    }
+  }else checks.append(node('li','meta','No detailed safety checks were recorded.'));
+  checkSection.append(checks);
+  checkSection.append(node('p','meta','Topology nodes checked: '+(verifier.nodes??'not recorded')+' · Connections checked: '+(verifier.edges??'not recorded')));
+  card.append(checkSection);
+
+  const details=document.createElement('details');
+  details.append(node('summary','','Technical details (fingerprints, timestamps and original reason)'));
+  const metadata=node('div','proposal-section');
+  metadata.append(node('p','meta','Created: '+formatDate(p.created_at)));
+  metadata.append(node('p','meta','Expires: '+formatDate(p.expires_at)));
+  metadata.append(node('p','meta','Target switch: s'+String((p.intent||{}).target_switch||'?')+' · Port: '+String((p.intent||{}).from_port||'?')));
+  const raw=node('pre','',JSON.stringify({topology_fingerprint:p.topology_fingerprint,proposal_fingerprint:p.proposal_fingerprint,original_reason:(p.intent||{}).reason,decision:p.decision,consumed_at:p.consumed_at},null,2));
+  metadata.append(raw);details.append(metadata);card.append(details);
+
+  const decisionSection=node('section','proposal-section');
+  decisionSection.append(node('h3','','Your Decision'));
+  if(p.status==='pending'){
+    decisionSection.append(node('p','explainer','Review the issue, proposed changes, and safety checks. Choose approve, reject, or request changes, and record a short reason for the audit trail.'));
+    const reason=node('textarea','reason-box');reason.placeholder='Why are you approving, rejecting, or requesting changes?';reason.rows=3;reason.style.display='block';decisionSection.append(reason);
+    const row=node('div','action-row');
+    for(const decision of ['approve','reject','request_changes']){
+      const b=node('button',decision==='approve'?'approve':decision==='reject'?'reject':'',decision==='approve'?'Approve proposal':decision==='reject'?'Reject proposal':'Request changes');
+      b.onclick=async()=>{
+        if(!reason.value.trim()){alert('Enter a reason for the audit trail.');return;}
+        b.disabled=true;
+        try{
+          const res=await fetch('/api/approvals/'+encodeURIComponent(p.proposal_id)+'/decision',{method:'POST',headers:auth(),body:JSON.stringify({decision,reason:reason.value,proposal_fingerprint:p.proposal_fingerprint})});
+          const out=await res.json();if(!res.ok)throw new Error(out.error||'Decision failed');
+          await loadApprovals();
+          status.textContent='Decision recorded: '+humanStatus(out.proposal||{status:decision==='approve'?'approved':decision==='reject'?'rejected':'changes_requested'}).label+'.';
+        }catch(e){alert(e.message);b.disabled=false;}
+      };
+      row.append(b);
+    }
+    decisionSection.append(row);
+  }else if(p.status==='approved'){
+    const decided=p.decision||{};
+    decisionSection.append(node('p','explainer','Decision: Approved by '+(decided.approver_id||'authorized reviewer')+' on '+formatDate(decided.decided_at)+'.'));
+    if(decided.reason)decisionSection.append(node('p','meta','Recorded reason: '+decided.reason));
+    decisionSection.append(node('p','explainer','The proposal is approved, but the change is not confirmed as applied until execution succeeds and connectivity is checked.'));
+    const b=node('button','approve','Execute approved action');
+    b.onclick=async()=>{
+      if(!confirm('Run this exact approved action? It will be revalidated. Execution changes the lab network and requires a live connectivity check.'))return;
+      b.disabled=true;
+      try{
+        const res=await fetch('/api/approvals/'+encodeURIComponent(p.proposal_id)+'/execute',{method:'POST',headers:auth(),body:'{}'});
+        const out=await res.json();
+        alert(JSON.stringify(out,null,2));
+        await loadApprovals();
+      }catch(e){alert(e.message);b.disabled=false;}
+    };
+    decisionSection.append(b);
+  }else{
+    const decided=p.decision||{};
+    decisionSection.append(node('p','explainer',state.summary));
+    if(decided.approver_id)decisionSection.append(node('p','meta','Decision recorded by: '+decided.approver_id));
+    if(decided.decided_at)decisionSection.append(node('p','meta','Decision date: '+formatDate(decided.decided_at)));
+    if(decided.reason)decisionSection.append(node('p','meta','Reason: '+decided.reason));
+    if(p.status==='consumed'){
+      decisionSection.append(node('p','explainer','Do not mark this as fixed until the execution result and post-change connectivity check confirm success.'));
+    }
+  }
+  card.append(decisionSection);
+  items.append(card);
+}
+if(!(data.proposals||[]).length){status.textContent='No active proposals or recent decisions.';}
+}catch(e){status.textContent='Error: '+e.message;}}
+</script></body></html>""")
+
+    @app.route("/api/approvals", methods=["GET"])
+    def api_human_approvals():
+        approver, error = _authenticated_approver()
+        if error:
+            return error
+        all_proposals = approval_store.list_proposals(include_decided=True)
+        active_proposals = [
+            p for p in all_proposals
+            if p.get("status") in {"pending", "approved"}
+            and not approval_store._is_expired(p)
+        ]
+        # Keep the latest terminal decisions visible instead of making rejected
+        # proposals disappear from the Human Verifier queue.
+        terminal_statuses = {"rejected", "changes_requested", "consumed"}
+        recent_decisions = [
+            p for p in all_proposals if p.get("status") in terminal_statuses
+        ]
+        recent_decisions.sort(
+            key=lambda p: (
+                (p.get("decision") or {}).get("decided_at")
+                or p.get("consumed_at")
+                or p.get("created_at")
+                or ""
+            ),
+            reverse=True,
+        )
+        proposals = active_proposals + recent_decisions[:10]
+        return jsonify({"proposals": proposals, "authenticated_approver": approver}), 200
+
+    @app.route("/api/approvals/<proposal_id>/decision", methods=["POST"])
+    def api_human_approval_decision(proposal_id):
+        approver, error = _authenticated_approver()
+        if error:
+            return error
+        payload = request.get_json(silent=True) or {}
+        reason = str(payload.get("reason", "")).strip()
+        if not reason:
+            return jsonify({"error": "A decision reason is required"}), 400
+        current = approval_store.get_proposal(proposal_id)
+        if current is None:
+            return jsonify({"error": "Proposal not found"}), 404
+        try:
+            updated = approval_store.decide(
+                proposal_id=proposal_id,
+                decision=payload.get("decision", ""),
+                approver_id=approver,
+                reason=reason,
+                proposal_fingerprint_value=payload.get("proposal_fingerprint"),
+            )
+        except ApprovalError as exc:
+            return jsonify({"error": str(exc)}), 409
+        audit_decision = {"approved": "APPROVED", "rejected": "REJECTED", "changes_requested": "CHANGES_REQUESTED"}[updated["status"]]
+        audit_record = audit.record_decision(
+            decision=audit_decision,
+            intent=current["intent"],
+            verifier_result=current["verifier_result"],
+            execution_result={"human_approval": {
+                "proposal_id": proposal_id,
+                "status": updated["status"],
+                "approver_id": approver,
+                "reason": reason,
+                "proposal_fingerprint": updated["proposal_fingerprint"],
+            }},
+        )
+
+        # Preserve the original AI proposal event and append the final human
+        # decision as a separate event in Pipeline Trace.
+        decision_details = updated.get("decision") or {}
+        trace_event = {
+            "event_type": "human_approval_decision",
+            "decision": audit_decision,
+            "intent": current.get("intent") or {},
+            "verification": current.get("verifier_result") or {},
+            "execution": None,
+            "human_approval": {
+                "proposal_id": proposal_id,
+                "status": updated["status"],
+                "proposal_fingerprint": updated.get("proposal_fingerprint"),
+                "expires_at": updated.get("expires_at"),
+                "decision": decision_details,
+            },
+            "decision_reason": reason,
+            "audit_record": audit_record,
+            "timestamp": decision_details.get("decided_at") or datetime.now(timezone.utc).isoformat(),
+        }
+        try:
+            os.makedirs(os.path.dirname(trace_file) or ".", exist_ok=True)
+            with open(trace_file, "a", encoding="utf-8") as trace_handle:
+                trace_handle.write(json.dumps(trace_event) + "\n")
+        except OSError:
+            app.logger.exception("Failed to append human approval decision to pipeline trace")
+
+        return jsonify({
+            "proposal": updated,
+            "audit_status": "recorded",
+            "trace_status": "recorded",
+        }), 200
+
+    @app.route("/api/approvals/<proposal_id>/execute", methods=["POST"])
+    def api_execute_human_approved(proposal_id):
+        approver, error = _authenticated_approver()
+        if error:
+            return error
+        proposal = approval_store.get_proposal(proposal_id)
+        if proposal is None:
+            return jsonify({"error": "Proposal not found"}), 404
+        if proposal.get("status") != "approved":
+            return jsonify({"error": "Only an approved, unconsumed proposal can execute"}), 409
+        chain_ok, chain_message = audit.verify_chain(audit.chain)
+        if not chain_ok:
+            return jsonify({"error": f"Audit chain verification failed; execution blocked: {chain_message}"}), 503
+        approval_audited = any(
+            record.get("decision") == "APPROVED"
+            and record.get("intent") == proposal.get("intent")
+            and isinstance(record.get("execution_result"), dict)
+            and isinstance(record["execution_result"].get("human_approval"), dict)
+            and record["execution_result"]["human_approval"].get("proposal_id") == proposal_id
+            and record["execution_result"]["human_approval"].get("status") == "approved"
+            for record in audit.chain
+        )
+        if not approval_audited:
+            return jsonify({
+                "error": "Matching signed approval record is missing; execution remains blocked."
+            }), 503
+        checker_spec = os.environ.get("NETOPS_CONNECTIVITY_CHECKER", "")
+        if ":" not in checker_spec:
+            return jsonify({
+                "error": "Execution disabled: configure NETOPS_CONNECTIVITY_CHECKER=module:function for a real host-to-host connectivity check."
+            }), 503
+        module_name, function_name = checker_spec.split(":", 1)
+        try:
+            checker = getattr(importlib.import_module(module_name), function_name)
+            if not callable(checker):
+                raise ValueError("checker is not callable")
+        except Exception as exc:
+            return jsonify({"error": f"Connectivity checker could not be loaded: {exc}"}), 503
+        result = decide(
+            telemetry_path=collector.telemetry_path,
+            execute_approved=True,
+            connectivity_checker=checker,
+            approval_id=proposal_id,
+            approval_store=approval_store,
+            audit_logger=audit,
+        )
+        execution = result.get("execution") or {}
+        status_code = 200 if execution.get("success") else 409
+        return jsonify({"authenticated_approver": approver, "result": result}), status_code
+
     @app.route("/api/topology", methods=["GET"])
     def api_topology():
         telem_path = collector.telemetry_path
@@ -703,85 +1107,337 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=
     # =========================================================================
     @app.route("/api/chaos/inject-loop", methods=["POST"])
     def api_chaos_inject_loop():
-        confirm = request.args.get("confirm", "").strip().lower()
-        if confirm != "true":
+        """Restore the redundant trunk as a controlled fault, then run the AI gate.
+
+        This endpoint only resets the known trunk-B test condition. It never
+        invokes the executor; the action must pass verification and be approved
+        in Human Verifier before the separate execution endpoint can run.
+        """
+        configured_token = os.environ.get("NETOPS_CHAOS_API_TOKEN", "")
+        if not configured_token:
             return jsonify({
-                "error": "Confirmation required. Call with ?confirm=true to proceed."
-            }), 400
+                "error": "Fault injection is disabled. Configure NETOPS_CHAOS_API_TOKEN when starting the local server."
+            }), 503
+        supplied_token = request.headers.get("Authorization", "")
+        if not hmac.compare_digest(supplied_token, f"Bearer {configured_token}"):
+            return jsonify({"error": "Unauthorized"}), 401
+        if request.args.get("confirm", "").strip().lower() != "true":
+            return jsonify({"error": "Confirmation required. Call with ?confirm=true to continue."}), 400
+
+        # Fixed commands only. Refuse unless this project's two OVS bridges exist.
+        for bridge in ("s1", "s2"):
+            check = subprocess.run(
+                ["sudo", "-n", "ovs-vsctl", "br-exists", bridge],
+                shell=False, capture_output=True, text=True, check=False, timeout=3,
+            )
+            if check.returncode != 0:
+                return jsonify({
+                    "error": f"Controlled fault injection requires live Mininet bridge {bridge}; no command was run."
+                }), 409
+
+        # Require a configured, real bidirectional ping checker before touching
+        # the lab. A missing/stopped testbed must fail closed.
+        checker_spec = os.environ.get("NETOPS_CONNECTIVITY_CHECKER", "")
+        module_name, separator, function_name = checker_spec.partition(":")
+        if not separator or not module_name or not function_name:
+            return jsonify({
+                "error": "Fault injection disabled: configure a real NETOPS_CONNECTIVITY_CHECKER=module:function first."
+            }), 503
+        try:
+            checker_module = importlib.import_module(module_name)
+            connectivity_checker = getattr(checker_module, function_name)
+            if not callable(connectivity_checker):
+                raise TypeError("configured connectivity checker is not callable")
+            if connectivity_checker() is not True:
+                return jsonify({
+                    "error": "Baseline host-to-host connectivity did not pass; refusing to inject a fault."
+                }), 409
+        except Exception as exc:
+            return jsonify({
+                "error": f"Baseline connectivity checker failed closed: {type(exc).__name__}: {exc}"
+            }), 503
+
+        # Reintroduce the known redundant trunk-B condition, removing only the
+        # previous trunk-B guardrail rule and ensuring both link interfaces are up.
+        commands = [
+            ["sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "del-flows", "s1", "in_port=3"],
+            ["sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "del-flows", "s2", "in_port=2"],
+            ["sudo", "-n", "ip", "link", "set", "s1-eth3", "up"],
+            ["sudo", "-n", "ip", "link", "set", "s2-eth2", "up"],
+        ]
+        for command in commands:
+            try:
+                result = subprocess.run(
+                    command, shell=False, capture_output=True, text=True,
+                    check=False, timeout=4,
+                )
+            except (OSError, subprocess.SubprocessError) as exc:
+                return jsonify({
+                    "error": f"Fault reset command failed ({command[2]}): {exc}",
+                    "network_mutation_attempted": True, "execution_started": False,
+                }), 503
+            if result.returncode != 0:
+                return jsonify({
+                    "error": f"Fault reset command failed ({command[2]}): {(result.stderr or result.stdout).strip()}",
+                    "network_mutation_attempted": True, "execution_started": False,
+                }), 503
 
         try:
-            # Run pre-approved, hardcoded command using subprocess with shell=False,
-            # matching the safety pattern of RemediationExecutor._default_cmd_runner.
-            # Reconnect redundant trunk link / delete OVS drop rules blocking redundant trunk
-            cmds = [
-                ["sudo", "ovs-ofctl", "-O", "OpenFlow13", "del-flows", "s1", "in_port=3"],
-                ["sudo", "ovs-ofctl", "-O", "OpenFlow13", "del-flows", "s2", "in_port=2"],
-                ["sudo", "ip", "link", "set", "s1-eth3", "up"],
-                ["sudo", "ip", "link", "set", "s2-eth2", "up"]
-            ]
-            for cmd in cmds:
-                try:
-                    subprocess.run(
-                        cmd,
-                        shell=False,
-                        capture_output=True,
-                        text=True,
-                        check=False
-                    )
-                except Exception:
-                    pass
-
-            # Update telemetry data to restore redundant trunk link s1-p3 <-> s2-p2
-            # so discovery / verifier observes the re-introduced physical loop
-            telem_path = collector.telemetry_path
-            if os.path.exists(telem_path):
-                with open(telem_path, "r", encoding="utf-8") as f:
-                    telem = json.load(f)
-
-                sw1_ports = telem.setdefault("switches", {}).setdefault("1", {}).setdefault("ports", {})
-                if "3" not in sw1_ports:
-                    sw1_ports["3"] = {
-                        "rx_packets": 37290, "tx_packets": 32217423,
-                        "rx_bytes": 3204454, "tx_bytes": 3156857654
-                    }
-
-                sw2_ports = telem.setdefault("switches", {}).setdefault("2", {}).setdefault("ports", {})
-                if "2" not in sw2_ports:
-                    sw2_ports["2"] = {
-                        "rx_packets": 32218198, "tx_packets": 37291,
-                        "rx_bytes": 3156933536, "tx_bytes": 3204540
-                    }
-
-                links = telem.setdefault("links", [])
-                has_1_to_2 = any(
-                    str(l.get("src_switch")) == "1" and str(l.get("src_port")) == "3" and
-                    str(l.get("dst_switch")) == "2" and str(l.get("dst_port")) == "2"
-                    for l in links
-                )
-                if not has_1_to_2:
-                    links.append({"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"})
-
-                has_2_to_1 = any(
-                    str(l.get("src_switch")) == "2" and str(l.get("src_port")) == "2" and
-                    str(l.get("dst_switch")) == "1" and str(l.get("dst_port")) == "3"
-                    for l in links
-                )
-                if not has_2_to_1:
-                    links.append({"src_switch": "2", "src_port": "2", "dst_switch": "1", "dst_port": "3"})
-
-                with open(telem_path, "w", encoding="utf-8") as f:
-                    json.dump(telem, f, indent=4)
-
+            if connectivity_checker() is not True:
+                return jsonify({
+                    "error": "Host-to-host connectivity did not pass after restoring the redundant trunk; no AI proposal was created.",
+                    "network_mutation_attempted": True,
+                    "execution_started": False,
+                }), 503
+        except Exception as exc:
             return jsonify({
-                "status": "injected",
-                "action": "restored redundant trunk link s1-p3<->s2-p2"
+                "error": f"Post-reset connectivity checker failed closed: {type(exc).__name__}: {exc}",
+                "network_mutation_attempted": True,
+                "execution_started": False,
+            }), 503
+
+        # Use live Ryu telemetry only: do not forge topology edges or timestamps.
+        try:
+            with open(collector.telemetry_path, "r", encoding="utf-8") as handle:
+                telemetry = json.load(handle)
+        except (OSError, json.JSONDecodeError) as exc:
+            return jsonify({
+                "error": f"Cannot read Ryu telemetry after fault reset: {exc}",
+                "network_mutation_attempted": True, "execution_started": False,
+            }), 503
+
+        switches = telemetry.get("switches", {})
+        states = {
+            str(sw): {str(port): str(state).upper()
+                      for port, state in (data.get("stp_port_states") or {}).items()}
+            for sw, data in switches.items() if isinstance(data, dict)
+        }
+        links = set()
+        for link in telemetry.get("links", []):
+            if isinstance(link, dict):
+                a = f"s{str(link.get('src_switch', '')).strip()}-p{str(link.get('src_port', '')).strip()}"
+                b = f"s{str(link.get('dst_switch', '')).strip()}-p{str(link.get('dst_port', '')).strip()}"
+                links.add(tuple(sorted((a, b))))
+        trunk_a = tuple(sorted(("s1-p2", "s2-p1")))
+        trunk_b = tuple(sorted(("s1-p3", "s2-p2")))
+        if trunk_a not in links or trunk_b not in links:
+            return jsonify({
+                "error": "Ryu telemetry does not confirm both redundant trunks; keep Mininet/Ryu running and retry.",
+                "observed_links": sorted(links), "network_mutation_attempted": True,
+                "execution_started": False,
+            }), 409
+        if not (
+            states.get("1", {}).get("1") == "FORWARD"
+            and states.get("2", {}).get("3") == "FORWARD"
+            and states.get("1", {}).get("2") == "FORWARD"
+            and states.get("2", {}).get("1") == "FORWARD"
+            and "BLOCK" in {states.get("1", {}).get("3", "UNKNOWN"),
+                            states.get("2", {}).get("2", "UNKNOWN")}
+        ):
+            return jsonify({
+                "error": "Safety precondition failed: host access and primary trunk must be FORWARD, and a standby endpoint must be STP BLOCK.",
+                "stp_states": states, "network_mutation_attempted": True,
+                "execution_started": False,
+            }), 409
+
+        incident_context = {
+            "fault_type": "redundant_trunk_restored",
+            "summary": "Controlled fault injection restored redundant trunk B and cleared prior guardrail drop rules on that trunk. Use current Ryu topology and STP telemetry as evidence.",
+            "affected_link": {"endpoint_a": "s1-p3", "endpoint_b": "s2-p2"},
+            "expected_action": "block",
+            "expected_target_switch": "1",
+            "expected_from_port": "3",
+            "reason": "Re-isolate the restored standby trunk while preserving the primary trunk and host reachability.",
+        }
+        try:
+            pipeline = decide(
+                telemetry_path=collector.telemetry_path,
+                execute_approved=False,
+                audit_logger=audit,
+                incident_context=incident_context,
+            )
+        except Exception as exc:
+            return jsonify({
+                "error": f"AI decision pipeline failed closed: {type(exc).__name__}: {exc}",
+                "network_mutation_attempted": True, "execution_started": False,
+            }), 503
+
+        if pipeline.get("decision") != "PENDING_HUMAN_APPROVAL" or not pipeline.get("human_approval"):
+            return jsonify({
+                "error": "AI/verifier did not produce a safe human-reviewable block proposal. No remediation was executed.",
+                "fault": incident_context, "pipeline": pipeline,
+                "network_mutation_attempted": True, "execution_started": False,
+            }), 409
+
+        return jsonify({
+            "status": "fault_injected_proposal_created",
+            "fault": incident_context,
+            "pipeline": pipeline,
+            "proposal_id": pipeline["human_approval"]["proposal_id"],
+            "expires_at": pipeline["human_approval"]["expires_at"],
+            "network_mutation_attempted": True,
+            "execution_started": False,
+            "next_step": "Open /approvals, inspect the AI-generated intent and verifier checks, and approve/reject with a reason.",
+        }), 200
+
+    @app.route("/api/chaos/standby-forwarding", methods=["POST"])
+    def api_issue2_standby_forwarding():
+        """Run Issue 2 detection or an explicitly labeled, non-disruptive demo signal.
+
+        No OVS/STP port state is changed here. Live telemetry and connectivity
+        are always checked. If live telemetry does not show both standby ends
+        forwarding, a proposal is created only when the caller explicitly asks
+        for a controlled simulation. The response and AI reason label it as such.
+        """
+        configured_token = os.environ.get("NETOPS_CHAOS_API_TOKEN", "")
+        if not configured_token:
+            return jsonify({"error": "Issue 2 is disabled: configure NETOPS_CHAOS_API_TOKEN."}), 503
+        supplied_token = request.headers.get("Authorization", "")
+        if not hmac.compare_digest(supplied_token, f"Bearer {configured_token}"):
+            return jsonify({"error": "Unauthorized"}), 401
+        if request.args.get("confirm", "").strip().lower() != "true":
+            return jsonify({"error": "Confirmation required. Call with ?confirm=true."}), 400
+
+        payload = request.get_json(silent=True) or {}
+        allow_simulation = payload.get("allow_controlled_simulation") is True
+
+        # Do not let the demo endpoint run when the expected lab is missing.
+        for bridge in ("s1", "s2"):
+            check = subprocess.run(
+                ["sudo", "-n", "ovs-vsctl", "br-exists", bridge],
+                shell=False, capture_output=True, text=True, check=False, timeout=3,
+            )
+            if check.returncode != 0:
+                return jsonify({
+                    "error": f"Issue 2 requires live Mininet bridge {bridge}; no proposal was created.",
+                    "network_mutation_attempted": False,
+                }), 409
+
+        checker_spec = os.environ.get("NETOPS_CONNECTIVITY_CHECKER", "")
+        module_name, separator, function_name = checker_spec.partition(":")
+        if not separator or not module_name or not function_name:
+            return jsonify({
+                "error": "Issue 2 disabled: configure a real NETOPS_CONNECTIVITY_CHECKER=module:function.",
+                "network_mutation_attempted": False,
+            }), 503
+        try:
+            checker_module = importlib.import_module(module_name)
+            connectivity_checker = getattr(checker_module, function_name)
+            if not callable(connectivity_checker) or connectivity_checker() is not True:
+                return jsonify({
+                    "error": "Live baseline host connectivity did not pass; no proposal was created.",
+                    "network_mutation_attempted": False,
+                }), 409
+        except Exception as exc:
+            return jsonify({
+                "error": f"Live connectivity check failed closed: {type(exc).__name__}: {exc}",
+                "network_mutation_attempted": False,
+            }), 503
+
+        # Never propose a second block when the guardrail already contains the
+        # standby trunk. Inspect only the exact guardrail priority/ports.
+        for bridge, port in (("s1", "3"), ("s2", "2")):
+            result = subprocess.run(
+                ["sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "dump-flows", bridge],
+                shell=False, capture_output=True, text=True, check=False, timeout=3,
+            )
+            if result.returncode != 0:
+                return jsonify({
+                    "error": f"Could not inspect existing flows on {bridge}; refusing duplicate proposal.",
+                    "network_mutation_attempted": False,
+                }), 503
+            for line in (result.stdout or "").splitlines():
+                if "priority=65500" in line and f"in_port={port}" in line and "actions=drop" in line:
+                    return jsonify({
+                        "error": f"Standby trunk already has a guardrail drop rule on {bridge} port {port}; reconcile the existing action before a new proposal.",
+                        "network_mutation_attempted": False,
+                    }), 409
+
+        try:
+            with open(collector.telemetry_path, "r", encoding="utf-8") as handle:
+                telemetry = json.load(handle)
+        except (OSError, json.JSONDecodeError) as exc:
+            return jsonify({
+                "error": f"Could not read live Ryu telemetry: {exc}",
+                "network_mutation_attempted": False,
+            }), 503
+
+        observation = inspect_standby_forwarding(telemetry)
+        if not observation["ready_for_investigation"]:
+            return jsonify({
+                "error": "Live telemetry is stale or the primary/host path preconditions are not healthy; no Issue 2 proposal was created.",
+                "observation": observation,
+                "network_mutation_attempted": False,
+            }), 409
+
+        live_anomaly = observation["detected"]
+        if not live_anomaly and not allow_simulation:
+            return jsonify({
+                "status": "no_live_anomaly",
+                "message": "Live Ryu telemetry does not currently show both standby endpoints FORWARD. No AI proposal was created. Use the explicitly labeled controlled demo option only when you need to demonstrate the review workflow.",
+                "observation": observation,
+                "network_mutation_attempted": False,
+                "execution_started": False,
             }), 200
 
-        except Exception as e:
+        incident_context = {
+            "fault_type": "standby_forwarding_anomaly",
+            "summary": (
+                "Live telemetry reports both standby endpoints forwarding."
+                if live_anomaly else
+                "Controlled simulation of an unexpected standby-forwarding alert; the simulation signal is not a claim that live STP state is anomalous."
+            ),
+            "affected_link": {"endpoint_a": "s1-p3", "endpoint_b": "s2-p2"},
+            "expected_action": "block",
+            "expected_target_switch": "1",
+            "expected_from_port": "3",
+            "simulation_mode": not live_anomaly,
+            "signal_source": "live_telemetry" if live_anomaly else "controlled_demo_signal",
+            "observation": observation,
+            "reason": (
+                "Contain unexpected standby forwarding while preserving the primary trunk and host reachability."
+                if live_anomaly else
+                "Demonstrate the Issue 2 review flow safely; propose standby isolation for human review without changing switch/STP state during incident injection."
+            ),
+        }
+        try:
+            pipeline = decide(
+                telemetry_path=collector.telemetry_path,
+                execute_approved=False,
+                audit_logger=audit,
+                incident_context=incident_context,
+            )
+        except Exception as exc:
             return jsonify({
-                "status": "error",
-                "error": str(e)
-            }), 500
+                "error": f"Issue 2 AI decision pipeline failed closed: {type(exc).__name__}: {exc}",
+                "incident_context": incident_context,
+                "network_mutation_attempted": False,
+                "execution_started": False,
+            }), 503
+
+        if pipeline.get("decision") != "PENDING_HUMAN_APPROVAL" or not pipeline.get("human_approval"):
+            return jsonify({
+                "error": "AI/verifier did not create a safe human-reviewable proposal. No remediation was executed.",
+                "incident_context": incident_context,
+                "observation": observation,
+                "pipeline": pipeline,
+                "network_mutation_attempted": False,
+                "execution_started": False,
+            }), 409
+
+        return jsonify({
+            "status": "issue2_proposal_created",
+            "issue": "unexpected_standby_forwarding",
+            "detection_mode": "live_telemetry" if live_anomaly else "controlled_simulation",
+            "observation": observation,
+            "incident_context": incident_context,
+            "pipeline": pipeline,
+            "proposal_id": pipeline["human_approval"]["proposal_id"],
+            "expires_at": pipeline["human_approval"]["expires_at"],
+            "network_mutation_attempted": False,
+            "execution_started": False,
+            "next_step": "Review the proposal on /approvals. Approval is separate from execution; reject if you disagree.",
+        }), 200
 
     @app.route("/", methods=["GET"])
     def index():
@@ -805,7 +1461,12 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=
                 "/api/topology",
                 "/api/pipeline/trace",
                 "/api/audit/chain",
-                "/api/chaos/inject-loop"
+                "/approvals",
+                "/api/approvals",
+                "/api/approvals/<proposal_id>/decision",
+                "/api/approvals/<proposal_id>/execute",
+                "/api/chaos/inject-loop",
+                "/api/chaos/standby-forwarding"
             ]
         }), 200
 
@@ -814,7 +1475,7 @@ def create_metrics_app(telemetry_path=None, audit_log_path=None, trace_log_path=
 
 if __name__ == "__main__":
     port = int(os.environ.get("METRICS_PORT", 8000))
-    host = os.environ.get("METRICS_HOST", "0.0.0.0")
+    host = os.environ.get("METRICS_HOST", "127.0.0.1")
     print(f"Starting NetOps Observability Metrics Server on http://{host}:{port}/")
     print(f"Interactive Web Dashboard available at: http://localhost:{port}/dashboard")
     print(f"Prometheus Metrics Feed available at:   http://localhost:{port}/metrics")
