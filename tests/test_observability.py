@@ -236,6 +236,7 @@ class TestObservabilityMetrics:
         assert "const lifecycleRecords = chronological.filter(item =>" in html
         assert "Boolean(approvalInfoForTrace(item).proposal_id)" in html
         assert "const activePending = chronological.filter" not in html
+        assert "Proposal ID: ' + approval.proposal_id" in html
         assert "HUMAN APPROVAL: APPROVED · NOT EXECUTED" in html
 
     def test_grafana_dashboard_schema(self):

@@ -827,6 +827,7 @@
       const approval = approvalInfoForTrace(record);
       const decision = String(record.decision || '').toUpperCase();
       const approvalStatus = String(approval.status || '').toLowerCase();
+      const proposalRef = approval.proposal_id ? ' Proposal ID: ' + approval.proposal_id + '.' : '';
       const execution = record.execution ||
         record.audit_record?.execution_result?.execution ||
         record.execution_result || {};
@@ -851,9 +852,9 @@
         const isExpired = Number.isFinite(expiry) && expiry <= Date.now();
         setState('tint-pending', 'tag-pending-state',
           isExpired ? '● APPROVAL: EXPIRED' : '● HUMAN APPROVAL: PENDING',
-          isExpired
+          (isExpired
             ? 'This proposal has expired and cannot be approved for execution.'
-            : 'Safety checks are separate from approval. A human decision is still required; remediation has not executed.');
+            : 'Safety checks are separate from approval. A human decision is still required; remediation has not executed.') + proposalRef);
         return;
       }
 
@@ -872,7 +873,7 @@
       if (decision === 'APPROVED' || approvalStatus === 'approved') {
         setState('tint-human-approved', 'tag-human-approved',
           '● HUMAN APPROVAL: APPROVED · NOT EXECUTED',
-          'Approval was recorded, but that alone does not mean remediation executed successfully.');
+          'Approval was recorded, but that alone does not mean remediation executed successfully.' + proposalRef);
         return;
       }
 
