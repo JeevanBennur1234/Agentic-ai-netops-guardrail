@@ -668,12 +668,12 @@ button:disabled{opacity:.6;cursor:wait}
 </style></head><body>
 <h1>Human Verifier</h1>
 <p>Review the exact proposed action and its topology binding. Approval is single-use and expires. Automated verification still runs before execution.</p>
-<label>Operator bearer token<br><input id="token" type="password" autocomplete="current-password"></label>
+<label>Human Verifier token (different from the dashboard lab operator token)<br><input id="token" type="password" autocomplete="current-password"></label>
 <button onclick="connect()">Connect</button><button onclick="loadApprovals()">Refresh</button>
-<p id="status" role="status">Enter an operator token configured by the administrator.</p><main id="items"></main>
+<p id="status" role="status">Enter the Human Verifier token printed by the local startup script.</p><main id="items"></main>
 <script>
 const tokenInput=document.getElementById('token');tokenInput.value=sessionStorage.getItem('netops_approver_token')||'';
-function auth(){return {'Authorization':'Bearer '+tokenInput.value,'Content-Type':'application/json'};}
+function auth(){return {'Authorization':'Bearer '+tokenInput.value.trim(),'Content-Type':'application/json'};}
 function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined&&text!==null)el.textContent=String(text);return el;}
 function formatDate(value){if(!value)return 'Not recorded';const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString();}
 function humanStatus(p){
@@ -746,12 +746,13 @@ function humanStatus(p){
   };
   return states[String(p.status||'').toLowerCase()]||{label:String(p.status||'Unknown status').replaceAll('_',' '),className:'',summary:'Review the proposal details before taking action.'};
 }
-async function connect(){sessionStorage.setItem('netops_approver_token',tokenInput.value);await loadApprovals();}
+async function connect(){tokenInput.value=tokenInput.value.trim();if(!tokenInput.value){document.getElementById('status').textContent='Paste the Human Verifier token first.';return;}sessionStorage.setItem('netops_approver_token',tokenInput.value);await loadApprovals();}
 async function loadApprovals(){const status=document.getElementById('status'),items=document.getElementById('items');
-if(!tokenInput.value){status.textContent='Enter operator token.';return;}
+if(!tokenInput.value.trim()){status.textContent='Enter the Human Verifier token.';return;}
 status.textContent='Loading proposals…';items.replaceChildren();
 try{const r=await fetch('/api/approvals',{headers:auth()});const data=await r.json();
-if(!r.ok)throw new Error(data.error||'Request failed');status.textContent='Connected as '+(data.authenticated_approver||'authorized operator')+'. Review each proposal before deciding.';
+if(r.status===401){sessionStorage.removeItem('netops_approver_token');tokenInput.value='';status.textContent='Unauthorized. Use the Human Verifier token printed by start_local_observability.sh — not the Lab operator token. Paste it here and click Connect.';return;}
+if(!r.ok)throw new Error(data.error||'Request failed');sessionStorage.setItem('netops_approver_token',tokenInput.value.trim());status.textContent='Connected as '+(data.authenticated_approver||'authorized operator')+'. Review each proposal before deciding.';
 for(const p of data.proposals||[]){
   const card=node('section','card');
   const head=node('div','proposal-head');
