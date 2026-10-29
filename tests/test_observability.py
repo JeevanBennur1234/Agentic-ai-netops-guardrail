@@ -231,9 +231,10 @@ class TestObservabilityMetrics:
         assert res.status_code == 200
         html = res.get_data(as_text=True)
 
-        # The topology status must not let a different older pending proposal
-        # override the newest approval decision shown in the pipeline trace.
-        assert "const latest = chronological[chronological.length - 1];" in html
+        # The topology badge follows the newest proposal lifecycle event,
+        # not a global list of any pending proposal or an unrelated guardrail event.
+        assert "const lifecycleRecords = chronological.filter(item =>" in html
+        assert "Boolean(approvalInfoForTrace(item).proposal_id)" in html
         assert "const activePending = chronological.filter" not in html
         assert "HUMAN APPROVAL: APPROVED · NOT EXECUTED" in html
 
