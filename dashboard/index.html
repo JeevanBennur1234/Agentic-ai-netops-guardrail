@@ -910,31 +910,14 @@
           return;
         }
 
-        // Resolve the newest human decision per proposal first. A pending proposal
-        // remains visible even if a different, older proposal was approved later.
+        // The topology status badge summarizes the latest lifecycle event overall.
+        // Do not let an older, unrelated pending proposal override a newer human decision.
         const chronological = records.slice().sort((a, b) => {
           const aTime = Date.parse(a.timestamp || '') || 0;
           const bTime = Date.parse(b.timestamp || '') || 0;
           return aTime - bTime;
         });
-        const latestByProposal = new Map();
-        for (const item of chronological) {
-          const approval = approvalInfoForTrace(item);
-          if (approval.proposal_id) latestByProposal.set(approval.proposal_id, item);
-        }
-        const activePending = chronological.filter(item => {
-          const approval = approvalInfoForTrace(item);
-          if (!approval.proposal_id) return false;
-          const current = latestByProposal.get(approval.proposal_id);
-          if (current !== item) return false;
-          const pending = item.decision === 'PENDING_HUMAN_APPROVAL' ||
-            String(approval.status || '').toLowerCase() === 'pending';
-          const expiry = Date.parse(approval.expires_at || '');
-          return pending && (!Number.isFinite(expiry) || expiry > Date.now());
-        });
-        const latest = activePending.length
-          ? activePending[activePending.length - 1]
-          : chronological[chronological.length - 1];
+        const latest = chronological[chronological.length - 1];
         if (latest) applyTopologyStatus(latest);
 
         // Display list with most recent at top

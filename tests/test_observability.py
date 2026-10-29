@@ -224,6 +224,19 @@ class TestObservabilityMetrics:
         assert "endpoints" in data
         assert "/metrics" in data["endpoints"]
 
+    def test_dashboard_status_uses_latest_human_decision(self):
+        app = create_metrics_app()
+        client = app.test_client()
+        res = client.get("/dashboard")
+        assert res.status_code == 200
+        html = res.get_data(as_text=True)
+
+        # The topology status must not let a different older pending proposal
+        # override the newest approval decision shown in the pipeline trace.
+        assert "const latest = chronological[chronological.length - 1];" in html
+        assert "const activePending = chronological.filter" not in html
+        assert "HUMAN APPROVAL: APPROVED · NOT EXECUTED" in html
+
     def test_grafana_dashboard_schema(self):
         import os
         dashboard_path = os.path.expanduser(
