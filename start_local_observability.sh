@@ -33,6 +33,9 @@ set -a
 source "$SECRETS_FILE"
 set +a
 export NETOPS_APPROVER_TOKENS="$("$PY" -c 'import json,os; print(json.dumps({"netops-admin":os.environ["NETOPS_APPROVER_TOKEN"]}))')"
+# Running observability/server.py sets sys.path[0] to observability/, so explicitly
+# expose the repository root for importing testbed.live_connectivity.
+export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
 export NETOPS_CONNECTIVITY_CHECKER='testbed.live_connectivity:check_host_connectivity'
 
 if [[ -z "${NETOPS_APPROVER_TOKEN:-}" || -z "${NETOPS_CHAOS_API_TOKEN:-}" ]]; then
