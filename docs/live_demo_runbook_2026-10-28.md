@@ -32,14 +32,14 @@ sudo -E /home/bennurjeevan/venvs/netops/bin/ryu-manager --ofp-tcp-listen-port 66
 Leave Terminal A open and wait for successful startup.
 
 ## 2. Terminal B - Web dashboard and Human Verifier
+Run the checked-in local startup helper:
 ~~~bash
 cd /home/bennurjeevan/netops_guardrail
-export NETOPS_APPROVER_TOKEN="$(/home/bennurjeevan/venvs/netops/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
-export NETOPS_APPROVER_TOKENS="$(/home/bennurjeevan/venvs/netops/bin/python -c 'import json,os; print(json.dumps({"netops-admin":os.environ["NETOPS_APPROVER_TOKEN"]}))')"
-printf 'Human Verifier token (keep private): %s\n' "$NETOPS_APPROVER_TOKEN"
-/home/bennurjeevan/venvs/netops/bin/python observability/server.py
+chmod +x start_local_observability.sh
+./start_local_observability.sh
 ~~~
-Keep Terminal B open. The server binds to localhost port 8000. Do not expose this development server to untrusted networks.
+The helper configures both `NETOPS_APPROVER_TOKENS` and `NETOPS_CHAOS_API_TOKEN`, plus the real connectivity checker required by the issue endpoints. It creates reusable random local tokens outside the repository in `~/.config/netops-guardrail/local-secrets.env` (directory mode 700, file mode 600) and prints them for this local session. Keep Terminal B open; if port 8000 is already occupied, identify the existing process instead of starting a duplicate.
+The server binds to localhost port 8000. Do not expose this development server to untrusted networks.
 
 Open in the Windows browser:
 - Dashboard: http://127.0.0.1:8000/dashboard
