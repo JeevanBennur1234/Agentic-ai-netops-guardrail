@@ -128,10 +128,12 @@ def main():
         report["baseline_ping_loss_percent"] = baseline_loss
         print(f"Baseline pingall loss: {baseline_loss:.1f}%")
         if baseline_loss != 0.0:
+            report["result"] = "INCONCLUSIVE"
             report["failure_reason"] = "Baseline connectivity failed before fault injection."
             return 1
 
         if initial_states.get(("1", "2")) != "FORWARD" or initial_states.get(("2", "1")) != "FORWARD":
+            report["result"] = "INCONCLUSIVE"
             report["failure_reason"] = "Selected trunk A was not forwarding at both ends; test refuses ambiguous injection."
             return 1
 
@@ -149,6 +151,7 @@ def main():
                 switch_name, str(port_id), "down",
             ])
             if result.returncode != 0:
+                report["result"] = "INCONCLUSIVE"
                 report["failure_reason"] = (
                     f"OpenFlow port shutdown failed for {switch_name} port {port_id}: "
                     f"{result.stderr.strip()}"
@@ -186,9 +189,10 @@ def main():
             if recovery_loss > 0.0 and not first_ping_failure_seen:
                 first_ping_failure_seen = True
                 log_event(report, "first_ping_failure", started_at, ping_loss_percent=recovery_loss, since_link_down_seconds=round(time.monotonic() - started_at, 3))
-            elif recovery_loss == 0.0 and first_ping_failure_seen and not first_ping_success_seen:
+            elif recovery_loss == 0.0 and not first_ping_success_seen:
                 first_ping_success_seen = True
-                log_event(report, "first_ping_success_after_failure", started_at, ping_loss_percent=recovery_loss, since_link_down_seconds=round(time.monotonic() - started_at, 3))
+                success_event = "first_ping_success_after_failure" if first_ping_failure_seen else "first_ping_success_after_link_down"
+                log_event(report, success_event, started_at, ping_loss_percent=recovery_loss, after_observed_failure=first_ping_failure_seen, since_link_down_seconds=round(time.monotonic() - started_at, 3))
             alt_forward = all(recovered_states.get(port) == "FORWARD" for port in FAILOVER_TRUNK_STATES)
             if alt_forward and recovery_loss == 0.0:
                 recovered = True
