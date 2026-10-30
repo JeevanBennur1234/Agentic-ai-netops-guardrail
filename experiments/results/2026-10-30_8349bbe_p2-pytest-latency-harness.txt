@@ -1,0 +1,10 @@
+date: 2026-10-30
+commit: 8349bbefea97bfefa35ddc47f10526db40ce9bf2
+model: none-regression-test
+command: .venv/bin/pytest -q
+worktree: new live-OVS latency-only harness
+
+........................................................................ [ 40%]
+..............................s......................................... [ 81%]
+................................                                         [100%]
+175 passed, 1 skipped in 1.49s

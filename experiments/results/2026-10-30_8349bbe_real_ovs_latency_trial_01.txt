@@ -1,0 +1,11 @@
+date: 2026-10-30
+commit: 8349bbefea97bfefa35ddc47f10526db40ce9bf2
+model: none-live-OVS-Mininet-with-synthetic-test-approval
+command: sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_trunk_remediation.py
+
+Traceback (most recent call last):
+  File "/home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_trunk_remediation.py", line 33, in <module>
+    from netops_guardrail.audit.audit_trail import AuditTrail  # noqa: E402
+  File "/home/bennurjeevan/netops_guardrail/src/netops_guardrail/audit/audit_trail.py", line 6, in <module>
+    from ecdsa import BadSignatureError, NIST256p, SigningKey, VerifyingKey
+ModuleNotFoundError: No module named 'ecdsa'
