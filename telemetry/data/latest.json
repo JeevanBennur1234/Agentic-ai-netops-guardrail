@@ -9,116 +9,164 @@
                     "tx_bytes": 0
                 },
                 "1": {
-                    "rx_packets": 255,
-                    "tx_packets": 74088,
-                    "rx_bytes": 21938,
-                    "tx_bytes": 6367242
+                    "rx_packets": 22,
+                    "tx_packets": 11321,
+                    "rx_bytes": 1692,
+                    "tx_bytes": 679962
                 },
                 "2": {
-                    "rx_packets": 32217392,
-                    "tx_packets": 37294,
-                    "rx_bytes": 3156854666,
-                    "tx_bytes": 3204828
+                    "rx_packets": 7807,
+                    "tx_packets": 11314,
+                    "rx_bytes": 468968,
+                    "tx_bytes": 679452
                 },
                 "3": {
-                    "rx_packets": 37290,
-                    "tx_packets": 32217423,
-                    "rx_bytes": 3204454,
-                    "tx_bytes": 3156857654
+                    "rx_packets": 41,
+                    "tx_packets": 11314,
+                    "rx_bytes": 2776,
+                    "tx_bytes": 679348
                 }
             },
             "flows": [
                 {
                     "priority": 65535,
-                    "packet_count": 6,
-                    "byte_count": 360
+                    "packet_count": 7786,
+                    "byte_count": 467160
+                },
+                {
+                    "priority": 65535,
+                    "packet_count": 9,
+                    "byte_count": 540
                 },
                 {
                     "priority": 1,
-                    "packet_count": 0,
-                    "byte_count": 0
+                    "packet_count": 5,
+                    "byte_count": 434
                 },
                 {
                     "priority": 1,
-                    "packet_count": 31690717,
-                    "byte_count": 3105690266
-                },
-                {
-                    "priority": 1,
-                    "packet_count": 0,
-                    "byte_count": 0
+                    "packet_count": 4,
+                    "byte_count": 336
                 },
                 {
                     "priority": 0,
-                    "packet_count": 74175,
-                    "byte_count": 6374862
+                    "packet_count": 41,
+                    "byte_count": 2882
                 }
-            ]
+            ],
+            "port_status": {
+                "1": {
+                    "state": "UP",
+                    "reason": "MODIFY",
+                    "link_down": false,
+                    "admin_down": false
+                },
+                "2": {
+                    "state": "UP",
+                    "reason": "MODIFY",
+                    "link_down": false,
+                    "admin_down": false
+                },
+                "3": {
+                    "state": "UP",
+                    "reason": "MODIFY",
+                    "link_down": false,
+                    "admin_down": false
+                }
+            },
+            "stp_port_states": {
+                "1": "FORWARD",
+                "2": "FORWARD",
+                "3": "FORWARD"
+            }
         },
         "2": {
             "ports": {
+                "1": {
+                    "rx_packets": 11314,
+                    "tx_packets": 7807,
+                    "rx_bytes": 679452,
+                    "tx_bytes": 468968
+                },
                 "4294967294": {
                     "rx_packets": 0,
                     "tx_packets": 0,
                     "rx_bytes": 0,
                     "tx_bytes": 0
                 },
-                "1": {
-                    "rx_packets": 37300,
-                    "tx_packets": 32218147,
-                    "rx_bytes": 3205348,
-                    "tx_bytes": 3156928644
-                },
                 "2": {
-                    "rx_packets": 32218198,
-                    "tx_packets": 37291,
-                    "rx_bytes": 3156933536,
-                    "tx_bytes": 3204540
+                    "rx_packets": 11314,
+                    "tx_packets": 41,
+                    "rx_bytes": 679348,
+                    "tx_bytes": 2776
                 },
                 "3": {
-                    "rx_packets": 285,
-                    "tx_packets": 74018,
-                    "rx_bytes": 24518,
-                    "tx_bytes": 6361146
+                    "rx_packets": 22,
+                    "tx_packets": 11323,
+                    "rx_bytes": 1692,
+                    "tx_bytes": 680108
                 }
             },
             "flows": [
                 {
                     "priority": 65535,
-                    "packet_count": 6,
-                    "byte_count": 360
+                    "packet_count": 15535,
+                    "byte_count": 932100
+                },
+                {
+                    "priority": 65535,
+                    "packet_count": 7004,
+                    "byte_count": 420240
+                },
+                {
+                    "priority": 65534,
+                    "packet_count": 42,
+                    "byte_count": 2972
                 },
                 {
                     "priority": 1,
-                    "packet_count": 31690723,
-                    "byte_count": 3105690854
+                    "packet_count": 5,
+                    "byte_count": 434
                 },
                 {
                     "priority": 1,
-                    "packet_count": 0,
-                    "byte_count": 0
+                    "packet_count": 4,
+                    "byte_count": 336
                 },
                 {
                     "priority": 0,
-                    "packet_count": 74205,
-                    "byte_count": 6377390
+                    "packet_count": 43,
+                    "byte_count": 3058
                 }
-            ]
+            ],
+            "port_status": {
+                "3": {
+                    "state": "UP",
+                    "reason": "MODIFY",
+                    "link_down": false,
+                    "admin_down": false
+                },
+                "1": {
+                    "state": "UP",
+                    "reason": "MODIFY",
+                    "link_down": false,
+                    "admin_down": false
+                },
+                "2": {
+                    "state": "UP",
+                    "reason": "MODIFY",
+                    "link_down": false,
+                    "admin_down": false
+                }
+            },
+            "stp_port_states": {
+                "3": "FORWARD",
+                "1": "FORWARD",
+                "2": "BLOCK"
+            }
         }
     },
     "links": [
-        {
-            "src_switch": "2",
-            "src_port": "2",
-            "dst_switch": "1",
-            "dst_port": "3"
-        },
-        {
-            "src_switch": "2",
-            "src_port": "1",
-            "dst_switch": "1",
-            "dst_port": "2"
-        },
         {
             "src_switch": "1",
             "src_port": "2",
@@ -130,6 +178,13 @@
             "src_port": "3",
             "dst_switch": "2",
             "dst_port": "2"
+        },
+        {
+            "src_switch": "2",
+            "src_port": "1",
+            "dst_switch": "1",
+            "dst_port": "2"
         }
-    ]
+    ],
+    "updated_at_utc": "2026-10-29T16:45:52.034348+00:00"
 }
