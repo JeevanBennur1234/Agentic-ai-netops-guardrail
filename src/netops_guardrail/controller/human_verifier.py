@@ -19,7 +19,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+from netops_guardrail.netops_paths import NETOPS_HOME
+
+PROJECT_ROOT = NETOPS_HOME
 DEFAULT_APPROVAL_PATH = PROJECT_ROOT / "audit" / "human_approvals.json"
 DEFAULT_MAX_TELEMETRY_AGE_SECONDS = 30
 

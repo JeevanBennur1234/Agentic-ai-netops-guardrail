@@ -4,7 +4,7 @@ import pytest
 from ecdsa import SigningKey, NIST256p
 import hashlib
 
-from audit_trail import AuditTrail, GENESIS_HASH
+from netops_guardrail.audit.audit_trail import AuditTrail, GENESIS_HASH
 
 
 @pytest.fixture

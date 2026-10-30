@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from remediation_service import build_parser, load_callable, telemetry_fingerprint
+from netops_guardrail.controller.remediation_service import build_parser, load_callable, telemetry_fingerprint
 
 
 def test_service_is_dry_run_by_default():
@@ -39,7 +39,7 @@ def test_service_rejects_invalid_callable_spec():
 
 
 def test_service_once_invokes_decision_pipeline_in_dry_run(monkeypatch, tmp_path, capsys):
-    import remediation_service as service
+    import netops_guardrail.controller.remediation_service as service
 
     telemetry = tmp_path / "latest.json"
     telemetry.write_text('{"switches":{}}', encoding="utf-8")
@@ -59,7 +59,7 @@ def test_service_once_invokes_decision_pipeline_in_dry_run(monkeypatch, tmp_path
 
 
 def test_service_execute_mode_requires_connectivity_checker(tmp_path):
-    import remediation_service as service
+    import netops_guardrail.controller.remediation_service as service
 
     telemetry = tmp_path / "latest.json"
     telemetry.write_text('{"switches":{}}', encoding="utf-8")
@@ -69,7 +69,7 @@ def test_service_execute_mode_requires_connectivity_checker(tmp_path):
 
 
 def test_service_reports_failed_executor_result(monkeypatch, tmp_path):
-    import remediation_service as service
+    import netops_guardrail.controller.remediation_service as service
 
     telemetry = tmp_path / "latest.json"
     telemetry.write_text('{"switches":{}}', encoding="utf-8")

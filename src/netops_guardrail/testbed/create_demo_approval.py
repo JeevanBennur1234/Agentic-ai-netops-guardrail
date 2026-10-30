@@ -6,14 +6,13 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-for subdir in ("controller", "verifier", "audit", "agent", "executor"):
-    sys.path.insert(0, str(ROOT / subdir))
+from netops_guardrail.netops_paths import NETOPS_HOME
+ROOT = NETOPS_HOME
 
-from audit_trail import AuditTrail
-from decision_gate import apply_intent_to_graph
-from human_verifier import ApprovalError, HumanApprovalStore, topology_fingerprint_from_path
-from safety_verifier import build_topology
+from netops_guardrail.audit.audit_trail import AuditTrail
+from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+from netops_guardrail.controller.human_verifier import ApprovalError, HumanApprovalStore, topology_fingerprint_from_path
+from netops_guardrail.verifier.safety_verifier import build_topology
 
 TELEMETRY_PATH = ROOT / "telemetry" / "data" / "latest.json"
 TRACE_PATH = ROOT / "observability" / "data" / "pipeline_trace.jsonl"

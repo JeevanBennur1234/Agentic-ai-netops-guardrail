@@ -1,9 +1,9 @@
 import json
 import pytest
 
-from metrics import NetOpsMetricsCollector
-from server import create_metrics_app
-from audit_trail import AuditTrail
+from netops_guardrail.observability.metrics import NetOpsMetricsCollector
+from netops_guardrail.observability.server import create_metrics_app
+from netops_guardrail.audit.audit_trail import AuditTrail
 
 
 @pytest.fixture
@@ -240,7 +240,7 @@ class TestObservabilityMetrics:
         assert "HUMAN APPROVAL: APPROVED · NOT EXECUTED" in html
 
     def test_grafana_dashboard_schema(self):
-        from netops_paths import NETOPS_HOME
+        from netops_guardrail.netops_paths import NETOPS_HOME
 
         dashboard_path = (
             NETOPS_HOME / "observability" / "grafana"
@@ -321,7 +321,7 @@ def test_human_verifier_approval_is_audited_and_execute_fails_closed_without_che
     mock_telemetry, mock_audit_log, tmp_path, monkeypatch
 ):
     from datetime import datetime, timezone
-    from human_verifier import HumanApprovalStore
+    from netops_guardrail.controller.human_verifier import HumanApprovalStore
 
     monkeypatch.setenv("NETOPS_APPROVER_TOKENS", '{"netops-admin":"test-only-strong-token"}')
     monkeypatch.delenv("NETOPS_CONNECTIVITY_CHECKER", raising=False)
@@ -379,7 +379,7 @@ def test_human_verifier_approval_is_audited_and_execute_fails_closed_without_che
 
 def test_human_verifier_request_changes_is_audited(mock_telemetry, mock_audit_log, tmp_path, monkeypatch):
     from datetime import datetime, timezone
-    from human_verifier import HumanApprovalStore
+    from netops_guardrail.controller.human_verifier import HumanApprovalStore
 
     monkeypatch.setenv("NETOPS_APPROVER_TOKENS", '{"netops-admin":"test-only-strong-token"}')
     telemetry_data = json.loads(open(mock_telemetry, encoding="utf-8").read())
@@ -461,7 +461,7 @@ def test_human_verifier_request_changes_is_audited(mock_telemetry, mock_audit_lo
 def test_fault_injection_runs_ai_gate_and_returns_human_proposal(monkeypatch, tmp_path):
     import json
     from types import SimpleNamespace
-    import server as server_module
+    import netops_guardrail.observability.server as server_module
 
     telemetry_path = tmp_path / "latest.json"
     telemetry = {
@@ -530,7 +530,7 @@ def test_issue2_standby_forwarding_simulation_creates_review_only_proposal(
 ):
     from datetime import datetime, timezone
     from types import SimpleNamespace
-    import server as server_module
+    import netops_guardrail.observability.server as server_module
 
     telemetry_path = tmp_path / "issue2-latest.json"
     telemetry = {
@@ -604,7 +604,7 @@ def test_issue2_detector_only_reports_no_live_anomaly_without_simulation(
 ):
     from datetime import datetime, timezone
     from types import SimpleNamespace
-    import server as server_module
+    import netops_guardrail.observability.server as server_module
 
     telemetry_path = tmp_path / "issue2-healthy.json"
     telemetry = {

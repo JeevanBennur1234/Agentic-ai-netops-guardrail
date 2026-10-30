@@ -6,10 +6,7 @@ from datetime import datetime, timezone
 from ecdsa import SigningKey, VerifyingKey, NIST256p, BadSignatureError
 
 
-_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)
-from netops_paths import NETOPS_HOME
+from netops_guardrail.netops_paths import NETOPS_HOME
 
 DEFAULT_AUDIT_LOG_PATH = str(NETOPS_HOME / "audit" / "audit_log.json")
 DEFAULT_KEY_PATH = str(NETOPS_HOME / "audit" / "audit_key.pem")

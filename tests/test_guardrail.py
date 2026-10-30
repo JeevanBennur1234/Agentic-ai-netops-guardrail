@@ -2,9 +2,9 @@ import json
 import os
 import pytest
 
-from safety_verifier import build_topology, run_safety_checks, test_port_removal as sim_port_removal
-from decision_gate import apply_intent_to_graph
-from remediation_agent import (
+from netops_guardrail.verifier.safety_verifier import build_topology, run_safety_checks, test_port_removal as sim_port_removal
+from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+from netops_guardrail.agent.remediation_agent import (
     get_valid_physical_ports,
     sanitize_telemetry,
     INTENT_SCHEMA

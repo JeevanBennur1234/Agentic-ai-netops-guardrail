@@ -11,3 +11,6 @@ observability/data/
 experiments/results/*_key.pem
 observability/server_runtime.log
 .venv/
+*.egg-info/
+build/
+dist/

@@ -1,4 +1,4 @@
-import testbed.live_connectivity as checker
+import netops_guardrail.testbed.live_connectivity as checker
 
 
 def test_connectivity_checker_checks_both_directions(monkeypatch):

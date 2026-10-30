@@ -14,8 +14,8 @@ from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
 from mininet.topo import Topo
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT))
+from netops_guardrail.netops_paths import NETOPS_HOME
+PROJECT_ROOT = NETOPS_HOME
 
 class TriangleTopo(Topo):
     def build(self):

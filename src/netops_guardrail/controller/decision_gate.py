@@ -3,34 +3,16 @@ import json
 import sys
 import os
 
-sys.path.append(
-    os.path.join(os.path.dirname(__file__), "..", "verifier")
-)
-sys.path.append(
-    os.path.join(os.path.dirname(__file__), "..", "agent")
-)
-sys.path.append(
-    os.path.join(os.path.dirname(__file__), "..", "audit")
-)
-sys.path.append(
-    os.path.join(os.path.dirname(__file__), "..", "executor")
-)
-sys.path.append(os.path.dirname(__file__))
-
-from human_verifier import HumanApprovalStore, ApprovalError
-from safety_verifier import (
+from netops_guardrail.netops_paths import NETOPS_HOME
+from netops_guardrail.controller.human_verifier import HumanApprovalStore, ApprovalError
+from netops_guardrail.verifier.safety_verifier import (
     build_topology,
     run_safety_checks,
     test_port_removal
 )
-from remediation_agent import propose_remediation
-from audit_trail import AuditTrail
-from remediation_executor import RemediationExecutor
-
-_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)
-from netops_paths import NETOPS_HOME
+from netops_guardrail.agent.remediation_agent import propose_remediation
+from netops_guardrail.audit.audit_trail import AuditTrail
+from netops_guardrail.executor.remediation_executor import RemediationExecutor
 
 DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
 _TRACE_DIR = str(NETOPS_HOME / "observability" / "data")

@@ -3,12 +3,12 @@
 import copy, json, math, re, statistics, tempfile, time, sys
 from datetime import datetime, timezone
 from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-from controller.decision_gate import apply_intent_to_graph
-from executor.remediation_executor import RemediationExecutor
-from verifier.safety_verifier import build_topology
-from experiments.topologies import build_redundant_topology_data, build_star_topology_data
+from netops_guardrail.netops_paths import NETOPS_HOME
+ROOT = NETOPS_HOME
+from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+from netops_guardrail.executor.remediation_executor import RemediationExecutor
+from netops_guardrail.verifier.safety_verifier import build_topology
+from netops_guardrail.experiments.topologies import build_redundant_topology_data, build_star_topology_data
 
 OUT_JSON = ROOT / "experiments/results/recommended_evaluation_20261027.json"
 OUT_MD = ROOT / "experiments/results/recommended_evaluation_20261027.md"

@@ -7,19 +7,17 @@ import importlib
 from datetime import datetime, timezone
 from flask import Flask, Response, jsonify, request, render_template_string, send_file
 
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-for subdir in ["verifier", "audit", "agent", "controller", "executor", "observability", "testbed"]:
-    path = os.path.join(base_dir, subdir)
-    if path not in sys.path:
-        sys.path.insert(0, path)
+from netops_guardrail.netops_paths import NETOPS_HOME
+
+base_dir = str(NETOPS_HOME)
 
 from prometheus_client import CollectorRegistry, generate_latest, CONTENT_TYPE_LATEST
-from metrics import NetOpsMetricsCollector
-from safety_verifier import build_topology, run_safety_checks, test_port_removal
-from decision_gate import apply_intent_to_graph, decide
-from audit_trail import AuditTrail
-from human_verifier import HumanApprovalStore, ApprovalError
-from standby_anomaly import inspect_standby_forwarding
+from netops_guardrail.observability.metrics import NetOpsMetricsCollector
+from netops_guardrail.verifier.safety_verifier import build_topology, run_safety_checks, test_port_removal
+from netops_guardrail.controller.decision_gate import apply_intent_to_graph, decide
+from netops_guardrail.audit.audit_trail import AuditTrail
+from netops_guardrail.controller.human_verifier import HumanApprovalStore, ApprovalError
+from netops_guardrail.controller.standby_anomaly import inspect_standby_forwarding
 
 DASHBOARD_HTML = """<!DOCTYPE html>
 <html lang="en">
@@ -1474,7 +1472,7 @@ if(!(data.proposals||[]).length){status.textContent='No active proposals or rece
     return app
 
 
-if __name__ == "__main__":
+def main():
     port = int(os.environ.get("METRICS_PORT", 8000))
     host = os.environ.get("METRICS_HOST", "127.0.0.1")
     print(f"Starting NetOps Observability Metrics Server on http://{host}:{port}/")
@@ -1482,3 +1480,7 @@ if __name__ == "__main__":
     print(f"Prometheus Metrics Feed available at:   http://localhost:{port}/metrics")
     app = create_metrics_app()
     app.run(host=host, port=port)
+
+
+if __name__ == "__main__":
+    main()

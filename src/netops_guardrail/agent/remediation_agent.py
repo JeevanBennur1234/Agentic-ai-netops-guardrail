@@ -14,10 +14,7 @@ MODEL = os.environ.get(
     "OLLAMA_MODEL",
     "qwen2.5-coder:1.5b"
 )
-_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)
-from netops_paths import NETOPS_HOME
+from netops_guardrail.netops_paths import NETOPS_HOME
 
 DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
 

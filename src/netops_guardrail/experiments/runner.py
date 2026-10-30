@@ -3,18 +3,9 @@ import os
 import sys
 from datetime import datetime, timezone
 
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-for subdir in ["verifier", "audit", "agent", "controller", "executor", "observability", "experiments"]:
-    path = os.path.join(base_dir, subdir)
-    if path not in sys.path:
-        sys.path.insert(0, path)
-if base_dir not in sys.path:
-    sys.path.insert(0, base_dir)
-
-from netops_paths import NETOPS_HOME
-
-from experiment_suite import ExperimentSuite
-from benchmark import PerformanceBenchmark
+from netops_guardrail.netops_paths import NETOPS_HOME
+from netops_guardrail.experiments.experiment_suite import ExperimentSuite
+from netops_guardrail.experiments.benchmark import PerformanceBenchmark
 
 
 def run_all(output_dir=None):

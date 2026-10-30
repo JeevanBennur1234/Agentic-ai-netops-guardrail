@@ -5,18 +5,15 @@ import secrets
 import subprocess
 import sys
 
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-for subdir in ["verifier", "audit", "agent", "controller"]:
-    path = os.path.join(base_dir, subdir)
-    if path not in sys.path:
-        sys.path.insert(0, path)
-if base_dir not in sys.path:
-    sys.path.insert(0, base_dir)
-
-from netops_paths import NETOPS_HOME
-from safety_verifier import build_topology, get_access_endpoints, run_safety_checks, test_port_removal
-from audit_trail import AuditTrail
-from human_verifier import HumanApprovalStore, ApprovalError
+from netops_guardrail.netops_paths import NETOPS_HOME
+from netops_guardrail.verifier.safety_verifier import (
+    build_topology,
+    get_access_endpoints,
+    run_safety_checks,
+    test_port_removal,
+)
+from netops_guardrail.audit.audit_trail import AuditTrail
+from netops_guardrail.controller.human_verifier import HumanApprovalStore, ApprovalError
 
 
 SUPPORTED_ACTIONS = {"no_action", "block", "reroute"}

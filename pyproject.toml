@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netops_guardrail"
+version = "0.1.0"
+description = "Agentic AI-NetOps Guardrail: Formal graph verification, cryptographic audit, and human-in-the-loop control for automated network remediation."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "bennurjeevan"}
+]
+dependencies = [
+    "networkx",
+    "flask",
+    "ecdsa",
+    "jsonschema",
+    "prometheus_client",
+    "requests",
+    "ryu",
+    "eventlet<0.34.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[project.scripts]
+netops-server = "netops_guardrail.observability.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

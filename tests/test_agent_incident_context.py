@@ -1,6 +1,6 @@
 import json
 
-import agent.remediation_agent as agent
+import netops_guardrail.agent.remediation_agent as agent
 
 
 def test_sanitize_telemetry_keeps_links_and_stp_evidence():

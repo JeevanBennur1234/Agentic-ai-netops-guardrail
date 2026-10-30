@@ -2,17 +2,9 @@ import json
 import os
 import sys
 
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-for subdir in ["verifier", "audit", "agent", "controller", "executor"]:
-    path = os.path.join(base_dir, subdir)
-    if path not in sys.path:
-        sys.path.insert(0, path)
-if base_dir not in sys.path:
-    sys.path.insert(0, base_dir)
-
-from netops_paths import NETOPS_HOME
 from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily
-from audit_trail import AuditTrail
+from netops_guardrail.netops_paths import NETOPS_HOME
+from netops_guardrail.audit.audit_trail import AuditTrail
 
 
 DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")

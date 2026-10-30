@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from standby_anomaly import inspect_standby_forwarding
+from netops_guardrail.controller.standby_anomaly import inspect_standby_forwarding
 
 
 def sample_telemetry(standby_left="FORWARD", standby_right="BLOCK", age_seconds=0):

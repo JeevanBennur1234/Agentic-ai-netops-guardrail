@@ -1,4 +1,4 @@
-from experiments.evaluate_guardrail_cases import (
+from netops_guardrail.experiments.evaluate_guardrail_cases import (
     benchmark_executor_transaction,
     evaluate_cases,
 )

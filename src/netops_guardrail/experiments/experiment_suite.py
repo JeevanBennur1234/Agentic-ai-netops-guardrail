@@ -5,23 +5,14 @@ import copy
 import subprocess
 from jsonschema import validate, ValidationError
 
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-for subdir in ["verifier", "audit", "agent", "controller", "executor", "observability", "experiments"]:
-    path = os.path.join(base_dir, subdir)
-    if path not in sys.path:
-        sys.path.insert(0, path)
-if base_dir not in sys.path:
-    sys.path.insert(0, base_dir)
-
-from netops_paths import NETOPS_HOME
-
-from safety_verifier import run_safety_checks, test_port_removal, build_topology
-from decision_gate import apply_intent_to_graph
-from remediation_executor import RemediationExecutor
-from remediation_agent import INTENT_SCHEMA
-from audit_trail import AuditTrail
-from metrics import NetOpsMetricsCollector
-from topologies import build_star_topology_data, build_redundant_topology_data
+from netops_guardrail.netops_paths import NETOPS_HOME
+from netops_guardrail.verifier.safety_verifier import run_safety_checks, test_port_removal, build_topology
+from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+from netops_guardrail.executor.remediation_executor import RemediationExecutor
+from netops_guardrail.agent.remediation_agent import INTENT_SCHEMA
+from netops_guardrail.audit.audit_trail import AuditTrail
+from netops_guardrail.observability.metrics import NetOpsMetricsCollector
+from netops_guardrail.experiments.topologies import build_star_topology_data, build_redundant_topology_data
 
 
 class ExperimentSuite:

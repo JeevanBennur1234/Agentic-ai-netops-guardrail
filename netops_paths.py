@@ -1,8 +1,4 @@
-"""Shared repository path configuration for Agentic AI-NetOps Guardrail."""
-from pathlib import Path
-import os
+"""Compatibility shim for top-level netops_paths imports."""
+from netops_guardrail.netops_paths import NETOPS_HOME
 
-# NETOPS_HOME may point at a relocated checkout. Default to this module's repo root.
-NETOPS_HOME = Path(
-    os.environ.get("NETOPS_HOME", Path(__file__).resolve().parent)
-).expanduser().resolve()
+__all__ = ["NETOPS_HOME"]

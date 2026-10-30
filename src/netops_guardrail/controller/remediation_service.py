@@ -15,10 +15,7 @@ import sys
 import time
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "controller"))
-
-from decision_gate import DEFAULT_TELEMETRY_PATH, decide
+from netops_guardrail.controller.decision_gate import DEFAULT_TELEMETRY_PATH, decide
 
 
 def load_callable(spec):

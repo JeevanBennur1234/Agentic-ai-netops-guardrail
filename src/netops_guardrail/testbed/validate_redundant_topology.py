@@ -19,9 +19,9 @@ from mininet.log import setLogLevel
 from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT))
-from testbed.redundant_topo import RedundantTopo  # noqa: E402
+from netops_guardrail.netops_paths import NETOPS_HOME
+PROJECT_ROOT = NETOPS_HOME
+from netops_guardrail.testbed.redundant_topo import RedundantTopo  # noqa: E402
 
 TELEMETRY_PATH = PROJECT_ROOT / "telemetry/data/latest.json"
 TRUNK_PORTS = {("1", "2"), ("1", "3"), ("2", "1"), ("2", "2")}

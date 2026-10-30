@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from human_verifier import ApprovalError, HumanApprovalStore
-from remediation_executor import RemediationExecutor
+from netops_guardrail.controller.human_verifier import ApprovalError, HumanApprovalStore
+from netops_guardrail.executor.remediation_executor import RemediationExecutor
 
 
 def telemetry_fixture():
@@ -190,7 +190,7 @@ def test_controller_records_openflow_port_down_event(monkeypatch):
     from unittest.mock import Mock
 
     try:
-        from telemetry_controller import TelemetryController
+        from netops_guardrail.controller.telemetry_controller import TelemetryController
     except ImportError as exc:
         if "ALREADY_HANDLED" in str(exc):
             pytest.skip(
@@ -232,8 +232,8 @@ def test_duplicate_pending_proposals_reuse_existing_id(tmp_path):
 def test_decision_gate_creates_pending_human_approval_instead_of_executing(
     tmp_path, monkeypatch
 ):
-    import decision_gate
-    from audit_trail import AuditTrail
+    import netops_guardrail.controller.decision_gate as decision_gate
+    from netops_guardrail.audit.audit_trail import AuditTrail
 
     telemetry_path = write_telemetry(tmp_path / "telemetry.json")
     approval_store = HumanApprovalStore(tmp_path / "approvals.json")
@@ -274,8 +274,8 @@ def test_decision_gate_creates_pending_human_approval_instead_of_executing(
 
 
 def test_approved_gate_revalidates_exact_proposal_before_execution(tmp_path, monkeypatch):
-    import decision_gate
-    from audit_trail import AuditTrail
+    import netops_guardrail.controller.decision_gate as decision_gate
+    from netops_guardrail.audit.audit_trail import AuditTrail
 
     telemetry_file = tmp_path / "telemetry.json"
     telemetry_path = write_telemetry(telemetry_file)
@@ -311,7 +311,7 @@ def test_approved_gate_revalidates_exact_proposal_before_execution(tmp_path, mon
 
 
 def test_expired_approval_is_rejected(tmp_path, monkeypatch):
-    import human_verifier
+    import netops_guardrail.controller.human_verifier as human_verifier
     from datetime import timedelta
 
     telemetry_path = write_telemetry(tmp_path / "telemetry.json")
@@ -327,7 +327,7 @@ def test_expired_approval_is_rejected(tmp_path, monkeypatch):
 
 
 def test_approval_refuses_stale_or_untimestamped_telemetry(tmp_path, monkeypatch):
-    import human_verifier
+    import netops_guardrail.controller.human_verifier as human_verifier
     from datetime import timedelta
 
     stale_file = tmp_path / "stale.json"

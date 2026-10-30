@@ -26,28 +26,14 @@ from mininet.log import setLogLevel
 from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT))
-from netops_paths import NETOPS_HOME
-# Mininet may run under system Python while application dependencies live in
-# the active virtualenv (or the repository-local .venv used by the quickstart).
-VENV_ROOT = Path(os.environ.get("VIRTUAL_ENV", str(NETOPS_HOME / ".venv")))
-VENV_SITE = (
-    VENV_ROOT / "lib"
-    / f"python{sys.version_info.major}.{sys.version_info.minor}"
-    / "site-packages"
-)
-if VENV_SITE.exists():
-    sys.path.insert(0, str(VENV_SITE))
-from testbed.redundant_topo import RedundantTopo  # noqa: E402
-sys.path.insert(0, str(PROJECT_ROOT / "controller"))
-sys.path.insert(0, str(PROJECT_ROOT / "verifier"))
-sys.path.insert(0, str(PROJECT_ROOT / "executor"))
-sys.path.insert(0, str(PROJECT_ROOT / "audit"))
-from decision_gate import apply_intent_to_graph  # noqa: E402
-from remediation_executor import RemediationExecutor  # noqa: E402
-from safety_verifier import build_topology  # noqa: E402
-from audit_trail import AuditTrail  # noqa: E402
+from netops_guardrail.netops_paths import NETOPS_HOME
+PROJECT_ROOT = NETOPS_HOME
+
+from netops_guardrail.testbed.redundant_topo import RedundantTopo  # noqa: E402
+from netops_guardrail.controller.decision_gate import apply_intent_to_graph  # noqa: E402
+from netops_guardrail.executor.remediation_executor import RemediationExecutor  # noqa: E402
+from netops_guardrail.verifier.safety_verifier import build_topology  # noqa: E402
+from netops_guardrail.audit.audit_trail import AuditTrail  # noqa: E402
 
 TELEMETRY_PATH = PROJECT_ROOT / "telemetry/data/latest.json"
 TRUNK_PORTS = {("1", "2"), ("1", "3"), ("2", "1"), ("2", "2")}
