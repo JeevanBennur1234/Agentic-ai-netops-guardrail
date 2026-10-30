@@ -1,0 +1,29 @@
+body{font:16px system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem;background:#0f172a;color:#e2e8f0}
+input,textarea,button{font:inherit;padding:.65rem;border-radius:8px;border:1px solid #475569}
+input,textarea{background:#111827;color:#e2e8f0;width:min(95%,650px)}button{cursor:pointer;margin:.25rem;background:#1e293b;color:#f8fafc}
+.card{border:1px solid #334155;padding:1rem;border-radius:12px;margin:1rem 0;background:#1e293b}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1120;padding:.75rem;border-radius:8px}
+small{color:#94a3b8}.approve{border-color:#22c55e}.reject{border-color:#ef4444}
+.proposal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
+.status-chip{display:inline-block;padding:.3rem .65rem;border-radius:999px;font-weight:700;font-size:.85rem;border:1px solid #64748b;background:#334155;color:#e2e8f0}
+.status-pending{border-color:#f59e0b;background:#78350f;color:#fde68a}
+.status-approved{border-color:#60a5fa;background:#1e3a8a;color:#dbeafe}
+.status-rejected{border-color:#f87171;background:#7f1d1d;color:#fee2e2}
+.status-consumed{border-color:#a78bfa;background:#4c1d95;color:#ede9fe}
+.status-safe{color:#86efac}.status-unsafe{color:#fca5a5}
+.proposal-section{margin:.65rem 0;padding:.8rem;background:#111827;border:1px solid #334155;border-radius:10px}
+.proposal-section h3{margin:.1rem 0 .5rem;font-size:1rem}
+.proposal-summary{font-size:1rem;line-height:1.45;margin:.25rem 0}
+.issue-kicker{font-size:.76rem;letter-spacing:.04em;text-transform:uppercase;color:#93c5fd;font-weight:700}
+.change-list{margin:.4rem 0;padding-left:1.25rem}
+.change-list li{margin:.35rem 0;line-height:1.45}
+.check-list{list-style:none;padding:0;margin:.4rem 0}
+.check-list li{margin:.3rem 0;line-height:1.4}
+.check-pass{color:#86efac}.check-fail{color:#fca5a5}
+.explainer{color:#cbd5e1;line-height:1.55;margin:.5rem 0}
+.meta{color:#94a3b8;font-size:.9rem;line-height:1.6}
+details{margin-top:1rem}summary{cursor:pointer;color:#93c5fd;font-weight:600}
+textarea.reason-box{box-sizing:border-box;width:min(95%,650px);margin:.5rem 0}
+.action-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}
+button:disabled{opacity:.6;cursor:wait}
+@media(max-width:600px){body{margin:1rem auto}.card{padding:.75rem}.proposal-section{padding:.75rem}}

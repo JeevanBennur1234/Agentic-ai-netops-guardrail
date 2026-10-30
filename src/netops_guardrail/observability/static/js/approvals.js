@@ -1,0 +1,187 @@
+const tokenInput=document.getElementById('token');tokenInput.value=sessionStorage.getItem('netops_approver_token')||'';
+function auth(){return {'Authorization':'Bearer '+tokenInput.value.trim(),'Content-Type':'application/json'};}
+function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined&&text!==null)el.textContent=String(text);return el;}
+function formatDate(value){if(!value)return 'Not recorded';const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString();}
+function humanStatus(p){
+  const states={
+    pending:{label:'Waiting for your decision',className:'status-pending',summary:'The proposal has not been approved, and no remediation has been executed.'},
+    approved:{label:'Approved — not executed yet',className:'status-approved',summary:'A human approved this action. The network has not necessarily changed; execution is a separate step.'},
+    rejected:{label:'Rejected',className:'status-rejected',summary:'The reviewer rejected this proposal. It must not be executed.'},
+    changes_requested:{label:'Changes requested',className:'status-pending',summary:'The reviewer asked for changes. A revised proposal is needed before execution.'},
+    consumed:{label:'Approval used — check execution result',className:'status-consumed',summary:'This approval has been used. Check the execution result and connectivity test to determine whether the change succeeded.'}
+  };
+  return states[String(p.status||'').toLowerCase()]||{label:String(p.status||'Unknown status').replaceAll('_',' '),className:'',summary:'Review the technical details before taking action.'};
+}
+function issuePresentation(p){
+  const intent=p.intent||{};
+  const raw=String(intent.reason||'');
+  const action=String(intent.action||'review').toLowerCase();
+  const sw=String(intent.target_switch||'?');
+  const port=String(intent.from_port||'?');
+  const isDemo2=/CONTROLLED DEMO SIGNAL/i.test(raw);
+  const isIssue2=isDemo2||/standby.forwarding.anomaly|standby_forwarding_anomaly|unexpected standby forwarding/i.test(raw);
+  const isIssue1=!isIssue2&&/re.isolate|restored standby trunk|redundant_trunk_restored/i.test(raw);
+  const status=String(p.status||'').toLowerCase();
+  let title='Network remediation proposal';
+  let summary=raw||'The AI proposed a network change. Review the target, impact, and safety checks below.';
+  let changes=[];
+  if(isIssue2){
+    title='Issue 2 — Unexpected standby forwarding';
+    summary=isDemo2
+      ?'This proposal was created from a controlled demo signal. Live telemetry did not confirm both ends of the standby link forwarding, and the demo did not change switch or STP state.'
+      :'The issue is unexpected forwarding on the standby connection. Review the current link states and safety evidence before approving the proposed isolation.';
+    changes=[
+      action==='block'&&sw==='1'&&port==='3'?'Proposed change: isolate backup link s1-p3 ↔ s2-p2 with guardrail block rules.':action==='block'?'Proposed change: block traffic on s'+sw+'-p'+port+'.':'Proposed action: '+action+' on switch s'+sw+', port '+port+'.',
+      'Keep the primary connection s1-p2 ↔ s2-p1 available.',
+      'After execution, check host connectivity and confirm the actual flow-rule result.'
+    ];
+  }else if(isIssue1){
+    title='Issue 1 — Standby trunk re-isolation';
+    summary='The primary connection s1-p2 ↔ s2-p1 is reported as forwarding. At least one end of the backup connection s1-p3 ↔ s2-p2 is blocked by STP. This proposal aims to explicitly isolate the restored backup path.';
+    changes=[
+      action==='block'&&sw==='1'&&port==='3'?'Proposed change: isolate backup link s1-p3 ↔ s2-p2 with guardrail block rules.':action==='block'?'Proposed change: block traffic on s'+sw+'-p'+port+'.':'Proposed action: '+action+' on switch s'+sw+', port '+port+'.',
+      'Preserve the primary connection s1-p2 ↔ s2-p1 for normal traffic.',
+      'After execution, verify host connectivity and confirm the rule was installed.'
+    ];
+  }else{
+    title='Network remediation proposal';
+    summary=raw||'The AI has suggested a network action. Review it carefully before deciding.';
+    changes=[
+      'Proposed action: '+action+' on switch s'+sw+', port '+port+'.',
+      'Review how this affects traffic using that port.',
+      'After execution, verify connectivity and inspect the actual execution result.'
+    ];
+  }
+
+  let stage='Proposed only — not applied to the network yet.';
+  if(status==='approved') stage='Approved by a human reviewer; execution is a separate step and is not confirmed yet.';
+  else if(status==='rejected') stage='Rejected by the human reviewer. This proposal is not authorized for execution.';
+  else if(status==='changes_requested') stage='Changes requested. A revised proposal is needed; this proposal is not authorized for execution.';
+  else if(status==='consumed') stage='Execution was attempted using this approval. Check the executor result and connectivity test to determine whether it succeeded.';
+  else if(status==='expired') stage='This proposal expired before a decision. Generate a fresh proposal to continue.';
+  return {title,summary,changes,stage,isDemo2,isIssue2,isIssue1};
+}
+function humanStatus(p){
+  const states={
+    pending:{label:'Waiting for your decision',className:'status-pending',summary:'No human approval has been recorded. The proposed network change has not been executed.'},
+    approved:{label:'Approved — not executed yet',className:'status-approved',summary:'A human approved this action. Approval does not mean the network has changed.'},
+    rejected:{label:'Rejected',className:'status-rejected',summary:'The reviewer rejected this proposal. It must not be executed.'},
+    changes_requested:{label:'Changes requested',className:'status-pending',summary:'The reviewer asked for changes. A revised proposal is needed.'},
+    consumed:{label:'Execution attempted — verify result',className:'status-consumed',summary:'The approval has been used. Check execution and connectivity evidence before claiming success.'},
+    expired:{label:'Expired',className:'status-rejected',summary:'This proposal expired and cannot be approved.'}
+  };
+  return states[String(p.status||'').toLowerCase()]||{label:String(p.status||'Unknown status').replaceAll('_',' '),className:'',summary:'Review the proposal details before taking action.'};
+}
+async function connect(){tokenInput.value=tokenInput.value.trim();if(!tokenInput.value){document.getElementById('status').textContent='Paste the Human Verifier token first.';return;}sessionStorage.setItem('netops_approver_token',tokenInput.value);await loadApprovals();}
+async function loadApprovals(){const status=document.getElementById('status'),items=document.getElementById('items');
+if(!tokenInput.value.trim()){status.textContent='Enter the Human Verifier token.';return;}
+status.textContent='Loading proposals…';items.replaceChildren();
+try{const r=await fetch('/api/approvals',{headers:auth()});const data=await r.json();
+if(r.status===401){sessionStorage.removeItem('netops_approver_token');tokenInput.value='';status.textContent='Unauthorized. Use the Human Verifier token printed by start_local_observability.sh — not the Lab operator token. Paste it here and click Connect.';return;}
+if(!r.ok)throw new Error(data.error||'Request failed');sessionStorage.setItem('netops_approver_token',tokenInput.value.trim());status.textContent='Connected as '+(data.authenticated_approver||'authorized operator')+'. Review each proposal before deciding.';
+for(const p of data.proposals||[]){
+  const card=node('section','card');
+  const head=node('div','proposal-head');
+  const title=node('h2','', 'Proposal '+p.proposal_id);
+  const state=humanStatus(p);
+  const chip=node('span','status-chip '+state.className,state.label);
+  head.append(title,chip);card.append(head);
+  card.append(node('p','explainer',state.summary));
+
+  const presentation=issuePresentation(p);
+  const issueSection=node('section','proposal-section');
+  issueSection.append(node('div','issue-kicker','Issue details'));
+  issueSection.append(node('h3','',presentation.title));
+  issueSection.append(node('p','explainer',presentation.summary));
+  card.append(issueSection);
+
+  const changeSection=node('section','proposal-section');
+  changeSection.append(node('h3','','Changes to address the issue'));
+  changeSection.append(node('p','meta',presentation.stage));
+  const changeList=node('ul','change-list');
+  for(const change of presentation.changes)changeList.append(node('li','',change));
+  changeSection.append(changeList);
+  card.append(changeSection);
+
+  const verifier=p.verifier_result||{};
+  const checkSection=node('section','proposal-section');
+  const safe=verifier.safe===true;
+  checkSection.append(node('h3','', 'Automated safety checks'));
+  checkSection.append(node('p',safe?'status-safe':'status-unsafe',safe?'Safety checker: PASS':'Safety checker: FAIL — review before taking action'));
+  checkSection.append(node('p','explainer',safe
+    ?'The automated checks passed for this proposal. This does not equal human approval and does not prove that the network change was executed.'
+    :'One or more required checks did not pass. Review the failures before considering this action.'));
+  const checks=node('ul','check-list');
+  const checkValues=Array.isArray(verifier.checks)?verifier.checks:[];
+  if(checkValues.length){
+    for(const check of checkValues){
+      const passed=/^PASS:/i.test(String(check));
+      checks.append(node('li',passed?'check-pass':'check-fail',(passed?'✓ ':'✕ ')+String(check).replace(/^(PASS|FAIL):\\s*/i,'')));
+    }
+  }else checks.append(node('li','meta','No detailed safety checks were recorded.'));
+  checkSection.append(checks);
+  checkSection.append(node('p','meta','Topology nodes checked: '+(verifier.nodes??'not recorded')+' · Connections checked: '+(verifier.edges??'not recorded')));
+  card.append(checkSection);
+
+  const details=document.createElement('details');
+  details.append(node('summary','','Technical details (fingerprints, timestamps and original reason)'));
+  const metadata=node('div','proposal-section');
+  metadata.append(node('p','meta','Created: '+formatDate(p.created_at)));
+  metadata.append(node('p','meta','Expires: '+formatDate(p.expires_at)));
+  metadata.append(node('p','meta','Target switch: s'+String((p.intent||{}).target_switch||'?')+' · Port: '+String((p.intent||{}).from_port||'?')));
+  const raw=node('pre','',JSON.stringify({topology_fingerprint:p.topology_fingerprint,proposal_fingerprint:p.proposal_fingerprint,original_reason:(p.intent||{}).reason,decision:p.decision,consumed_at:p.consumed_at},null,2));
+  metadata.append(raw);details.append(metadata);card.append(details);
+
+  const decisionSection=node('section','proposal-section');
+  decisionSection.append(node('h3','','Your Decision'));
+  if(p.status==='pending'){
+    decisionSection.append(node('p','explainer','Review the issue, proposed changes, and safety checks. Choose approve, reject, or request changes, and record a short reason for the audit trail.'));
+    const reason=node('textarea','reason-box');reason.placeholder='Why are you approving, rejecting, or requesting changes?';reason.rows=3;reason.style.display='block';decisionSection.append(reason);
+    const row=node('div','action-row');
+    for(const decision of ['approve','reject','request_changes']){
+      const b=node('button',decision==='approve'?'approve':decision==='reject'?'reject':'',decision==='approve'?'Approve proposal':decision==='reject'?'Reject proposal':'Request changes');
+      b.onclick=async()=>{
+        if(!reason.value.trim()){alert('Enter a reason for the audit trail.');return;}
+        b.disabled=true;
+        try{
+          const res=await fetch('/api/approvals/'+encodeURIComponent(p.proposal_id)+'/decision',{method:'POST',headers:auth(),body:JSON.stringify({decision,reason:reason.value,proposal_fingerprint:p.proposal_fingerprint})});
+          const out=await res.json();if(!res.ok)throw new Error(out.error||'Decision failed');
+          await loadApprovals();
+          status.textContent='Decision recorded: '+humanStatus(out.proposal||{status:decision==='approve'?'approved':decision==='reject'?'rejected':'changes_requested'}).label+'.';
+        }catch(e){alert(e.message);b.disabled=false;}
+      };
+      row.append(b);
+    }
+    decisionSection.append(row);
+  }else if(p.status==='approved'){
+    const decided=p.decision||{};
+    decisionSection.append(node('p','explainer','Decision: Approved by '+(decided.approver_id||'authorized reviewer')+' on '+formatDate(decided.decided_at)+'.'));
+    if(decided.reason)decisionSection.append(node('p','meta','Recorded reason: '+decided.reason));
+    decisionSection.append(node('p','explainer','The proposal is approved, but the change is not confirmed as applied until execution succeeds and connectivity is checked.'));
+    const b=node('button','approve','Execute approved action');
+    b.onclick=async()=>{
+      if(!confirm('Run this exact approved action? It will be revalidated. Execution changes the lab network and requires a live connectivity check.'))return;
+      b.disabled=true;
+      try{
+        const res=await fetch('/api/approvals/'+encodeURIComponent(p.proposal_id)+'/execute',{method:'POST',headers:auth(),body:'{}'});
+        const out=await res.json();
+        alert(JSON.stringify(out,null,2));
+        await loadApprovals();
+      }catch(e){alert(e.message);b.disabled=false;}
+    };
+    decisionSection.append(b);
+  }else{
+    const decided=p.decision||{};
+    decisionSection.append(node('p','explainer',state.summary));
+    if(decided.approver_id)decisionSection.append(node('p','meta','Decision recorded by: '+decided.approver_id));
+    if(decided.decided_at)decisionSection.append(node('p','meta','Decision date: '+formatDate(decided.decided_at)));
+    if(decided.reason)decisionSection.append(node('p','meta','Reason: '+decided.reason));
+    if(p.status==='consumed'){
+      decisionSection.append(node('p','explainer','Do not mark this as fixed until the execution result and post-change connectivity check confirm success.'));
+    }
+  }
+  card.append(decisionSection);
+  items.append(card);
+}
+if(!(data.proposals||[]).length){status.textContent='No active proposals or recent decisions.';}
+}catch(e){status.textContent='Error: '+e.message;}}
