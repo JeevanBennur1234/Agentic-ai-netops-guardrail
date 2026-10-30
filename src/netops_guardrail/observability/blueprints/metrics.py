@@ -1,8 +1,9 @@
 """Metrics and dashboard routes for NetOps Guardrail observability."""
 import json
 import os
+
 from flask import Blueprint, Response, current_app, jsonify, render_template, request, send_file
-from prometheus_client import CollectorRegistry, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import CONTENT_TYPE_LATEST, CollectorRegistry, generate_latest
 
 metrics_bp = Blueprint("metrics", __name__)
 

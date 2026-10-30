@@ -1,19 +1,21 @@
-import time
+import csv
 import json
 import os
-import sys
 import statistics
 import subprocess
-import csv
+import time
+
 from jsonschema import validate
 
-from netops_guardrail.netops_paths import NETOPS_HOME
-from netops_guardrail.verifier.safety_verifier import build_topology, run_safety_checks, test_port_removal
-from netops_guardrail.controller.decision_gate import apply_intent_to_graph
-from netops_guardrail.executor.remediation_executor import RemediationExecutor
 from netops_guardrail.agent.remediation_agent import INTENT_SCHEMA, propose_remediation
 from netops_guardrail.audit.audit_trail import AuditTrail
+from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+from netops_guardrail.executor.remediation_executor import RemediationExecutor
 from netops_guardrail.experiments.topologies import build_star_topology_data
+from netops_guardrail.netops_paths import NETOPS_HOME
+from netops_guardrail.verifier.safety_verifier import (
+    run_safety_checks,
+)
 
 
 class PerformanceBenchmark:

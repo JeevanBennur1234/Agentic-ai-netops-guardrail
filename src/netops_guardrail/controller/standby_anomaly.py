@@ -9,7 +9,6 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
-
 PRIMARY = (("s1-p2", "s2-p1"),)
 STANDBY = (("s1-p3", "s2-p2"),)
 

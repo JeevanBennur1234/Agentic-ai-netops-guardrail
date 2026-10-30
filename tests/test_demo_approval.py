@@ -1,8 +1,11 @@
 import json
 
-from netops_guardrail.experiments.evaluate_guardrail_cases import stp_redundant
-from netops_guardrail.testbed.create_demo_approval import append_pipeline_trace, select_standby_s1_port
 from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+from netops_guardrail.experiments.evaluate_guardrail_cases import stp_redundant
+from netops_guardrail.testbed.create_demo_approval import (
+    append_pipeline_trace,
+    select_standby_s1_port,
+)
 from netops_guardrail.verifier.safety_verifier import build_topology
 
 

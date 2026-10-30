@@ -1,6 +1,5 @@
 import json
-import os
-import sys
+
 import networkx as nx
 
 from netops_guardrail.netops_paths import NETOPS_HOME

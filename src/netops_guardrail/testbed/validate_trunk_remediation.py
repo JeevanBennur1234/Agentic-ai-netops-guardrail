@@ -27,13 +27,14 @@ from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
 
 from netops_guardrail.netops_paths import NETOPS_HOME
+
 PROJECT_ROOT = NETOPS_HOME
 
-from netops_guardrail.testbed.redundant_topo import RedundantTopo  # noqa: E402
+from netops_guardrail.audit.audit_trail import AuditTrail  # noqa: E402
 from netops_guardrail.controller.decision_gate import apply_intent_to_graph  # noqa: E402
 from netops_guardrail.executor.remediation_executor import RemediationExecutor  # noqa: E402
+from netops_guardrail.testbed.redundant_topo import RedundantTopo  # noqa: E402
 from netops_guardrail.verifier.safety_verifier import build_topology  # noqa: E402
-from netops_guardrail.audit.audit_trail import AuditTrail  # noqa: E402
 
 TELEMETRY_PATH = PROJECT_ROOT / "telemetry/data/latest.json"
 TRUNK_PORTS = {("1", "2"), ("1", "3"), ("2", "1"), ("2", "2")}

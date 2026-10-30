@@ -1,11 +1,10 @@
 import json
 import os
-import sys
 from datetime import datetime, timezone
 
-from netops_guardrail.netops_paths import NETOPS_HOME
-from netops_guardrail.experiments.experiment_suite import ExperimentSuite
 from netops_guardrail.experiments.benchmark import PerformanceBenchmark
+from netops_guardrail.experiments.experiment_suite import ExperimentSuite
+from netops_guardrail.netops_paths import NETOPS_HOME
 
 
 def run_all(output_dir=None):

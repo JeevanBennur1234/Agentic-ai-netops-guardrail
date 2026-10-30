@@ -1,18 +1,17 @@
-from datetime import datetime, timezone
 import json
-import sys
 import os
+from datetime import datetime, timezone
 
+from netops_guardrail.agent.remediation_agent import propose_remediation
+from netops_guardrail.audit.audit_trail import AuditTrail
+from netops_guardrail.controller.human_verifier import ApprovalError, HumanApprovalStore
+from netops_guardrail.executor.remediation_executor import RemediationExecutor
 from netops_guardrail.netops_paths import NETOPS_HOME
-from netops_guardrail.controller.human_verifier import HumanApprovalStore, ApprovalError
 from netops_guardrail.verifier.safety_verifier import (
     build_topology,
     run_safety_checks,
-    test_port_removal
+    test_port_removal,
 )
-from netops_guardrail.agent.remediation_agent import propose_remediation
-from netops_guardrail.audit.audit_trail import AuditTrail
-from netops_guardrail.executor.remediation_executor import RemediationExecutor
 
 DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
 _TRACE_DIR = str(NETOPS_HOME / "observability" / "data")

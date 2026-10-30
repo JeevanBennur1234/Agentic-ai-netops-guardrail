@@ -1,6 +1,7 @@
 import json
-import os
+
 import pytest
+
 from netops_guardrail.observability.server import create_metrics_app
 
 

@@ -1,5 +1,6 @@
 from mininet.topo import Topo
 
+
 class RedundantTopo(Topo):
     def build(self):
         s1 = self.addSwitch('s1')

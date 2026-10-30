@@ -311,8 +311,9 @@ def test_approved_gate_revalidates_exact_proposal_before_execution(tmp_path, mon
 
 
 def test_expired_approval_is_rejected(tmp_path, monkeypatch):
-    import netops_guardrail.controller.human_verifier as human_verifier
     from datetime import timedelta
+
+    import netops_guardrail.controller.human_verifier as human_verifier
 
     telemetry_path = write_telemetry(tmp_path / "telemetry.json")
     store = HumanApprovalStore(tmp_path / "approvals.json")
@@ -327,7 +328,6 @@ def test_expired_approval_is_rejected(tmp_path, monkeypatch):
 
 
 def test_approval_refuses_stale_or_untimestamped_telemetry(tmp_path, monkeypatch):
-    import netops_guardrail.controller.human_verifier as human_verifier
     from datetime import timedelta
 
     stale_file = tmp_path / "stale.json"

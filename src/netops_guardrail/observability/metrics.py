@@ -1,11 +1,10 @@
 import json
 import os
-import sys
 
-from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily
-from netops_guardrail.netops_paths import NETOPS_HOME
+from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily
+
 from netops_guardrail.audit.audit_trail import AuditTrail
-
+from netops_guardrail.netops_paths import NETOPS_HOME
 
 DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
 DEFAULT_AUDIT_LOG_PATH = str(NETOPS_HOME / "audit" / "audit_log.json")

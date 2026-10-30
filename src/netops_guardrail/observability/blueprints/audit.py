@@ -1,6 +1,7 @@
 """Audit chain and pipeline trace routes for NetOps Guardrail."""
 import json
 import os
+
 from flask import Blueprint, current_app, jsonify, request
 
 audit_bp = Blueprint("audit", __name__)

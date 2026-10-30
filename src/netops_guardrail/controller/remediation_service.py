@@ -11,9 +11,7 @@ import hashlib
 import importlib
 import json
 import os
-import sys
 import time
-from pathlib import Path
 
 from netops_guardrail.controller.decision_gate import DEFAULT_TELEMETRY_PATH, decide
 

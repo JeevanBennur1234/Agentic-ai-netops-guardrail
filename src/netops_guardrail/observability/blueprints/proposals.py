@@ -1,8 +1,8 @@
 """Human proposals and remediation decision routes for NetOps Guardrail."""
-from datetime import datetime, timezone
-import importlib
 import json
 import os
+from datetime import datetime, timezone
+
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 import netops_guardrail.observability.server as server_module

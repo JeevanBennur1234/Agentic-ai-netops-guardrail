@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """Create a review-only Human Verifier item from fresh live telemetry. Never executes an action."""
 from __future__ import annotations
+
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 from netops_guardrail.netops_paths import NETOPS_HOME
+
 ROOT = NETOPS_HOME
 
 from netops_guardrail.audit.audit_trail import AuditTrail
 from netops_guardrail.controller.decision_gate import apply_intent_to_graph
-from netops_guardrail.controller.human_verifier import ApprovalError, HumanApprovalStore, topology_fingerprint_from_path
+from netops_guardrail.controller.human_verifier import (
+    ApprovalError,
+    HumanApprovalStore,
+    topology_fingerprint_from_path,
+)
 from netops_guardrail.verifier.safety_verifier import build_topology
 
 TELEMETRY_PATH = ROOT / "telemetry" / "data" / "latest.json"

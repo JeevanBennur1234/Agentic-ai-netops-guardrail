@@ -1,11 +1,12 @@
 import json
 import re
-import pytest
 from unittest.mock import MagicMock
 
+import pytest
+
+from netops_guardrail.audit.audit_trail import AuditTrail
 from netops_guardrail.executor.remediation_executor import RemediationExecutor
 from netops_guardrail.verifier.safety_verifier import build_topology
-from netops_guardrail.audit.audit_trail import AuditTrail, GENESIS_HASH
 
 
 @pytest.fixture

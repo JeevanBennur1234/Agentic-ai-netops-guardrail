@@ -1,10 +1,11 @@
-import os
-import json
 import pytest
 
-from netops_guardrail.experiments.topologies import build_star_topology_data, build_redundant_topology_data
-from netops_guardrail.experiments.experiment_suite import ExperimentSuite
 from netops_guardrail.experiments.benchmark import PerformanceBenchmark
+from netops_guardrail.experiments.experiment_suite import ExperimentSuite
+from netops_guardrail.experiments.topologies import (
+    build_redundant_topology_data,
+    build_star_topology_data,
+)
 
 
 @pytest.fixture

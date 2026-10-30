@@ -1,10 +1,9 @@
+import hashlib
 import json
 import os
-import sys
-import hashlib
 from datetime import datetime, timezone
-from ecdsa import SigningKey, VerifyingKey, NIST256p, BadSignatureError
 
+from ecdsa import BadSignatureError, NIST256p, SigningKey, VerifyingKey
 
 from netops_guardrail.netops_paths import NETOPS_HOME
 

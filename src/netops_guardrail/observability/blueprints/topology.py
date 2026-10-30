@@ -1,9 +1,9 @@
 """Topology and fault injection routes for NetOps Guardrail."""
 import hmac
-import importlib
 import json
 import os
 import subprocess
+
 from flask import Blueprint, current_app, jsonify, request
 
 import netops_guardrail.observability.server as server_module

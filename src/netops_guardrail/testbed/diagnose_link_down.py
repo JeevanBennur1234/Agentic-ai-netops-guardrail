@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Diagnostic for whether Mininet link-down causes OVS OpenFlow port-status updates."""
-import os, socket, subprocess, sys, time
+import os
+import socket
+import subprocess
+import time
+
 from mininet.log import setLogLevel
 from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
 from mininet.topo import Topo
+
 
 class TriangleTopo(Topo):
     def build(self):

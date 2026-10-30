@@ -1,23 +1,11 @@
-import json
-import pytest
 import networkx as nx
-from jsonschema import validate, ValidationError
+import pytest
+from jsonschema import ValidationError, validate
 
-from netops_guardrail.verifier.safety_verifier import (
-    build_topology,
-    run_safety_checks,
-    test_port_removal as sim_port_removal,
-    check_topology_exists,
-    check_connectivity,
-    check_loop_freedom,
-    check_reachability
-)
+from netops_guardrail.agent.remediation_agent import INTENT_SCHEMA
 from netops_guardrail.controller.decision_gate import apply_intent_to_graph
-from netops_guardrail.agent.remediation_agent import (
-    INTENT_SCHEMA,
-    get_valid_physical_ports,
-    sanitize_telemetry
-)
+from netops_guardrail.verifier.safety_verifier import build_topology, check_connectivity
+from netops_guardrail.verifier.safety_verifier import test_port_removal as sim_port_removal
 
 
 @pytest.fixture

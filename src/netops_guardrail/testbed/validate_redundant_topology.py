@@ -13,13 +13,13 @@ import socket
 import subprocess
 import sys
 import time
-from pathlib import Path
 
 from mininet.log import setLogLevel
 from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
 
 from netops_guardrail.netops_paths import NETOPS_HOME
+
 PROJECT_ROOT = NETOPS_HOME
 from netops_guardrail.testbed.redundant_topo import RedundantTopo  # noqa: E402
 

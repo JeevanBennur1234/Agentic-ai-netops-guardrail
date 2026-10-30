@@ -3,19 +3,14 @@ import os
 import tempfile
 from datetime import datetime, timezone
 
+from ryu import cfg
 from ryu.base import app_manager
 from ryu.controller import ofp_event
-from ryu.controller.handler import (
-    CONFIG_DISPATCHER,
-    MAIN_DISPATCHER,
-    set_ev_cls
-)
+from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER, set_ev_cls
+from ryu.lib import hub, stplib
+from ryu.lib.packet import ether_types, ethernet, packet
 from ryu.ofproto import ofproto_v1_3
-from ryu.lib import hub
-from ryu.lib import stplib
-from ryu.lib.packet import packet, ethernet, ether_types
-from ryu.topology import switches, api, event
-from ryu import cfg
+from ryu.topology import api, event, switches
 
 CONF = cfg.CONF
 CONF.set_default('observe_links', True)

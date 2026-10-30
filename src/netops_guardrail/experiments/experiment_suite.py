@@ -1,18 +1,23 @@
+import copy
 import json
 import os
-import sys
-import copy
 import subprocess
-from jsonschema import validate, ValidationError
 
-from netops_guardrail.netops_paths import NETOPS_HOME
-from netops_guardrail.verifier.safety_verifier import run_safety_checks, test_port_removal, build_topology
-from netops_guardrail.controller.decision_gate import apply_intent_to_graph
-from netops_guardrail.executor.remediation_executor import RemediationExecutor
+from jsonschema import ValidationError, validate
+
 from netops_guardrail.agent.remediation_agent import INTENT_SCHEMA
 from netops_guardrail.audit.audit_trail import AuditTrail
+from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+from netops_guardrail.executor.remediation_executor import RemediationExecutor
+from netops_guardrail.experiments.topologies import (
+    build_redundant_topology_data,
+    build_star_topology_data,
+)
+from netops_guardrail.netops_paths import NETOPS_HOME
 from netops_guardrail.observability.metrics import NetOpsMetricsCollector
-from netops_guardrail.experiments.topologies import build_star_topology_data, build_redundant_topology_data
+from netops_guardrail.verifier.safety_verifier import (
+    test_port_removal,
+)
 
 
 class ExperimentSuite:

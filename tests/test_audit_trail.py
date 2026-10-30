@@ -1,10 +1,9 @@
-import os
 import copy
-import pytest
-from ecdsa import SigningKey, NIST256p
-import hashlib
+import os
 
-from netops_guardrail.audit.audit_trail import AuditTrail, GENESIS_HASH
+import pytest
+
+from netops_guardrail.audit.audit_trail import GENESIS_HASH, AuditTrail
 
 
 @pytest.fixture

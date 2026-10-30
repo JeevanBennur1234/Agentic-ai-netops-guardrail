@@ -1,6 +1,6 @@
 """Shared repository path configuration for Agentic AI-NetOps Guardrail."""
-from pathlib import Path
 import os
+from pathlib import Path
 
 
 def get_netops_home() -> Path:

@@ -1,9 +1,12 @@
 import hashlib
-from pathlib import Path
 
 import pytest
 
-from netops_guardrail.controller.remediation_service import build_parser, load_callable, telemetry_fingerprint
+from netops_guardrail.controller.remediation_service import (
+    build_parser,
+    load_callable,
+    telemetry_fingerprint,
+)
 
 
 def test_service_is_dry_run_by_default():

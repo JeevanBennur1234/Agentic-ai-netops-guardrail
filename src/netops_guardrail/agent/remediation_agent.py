@@ -1,10 +1,8 @@
 import json
 import os
-import sys
 import urllib.request
 
-from jsonschema import validate, ValidationError
-
+from jsonschema import ValidationError, validate
 
 OLLAMA_URL = os.environ.get(
     "OLLAMA_URL",

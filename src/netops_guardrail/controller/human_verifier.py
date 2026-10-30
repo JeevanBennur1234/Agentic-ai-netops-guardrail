@@ -18,7 +18,6 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-
 from netops_guardrail.netops_paths import NETOPS_HOME
 
 PROJECT_ROOT = NETOPS_HOME

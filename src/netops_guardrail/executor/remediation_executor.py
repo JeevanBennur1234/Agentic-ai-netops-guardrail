@@ -3,8 +3,8 @@ import os
 import re
 import secrets
 import subprocess
-import sys
 
+from netops_guardrail.controller.human_verifier import ApprovalError, HumanApprovalStore
 from netops_guardrail.netops_paths import NETOPS_HOME
 from netops_guardrail.verifier.safety_verifier import (
     build_topology,
@@ -12,9 +12,6 @@ from netops_guardrail.verifier.safety_verifier import (
     run_safety_checks,
     test_port_removal,
 )
-from netops_guardrail.audit.audit_trail import AuditTrail
-from netops_guardrail.controller.human_verifier import HumanApprovalStore, ApprovalError
-
 
 SUPPORTED_ACTIONS = {"no_action", "block", "reroute"}
 LOCAL_PORT = "4294967294"
