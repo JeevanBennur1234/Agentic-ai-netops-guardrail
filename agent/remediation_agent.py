@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import urllib.request
 
 from jsonschema import validate, ValidationError
@@ -14,11 +15,11 @@ MODEL = os.environ.get(
     "qwen2.5-coder:1.5b"
 )
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-_LOCAL_TELEMETRY = os.path.join(_PROJECT_ROOT, "telemetry", "data", "latest.json")
-_HOME_TELEMETRY = os.path.expanduser("~/netops_guardrail/telemetry/data/latest.json")
-DEFAULT_TELEMETRY_PATH = (
-    _LOCAL_TELEMETRY if os.path.exists(_LOCAL_TELEMETRY) else _HOME_TELEMETRY
-)
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+from netops_paths import NETOPS_HOME
+
+DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
 
 INTENT_SCHEMA = {
     "type": "object",

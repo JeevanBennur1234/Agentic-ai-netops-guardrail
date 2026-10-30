@@ -12,6 +12,10 @@ for subdir in ["verifier", "audit", "agent", "controller", "executor", "observab
     path = os.path.join(base_dir, subdir)
     if path not in sys.path:
         sys.path.insert(0, path)
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
+
+from netops_paths import NETOPS_HOME
 
 from safety_verifier import build_topology, run_safety_checks, test_port_removal
 from decision_gate import apply_intent_to_graph
@@ -28,7 +32,7 @@ class PerformanceBenchmark:
     """
 
     def __init__(self, work_dir=None):
-        self.work_dir = work_dir or os.path.expanduser("~/netops_guardrail/experiments/results")
+        self.work_dir = work_dir or str(NETOPS_HOME / "experiments" / "results")
         os.makedirs(self.work_dir, exist_ok=True)
 
     @staticmethod
@@ -149,7 +153,7 @@ class PerformanceBenchmark:
         return self._calculate_stats(times)
 
     def benchmark_agent_decision(self, reps=3):
-        telem_file = os.path.expanduser("~/netops_guardrail/telemetry/data/latest.json")
+        telem_file = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
         times = []
         for _ in range(reps):
             try:

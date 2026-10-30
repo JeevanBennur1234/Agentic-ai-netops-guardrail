@@ -240,12 +240,14 @@ class TestObservabilityMetrics:
         assert "HUMAN APPROVAL: APPROVED · NOT EXECUTED" in html
 
     def test_grafana_dashboard_schema(self):
-        import os
-        dashboard_path = os.path.expanduser(
-            "~/netops_guardrail/observability/grafana/netops_guardrail_dashboard.json"
+        from netops_paths import NETOPS_HOME
+
+        dashboard_path = (
+            NETOPS_HOME / "observability" / "grafana"
+            / "netops_guardrail_dashboard.json"
         )
-        assert os.path.exists(dashboard_path)
-        with open(dashboard_path, "r") as f:
+        assert dashboard_path.exists()
+        with dashboard_path.open("r", encoding="utf-8") as f:
             dash = json.load(f)
         assert dash["title"] == "Agentic AI-NetOps Guardrail Overview"
         assert len(dash["panels"]) >= 10

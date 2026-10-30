@@ -1,4 +1,7 @@
 # Agentic AI-NetOps Guardrail - Implementation Status
+
+> Before running these examples, set NETOPS_HOME to the repository root and activate the Python environment: export NETOPS_HOME="$(pwd)" followed by source "$NETOPS_HOME/.venv/bin/activate".
+
 Date: 2026-10-27
 Branch: master
 
@@ -101,11 +104,11 @@ These numbers have narrow meanings:
 
 ## Reproducible commands
 
-From /home/bennurjeevan/netops_guardrail:
+From $NETOPS_HOME:
 
-    /home/bennurjeevan/venvs/netops/bin/python -m pytest -q
-    /home/bennurjeevan/venvs/netops/bin/python experiments/evaluate_guardrail_cases.py
-    /home/bennurjeevan/venvs/netops/bin/python -m py_compile controller/telemetry_controller.py controller/decision_gate.py controller/remediation_service.py executor/remediation_executor.py verifier/safety_verifier.py
+    $VIRTUAL_ENV/bin/python -m pytest -q
+    $VIRTUAL_ENV/bin/python experiments/evaluate_guardrail_cases.py
+    $VIRTUAL_ENV/bin/python -m py_compile controller/telemetry_controller.py controller/decision_gate.py controller/remediation_service.py executor/remediation_executor.py verifier/safety_verifier.py
 
 Live Mininet tests must only run in the project's isolated testbed. They require Ryu listening at 127.0.0.1:6653 and root privileges for Mininet. They refuse to take over pre-existing bridges and clean up the Mininet instance that they create.
 

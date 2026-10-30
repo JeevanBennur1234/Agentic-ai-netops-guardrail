@@ -28,12 +28,12 @@ from audit_trail import AuditTrail
 from remediation_executor import RemediationExecutor
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-_LOCAL_TELEMETRY = os.path.join(_PROJECT_ROOT, "telemetry", "data", "latest.json")
-_HOME_TELEMETRY = os.path.expanduser("~/netops_guardrail/telemetry/data/latest.json")
-DEFAULT_TELEMETRY_PATH = (
-    _LOCAL_TELEMETRY if os.path.exists(_LOCAL_TELEMETRY) else _HOME_TELEMETRY
-)
-_TRACE_DIR = os.path.join(_PROJECT_ROOT, "observability", "data")
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+from netops_paths import NETOPS_HOME
+
+DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
+_TRACE_DIR = str(NETOPS_HOME / "observability" / "data")
 _TRACE_FILE = os.path.join(_TRACE_DIR, "pipeline_trace.jsonl")
 
 

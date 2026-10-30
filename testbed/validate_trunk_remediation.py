@@ -28,9 +28,15 @@ from mininet.node import OVSKernelSwitch, RemoteController
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
-# Mininet is available in Ubuntu system Python; the application's NetworkX,
-# jsonschema, and cryptography dependencies live in the netops virtualenv.
-VENV_SITE = Path("/home/bennurjeevan/venvs/netops/lib/python3.10/site-packages")
+from netops_paths import NETOPS_HOME
+# Mininet may run under system Python while application dependencies live in
+# the active virtualenv (or the repository-local .venv used by the quickstart).
+VENV_ROOT = Path(os.environ.get("VIRTUAL_ENV", str(NETOPS_HOME / ".venv")))
+VENV_SITE = (
+    VENV_ROOT / "lib"
+    / f"python{sys.version_info.major}.{sys.version_info.minor}"
+    / "site-packages"
+)
 if VENV_SITE.exists():
     sys.path.insert(0, str(VENV_SITE))
 from testbed.redundant_topo import RedundantTopo  # noqa: E402

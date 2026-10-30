@@ -10,7 +10,10 @@ for subdir in ["verifier", "audit", "agent", "controller"]:
     path = os.path.join(base_dir, subdir)
     if path not in sys.path:
         sys.path.insert(0, path)
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
 
+from netops_paths import NETOPS_HOME
 from safety_verifier import build_topology, get_access_endpoints, run_safety_checks, test_port_removal
 from audit_trail import AuditTrail
 from human_verifier import HumanApprovalStore, ApprovalError
@@ -47,10 +50,9 @@ class RemediationExecutor:
         if telemetry_path is not None:
             self.telemetry_path = telemetry_path
         else:
-            _root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-            _local = os.path.join(_root, "telemetry", "data", "latest.json")
-            _home = os.path.expanduser("~/netops_guardrail/telemetry/data/latest.json")
-            self.telemetry_path = _local if os.path.exists(_local) else _home
+            self.telemetry_path = str(
+                NETOPS_HOME / "telemetry" / "data" / "latest.json"
+            )
         self.cmd_runner = cmd_runner or self._default_cmd_runner
         self.audit_trail = audit_trail
         self.topology_provider = topology_provider

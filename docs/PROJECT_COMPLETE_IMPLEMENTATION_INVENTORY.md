@@ -1,11 +1,14 @@
 # Agentic AI-NetOps Guardrail — Complete Project Implementation Inventory
 
+> Before running these examples, set NETOPS_HOME to the repository root and activate the Python environment: export NETOPS_HOME="$(pwd)" followed by source "$NETOPS_HOME/.venv/bin/activate".
+
+
 **Prepared:** 28 October 2026
 **Repository:** https://github.com/JeevanBennur1234/Agentic-ai-netops-guardrail
 **Branch reviewed:** master
 **Latest code commit at preparation:** 16ad240 — Add guarded remediation workflow and readable Human Verifier UI
 **Environment:** WSL Ubuntu 22.04 on Windows
-**Project root:** /home/bennurjeevan/netops_guardrail
+**Project root:** $NETOPS_HOME
 
 > This inventory describes implemented code, recorded test evidence, live experiments, and known limitations. It distinguishes real live-test results from synthetic or simulated results and does not claim production readiness.
 
@@ -96,8 +99,8 @@ The defensible contribution is the integration of an LLM intent proposer, a topo
 
 ### Local paths and URLs
 
-- Project root: /home/bennurjeevan/netops_guardrail
-- Python interpreter: /home/bennurjeevan/venvs/netops/bin/python
+- Project root: $NETOPS_HOME
+- Python interpreter: $VIRTUAL_ENV/bin/python
 - Dashboard: http://127.0.0.1:8000/dashboard
 - Human Verifier: http://127.0.0.1:8000/approvals
 - Health: http://127.0.0.1:8000/health
@@ -507,8 +510,8 @@ The last pre-inventory push was verified with local HEAD equal to origin/master 
 
 ### Preflight
 
-    cd /home/bennurjeevan/netops_guardrail
-    test -x /home/bennurjeevan/venvs/netops/bin/python && echo "Python venv OK"
+    cd "$NETOPS_HOME"
+    test -x $VIRTUAL_ENV/bin/python && echo "Python venv OK"
     pgrep -af '[r]yu-manager' || true
     pgrep -af '[o]bservability/server.py' || true
     sudo ovs-vsctl list-br
@@ -518,26 +521,26 @@ Do not start duplicate Ryu, server, or Mininet if it is already running.
 
 ### Start Ryu if stopped
 
-    cd /home/bennurjeevan/netops_guardrail
-    sudo -E /home/bennurjeevan/venvs/netops/bin/ryu-manager --ofp-tcp-listen-port 6653 controller/telemetry_controller.py
+    cd "$NETOPS_HOME"
+    sudo -E $VIRTUAL_ENV/bin/ryu-manager --ofp-tcp-listen-port 6653 controller/telemetry_controller.py
 
 ### Configure tokens and start the local server
 
 Use strong, different secrets and keep them private.
 
-    cd /home/bennurjeevan/netops_guardrail
+    cd "$NETOPS_HOME"
     export NETOPS_CHAOS_API_TOKEN="REPLACE_WITH_LONG_RANDOM_OPERATOR_TOKEN"
     export NETOPS_APPROVER_TOKENS='{"netops-admin":"REPLACE_WITH_DIFFERENT_LONG_RANDOM_APPROVER_TOKEN"}'
     export NETOPS_CONNECTIVITY_CHECKER='testbed.live_connectivity:check_host_connectivity'
-    /home/bennurjeevan/venvs/netops/bin/python observability/server.py
+    $VIRTUAL_ENV/bin/python observability/server.py
 
 If health already returns OK, keep the existing server instead of starting a duplicate. The development server should remain local unless proper remote access controls and HTTPS are configured.
 
 ### Start the Mininet lab only when no conflicting bridges exist
 
     sudo ovs-vsctl list-br
-    cd /home/bennurjeevan/netops_guardrail
-    sudo mn --custom /home/bennurjeevan/netops_guardrail/testbed/redundant_topo.py --topo redundant --controller=remote,ip=127.0.0.1,port=6653 --switch ovs,protocols=OpenFlow13
+    cd "$NETOPS_HOME"
+    sudo mn --custom $NETOPS_HOME/testbed/redundant_topo.py --topo redundant --controller=remote,ip=127.0.0.1,port=6653 --switch ovs,protocols=OpenFlow13
 
 At mininet>, run nodes, net, links, pingall. Allow STP and LLDP telemetry to settle.
 
@@ -545,9 +548,9 @@ At mininet>, run nodes, net, links, pingall. Allow STP and LLDP telemetry to set
 
     curl -fsS http://127.0.0.1:8000/health
     sudo ovs-vsctl list-br
-    /home/bennurjeevan/venvs/netops/bin/python -m testbed.live_connectivity
+    $VIRTUAL_ENV/bin/python -m testbed.live_connectivity
 
-    /home/bennurjeevan/venvs/netops/bin/python - <<'PY'
+    $VIRTUAL_ENV/bin/python - <<'PY'
     import json
     with open("telemetry/data/latest.json", encoding="utf-8") as f:
         data = json.load(f)
@@ -559,8 +562,8 @@ At mininet>, run nodes, net, links, pingall. Allow STP and LLDP telemetry to set
 
 ### Run tests and synthetic evaluation
 
-    /home/bennurjeevan/venvs/netops/bin/python -m pytest -q
-    /home/bennurjeevan/venvs/netops/bin/python experiments/evaluate_guardrail_cases.py
+    $VIRTUAL_ENV/bin/python -m pytest -q
+    $VIRTUAL_ENV/bin/python experiments/evaluate_guardrail_cases.py
     cat experiments/results/recommended_evaluation_20261027.md
 
 ### Inspect flow rules
@@ -856,7 +859,7 @@ From the repository root in WSL, configure a per-operator bearer token in the sa
 
 ```bash
 export NETOPS_APPROVER_TOKENS='{"netops-admin":"REPLACE_WITH_A_LONG_RANDOM_SECRET"}'
-/home/bennurjeevan/venvs/netops/bin/python observability/server.py
+$VIRTUAL_ENV/bin/python observability/server.py
 ```
 
 Use a strong random secret rather than the placeholder. Keep it private. The server binds to `127.0.0.1:8000` by default. Open:
@@ -1010,11 +1013,11 @@ These numbers have narrow meanings:
 
 ## Reproducible commands
 
-From /home/bennurjeevan/netops_guardrail:
+From $NETOPS_HOME:
 
-    /home/bennurjeevan/venvs/netops/bin/python -m pytest -q
-    /home/bennurjeevan/venvs/netops/bin/python experiments/evaluate_guardrail_cases.py
-    /home/bennurjeevan/venvs/netops/bin/python -m py_compile controller/telemetry_controller.py controller/decision_gate.py controller/remediation_service.py executor/remediation_executor.py verifier/safety_verifier.py
+    $VIRTUAL_ENV/bin/python -m pytest -q
+    $VIRTUAL_ENV/bin/python experiments/evaluate_guardrail_cases.py
+    $VIRTUAL_ENV/bin/python -m py_compile controller/telemetry_controller.py controller/decision_gate.py controller/remediation_service.py executor/remediation_executor.py verifier/safety_verifier.py
 
 Live Mininet tests must only run in the project's isolated testbed. They require Ryu listening at 127.0.0.1:6653 and root privileges for Mininet. They refuse to take over pre-existing bridges and clean up the Mininet instance that they create.
 
@@ -1067,9 +1070,9 @@ A normal STP state such as s1-p3=FORWARD, s2-p2=BLOCK is **not** treated as an a
 
 ## Useful checks
 
-    cd /home/bennurjeevan/netops_guardrail
+    cd "$NETOPS_HOME"
     curl -fsS http://127.0.0.1:8000/health
-    /home/bennurjeevan/venvs/netops/bin/python -m testbed.live_connectivity
+    $VIRTUAL_ENV/bin/python -m testbed.live_connectivity
     sudo ovs-ofctl -O OpenFlow13 dump-flows s1 | grep 'priority=65500' || true
     sudo ovs-ofctl -O OpenFlow13 dump-flows s2 | grep 'priority=65500' || true
 
@@ -1158,11 +1161,11 @@ This demo covers the web dashboard, live Mininet/OVS telemetry, a verifier-appro
 Do not claim active-link failover works. The latest interface-down experiment failed to reconverge. Do not run that failure injection as a live success demo.
 
 ## 0. Pre-flight
-Use WSL Ubuntu-22.04. Project root: /home/bennurjeevan/netops_guardrail
+Use WSL Ubuntu-22.04. Project root: $NETOPS_HOME
 
 ~~~bash
-cd /home/bennurjeevan/netops_guardrail
-test -x /home/bennurjeevan/venvs/netops/bin/python && echo "Python venv OK"
+cd "$NETOPS_HOME"
+test -x $VIRTUAL_ENV/bin/python && echo "Python venv OK"
 sudo ovs-vsctl list-br
 ss -ltnp | grep 6653
 ~~~
@@ -1177,18 +1180,18 @@ ss -ltnp | grep 6653
 ~~~
 If port 6653 is already listening for this project, leave it running; do not launch a duplicate. Otherwise:
 ~~~bash
-cd /home/bennurjeevan/netops_guardrail
-sudo -E /home/bennurjeevan/venvs/netops/bin/ryu-manager --ofp-tcp-listen-port 6653 controller/telemetry_controller.py
+cd "$NETOPS_HOME"
+sudo -E $VIRTUAL_ENV/bin/ryu-manager --ofp-tcp-listen-port 6653 controller/telemetry_controller.py
 ~~~
 Leave Terminal A open and wait for successful startup.
 
 ## 2. Terminal B - Web dashboard and Human Verifier
 ~~~bash
-cd /home/bennurjeevan/netops_guardrail
-export NETOPS_APPROVER_TOKEN="$(/home/bennurjeevan/venvs/netops/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
-export NETOPS_APPROVER_TOKENS="$(/home/bennurjeevan/venvs/netops/bin/python -c 'import json,os; print(json.dumps({"netops-admin":os.environ["NETOPS_APPROVER_TOKEN"]}))')"
+cd "$NETOPS_HOME"
+export NETOPS_APPROVER_TOKEN="$($VIRTUAL_ENV/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export NETOPS_APPROVER_TOKENS="$($VIRTUAL_ENV/bin/python -c 'import json,os; print(json.dumps({"netops-admin":os.environ["NETOPS_APPROVER_TOKEN"]}))')"
 printf 'Human Verifier token (keep private): %s\n' "$NETOPS_APPROVER_TOKEN"
-/home/bennurjeevan/venvs/netops/bin/python observability/server.py
+$VIRTUAL_ENV/bin/python observability/server.py
 ~~~
 Keep Terminal B open. The server binds to localhost port 8000. Do not expose this development server to untrusted networks.
 
@@ -1210,8 +1213,8 @@ sudo ovs-vsctl list-br
 ~~~
 If clear, start the two-switch dual-trunk topology:
 ~~~bash
-cd /home/bennurjeevan/netops_guardrail
-sudo mn --custom /home/bennurjeevan/netops_guardrail/testbed/redundant_topo.py --topo redundant --controller=remote,ip=127.0.0.1,port=6653 --switch ovs,protocols=OpenFlow13
+cd "$NETOPS_HOME"
+sudo mn --custom $NETOPS_HOME/testbed/redundant_topo.py --topo redundant --controller=remote,ip=127.0.0.1,port=6653 --switch ovs,protocols=OpenFlow13
 ~~~
 Leave Terminal C at the mininet> prompt. Do not run another Mininet test while these bridges exist.
 
@@ -1227,8 +1230,8 @@ Wait about 10-15 seconds for STP/LLDP telemetry before interpreting the first pi
 ## 4. Terminal D - Create a review-only Human Verifier item
 With Mininet still running and Ryu telemetry fresh:
 ~~~bash
-cd /home/bennurjeevan/netops_guardrail
-/home/bennurjeevan/venvs/netops/bin/python testbed/create_demo_approval.py
+cd "$NETOPS_HOME"
+$VIRTUAL_ENV/bin/python testbed/create_demo_approval.py
 ~~~
 The helper checks telemetry freshness (maximum 30 seconds), both discovered trunks, access-port forwarding, a STP-blocked trunk endpoint, and the existing automated verifier. It creates a pending Human Verifier proposal and signed audit entry. It never calls the executor or modifies OVS flows.
 
@@ -1250,7 +1253,7 @@ Do not proceed to the live remediation validator if test bridges remain or anoth
 ## 6. Demonstrate the live safe-remediation integration test
 Run sequentially, never simultaneously:
 ~~~bash
-cd /home/bennurjeevan/netops_guardrail
+cd "$NETOPS_HOME"
 sudo -E /usr/bin/python3 testbed/validate_redundant_topology.py
 sudo -E /usr/bin/python3 testbed/validate_trunk_remediation.py
 ~~~
@@ -1260,9 +1263,9 @@ If a validator reports existing bridges, stop and identify the owner; do not run
 
 ## 7. Run regression tests and evaluation
 ~~~bash
-cd /home/bennurjeevan/netops_guardrail
-/home/bennurjeevan/venvs/netops/bin/pytest -q
-/home/bennurjeevan/venvs/netops/bin/python experiments/evaluate_guardrail_cases.py
+cd "$NETOPS_HOME"
+$VIRTUAL_ENV/bin/pytest -q
+$VIRTUAL_ENV/bin/python experiments/evaluate_guardrail_cases.py
 cat experiments/results/recommended_evaluation_20261027.md
 ~~~
 Latest verified baseline: 155 tests passed. The evaluation uses 12 manually labelled synthetic cases and 30 executor transactions using an in-memory fake OVS runner. The 30 transactions are not 30 live OVS changes; reported latency is simulated software-path timing, not data-plane latency.
@@ -1450,11 +1453,11 @@ The two-switch topology baseline and standby-trunk blocking test pass. The same 
 
 From the repository root:
 
-    /home/bennurjeevan/venvs/netops/bin/python -m pytest -q
-    /home/bennurjeevan/venvs/netops/bin/python experiments/evaluate_guardrail_cases.py
-    sudo env PYTHONPATH=/home/bennurjeevan/venvs/netops/lib/python3.10/site-packages python3 testbed/validate_redundant_topology.py
-    sudo env PYTHONPATH=/home/bennurjeevan/venvs/netops/lib/python3.10/site-packages python3 testbed/validate_trunk_remediation.py
-    sudo env PYTHONPATH=/home/bennurjeevan/venvs/netops/lib/python3.10/site-packages python3 testbed/validate_triangle_failover.py
+    $VIRTUAL_ENV/bin/python -m pytest -q
+    $VIRTUAL_ENV/bin/python experiments/evaluate_guardrail_cases.py
+    sudo env PYTHONPATH=$VIRTUAL_ENV/lib/python3.10/site-packages python3 testbed/validate_redundant_topology.py
+    sudo env PYTHONPATH=$VIRTUAL_ENV/lib/python3.10/site-packages python3 testbed/validate_trunk_remediation.py
+    sudo env PYTHONPATH=$VIRTUAL_ENV/lib/python3.10/site-packages python3 testbed/validate_triangle_failover.py
 
 The live test scripts require Ryu listening on 127.0.0.1:6653, sudo/root access, and an isolated Mininet environment. They refuse to modify pre-existing bridges and stop only the network they create.
 

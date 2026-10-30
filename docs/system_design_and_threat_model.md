@@ -1,4 +1,7 @@
 # System Design and Threat Model
+
+> Before running these examples, set NETOPS_HOME to the repository root and activate the Python environment: export NETOPS_HOME="$(pwd)" followed by source "$NETOPS_HOME/.venv/bin/activate".
+
 Prepared: 2026-10-27
 
 ## 1. System goal
@@ -79,11 +82,11 @@ The two-switch topology baseline and standby-trunk blocking test pass. The same 
 
 From the repository root:
 
-    /home/bennurjeevan/venvs/netops/bin/python -m pytest -q
-    /home/bennurjeevan/venvs/netops/bin/python experiments/evaluate_guardrail_cases.py
-    sudo env PYTHONPATH=/home/bennurjeevan/venvs/netops/lib/python3.10/site-packages python3 testbed/validate_redundant_topology.py
-    sudo env PYTHONPATH=/home/bennurjeevan/venvs/netops/lib/python3.10/site-packages python3 testbed/validate_trunk_remediation.py
-    sudo env PYTHONPATH=/home/bennurjeevan/venvs/netops/lib/python3.10/site-packages python3 testbed/validate_triangle_failover.py
+    $VIRTUAL_ENV/bin/python -m pytest -q
+    $VIRTUAL_ENV/bin/python experiments/evaluate_guardrail_cases.py
+    sudo env PYTHONPATH=$VIRTUAL_ENV/lib/python3.10/site-packages python3 testbed/validate_redundant_topology.py
+    sudo env PYTHONPATH=$VIRTUAL_ENV/lib/python3.10/site-packages python3 testbed/validate_trunk_remediation.py
+    sudo env PYTHONPATH=$VIRTUAL_ENV/lib/python3.10/site-packages python3 testbed/validate_triangle_failover.py
 
 The live test scripts require Ryu listening on 127.0.0.1:6653, sudo/root access, and an isolated Mininet environment. They refuse to modify pre-existing bridges and stop only the network they create.
 

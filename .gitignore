@@ -10,3 +10,4 @@ observability/data/
 # Local private signing keys must never be committed
 experiments/results/*_key.pem
 observability/server_runtime.log
+.venv/

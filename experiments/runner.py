@@ -8,13 +8,17 @@ for subdir in ["verifier", "audit", "agent", "controller", "executor", "observab
     path = os.path.join(base_dir, subdir)
     if path not in sys.path:
         sys.path.insert(0, path)
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
+
+from netops_paths import NETOPS_HOME
 
 from experiment_suite import ExperimentSuite
 from benchmark import PerformanceBenchmark
 
 
 def run_all(output_dir=None):
-    results_dir = output_dir or os.path.expanduser("~/netops_guardrail/experiments/results")
+    results_dir = output_dir or str(NETOPS_HOME / "experiments" / "results")
     os.makedirs(results_dir, exist_ok=True)
 
     suite = ExperimentSuite(work_dir=results_dir)

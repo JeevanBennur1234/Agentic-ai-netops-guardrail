@@ -1,5 +1,8 @@
 # Issue 2 — Standby Forwarding Anomaly
 
+> Before running these examples, set NETOPS_HOME to the repository root and activate the Python environment: export NETOPS_HOME="$(pwd)" followed by source "$NETOPS_HOME/.venv/bin/activate".
+
+
 ## What this scenario checks
 
 The standby trunk is s1-p3 <-> s2-p2; the primary trunk is s1-p2 <-> s2-p1. The live detector reads the latest Ryu telemetry and reports a real anomaly only when:
@@ -31,9 +34,9 @@ A normal STP state such as s1-p3=FORWARD, s2-p2=BLOCK is **not** treated as an a
 
 ## Useful checks
 
-    cd /home/bennurjeevan/netops_guardrail
+    cd "$NETOPS_HOME"
     curl -fsS http://127.0.0.1:8000/health
-    /home/bennurjeevan/venvs/netops/bin/python -m testbed.live_connectivity
+    $VIRTUAL_ENV/bin/python -m testbed.live_connectivity
     sudo ovs-ofctl -O OpenFlow13 dump-flows s1 | grep 'priority=65500' || true
     sudo ovs-ofctl -O OpenFlow13 dump-flows s2 | grep 'priority=65500' || true
 

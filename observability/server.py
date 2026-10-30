@@ -790,7 +790,7 @@ for(const p of data.proposals||[]){
   if(checkValues.length){
     for(const check of checkValues){
       const passed=/^PASS:/i.test(String(check));
-      checks.append(node('li',passed?'check-pass':'check-fail',(passed?'✓ ':'✕ ')+String(check).replace(/^(PASS|FAIL):\s*/i,'')));
+      checks.append(node('li',passed?'check-pass':'check-fail',(passed?'✓ ':'✕ ')+String(check).replace(/^(PASS|FAIL):\\s*/i,'')));
     }
   }else checks.append(node('li','meta','No detailed safety checks were recorded.'));
   checkSection.append(checks);

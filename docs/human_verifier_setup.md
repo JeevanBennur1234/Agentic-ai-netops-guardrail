@@ -1,5 +1,8 @@
 # Human Verifier setup
 
+> Before running these examples, set NETOPS_HOME to the repository root and activate the Python environment: export NETOPS_HOME="$(pwd)" followed by source "$NETOPS_HOME/.venv/bin/activate".
+
+
 Updated: 2026-10-27
 
 ## What it does
@@ -14,7 +17,7 @@ From the repository root in WSL, configure a per-operator bearer token in the sa
 
 ```bash
 export NETOPS_APPROVER_TOKENS='{"netops-admin":"REPLACE_WITH_A_LONG_RANDOM_SECRET"}'
-/home/bennurjeevan/venvs/netops/bin/python observability/server.py
+$VIRTUAL_ENV/bin/python observability/server.py
 ```
 
 Use a strong random secret rather than the placeholder. Keep it private. The server binds to `127.0.0.1:8000` by default. Open:

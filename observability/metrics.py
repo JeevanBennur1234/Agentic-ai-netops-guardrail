@@ -7,17 +7,16 @@ for subdir in ["verifier", "audit", "agent", "controller", "executor"]:
     path = os.path.join(base_dir, subdir)
     if path not in sys.path:
         sys.path.insert(0, path)
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
 
+from netops_paths import NETOPS_HOME
 from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily
 from audit_trail import AuditTrail
 
 
-DEFAULT_TELEMETRY_PATH = os.path.expanduser(
-    "~/netops_guardrail/telemetry/data/latest.json"
-)
-DEFAULT_AUDIT_LOG_PATH = os.path.expanduser(
-    "~/netops_guardrail/audit/audit_log.json"
-)
+DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
+DEFAULT_AUDIT_LOG_PATH = str(NETOPS_HOME / "audit" / "audit_log.json")
 LOCAL_PORT = "4294967294"
 MAX_PHYSICAL_PORT = 4294967040
 

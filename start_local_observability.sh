@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/home/bennurjeevan/netops_guardrail"
-PY="/home/bennurjeevan/venvs/netops/bin/python"
+SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"
+ROOT="${NETOPS_HOME:-$SCRIPT_DIR}"
+ROOT="$(cd -- "$ROOT" && pwd)"
+export NETOPS_HOME="$ROOT"
+
+if [[ -n "${PYTHON_BIN:-}" ]]; then
+  PY="$PYTHON_BIN"
+elif [[ -n "${VIRTUAL_ENV:-}" && -x "$VIRTUAL_ENV/bin/python" ]]; then
+  PY="$VIRTUAL_ENV/bin/python"
+elif [[ -x "$ROOT/.venv/bin/python" ]]; then
+  PY="$ROOT/.venv/bin/python"
+else
+  PY="$(command -v python3 || true)"
+fi
+
 SECRETS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/netops-guardrail"
 SECRETS_FILE="$SECRETS_DIR/local-secrets.env"
 
