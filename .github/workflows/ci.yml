@@ -17,11 +17,9 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: |
-          # Ryu 4.34 calls a setuptools API removed by newer releases.
-          # Use a compatible setuptools and disable isolated builds so Ryu
-          # uses that pinned version instead of downloading the latest one.
+          # Ryu 4.34 needs legacy setuptools APIs and pbr during metadata generation.
           python -m pip install --upgrade pip
-          python -m pip install "setuptools==67.6.1" wheel
+          python -m pip install "setuptools==58.0.4" wheel pbr
           python -m pip install --no-build-isolation -r requirements.txt
       - name: Run test suite
         run: python -m pytest -q
