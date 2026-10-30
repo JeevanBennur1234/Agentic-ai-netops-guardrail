@@ -1,0 +1,10 @@
+date: 2026-10-31
+commit: 952e9e7c27ff4d700256fb455e2b97db5c22269e
+model: none-regression-suite
+command: wsl.exe -d Ubuntu-22.04 --cd /home/bennurjeevan/netops_guardrail .venv/bin/pytest -q
+phase: final P2 verification after live OVS benchmark harness
+
+........................................................................ [ 40%]
+..............................s......................................... [ 81%]
+................................                                         [100%]
+175 passed, 1 skipped in 2.56s

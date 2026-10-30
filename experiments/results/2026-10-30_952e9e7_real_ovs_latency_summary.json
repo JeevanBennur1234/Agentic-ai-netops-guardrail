@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "date": "2026-10-30",
+    "commit_hash": "952e9e7c27ff4d700256fb455e2b97db5c22269e",
+    "model_name": "none-live-OVS-Mininet-with-synthetic-test-approval",
+    "command": "sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src:/home/bennurjeevan/netops_guardrail/.venv/lib/python3.10/site-packages /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/experiments/benchmark_real_ovs_executor.py --output experiments/results/2026-10-30_952e9e7_real_ovs_latency_sample_0N.json (N=1..5)",
+    "testbed": "LIVE Mininet + Open vSwitch + Ryu",
+    "percentile_method": "linear interpolation, equivalent to NumPy default percentile method"
+  },
+  "metric": "executor.execute wall-clock latency in milliseconds; includes OVS mutation, post-mutation verification, safety verification and live connectivity check; excludes topology startup and synthetic approval preparation",
+  "n": 5,
+  "samples_ms": [
+    101.16,
+    87.438,
+    86.863,
+    82.21,
+    84.319
+  ],
+  "sorted_samples_ms": [
+    82.21,
+    84.319,
+    86.863,
+    87.438,
+    101.16
+  ],
+  "min_ms": 82.21,
+  "median_ms": 86.863,
+  "max_ms": 101.16,
+  "p95_ms": 98.4156,
+  "p99_ms": 100.61112,
+  "all_five_passed": true,
+  "postconditions": "All 5 runs: executor success, change verified, safety verified, connectivity verified, both expected drop rules present, post-transaction ping loss 0%.",
+  "caveats": [
+    "Synthetic approval record was prepared before the timer; this is not human approval latency.",
+    "Repeated transactions were executed on a fresh isolated Mininet/OVS topology each run.",
+    "One additional full-harness attempt failed on a separate access-port rejection assertion and is not included in the latency distribution; see 2026-10-30_8349bbe_real_ovs_latency_sample_01.txt."
+  ]
+}

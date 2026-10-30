@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "date": "2026-10-30T21:07:23+05:30",
+    "commit_hash": "952e9e7c27ff4d700256fb455e2b97db5c22269e",
+    "model_name": "none-live-OVS-Mininet-with-synthetic-test-approval",
+    "command": "cd /home/bennurjeevan/netops_guardrail && sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src:/home/bennurjeevan/netops_guardrail/.venv/lib/python3.10/site-packages /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/experiments/benchmark_real_ovs_executor.py --output experiments/results/2026-10-30_952e9e7_real_ovs_latency_sample_02.json",
+    "testbed": "LIVE Mininet + Open vSwitch + Ryu",
+    "measurement_scope": "executor.execute wall-clock duration including live OVS mutation, verification, and live connectivity check; excludes topology startup and synthetic approval preparation"
+  },
+  "result": "PASS",
+  "reason": null,
+  "baseline_ping_loss_percent": 0.0,
+  "gate_result": {
+    "safe": true,
+    "nodes": 7,
+    "edges": 6,
+    "checks": [
+      "PASS: Topology exists",
+      "PASS: Topology is connected",
+      "PASS: Topology is loop-free",
+      "PASS: All required endpoints mutually reachable"
+    ]
+  },
+  "execution_result": {
+    "success": true,
+    "action": "block",
+    "target_switch": "1",
+    "from_port": "3",
+    "target_ports": [
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "human_approval_id": "d0b4e897e6b745098ec8bdfd1e0ebf40",
+    "change_verified": true,
+    "safety_verified": true,
+    "connectivity_verified": true,
+    "rollback_attempted": false,
+    "rollback_success": null,
+    "rollback_details": "No rollback required",
+    "details": "Both ends of the inter-switch trunk were blocked and verified. Topology safety check: Topology safety checks passed. Live host-to-host reachability verified."
+  },
+  "latency_ms": 87.438,
+  "postconditions": {
+    "executor_success": true,
+    "change_verified": true,
+    "safety_verified": true,
+    "connectivity_verified": true,
+    "drop_rule_s1_p3_present": true,
+    "drop_rule_s2_p2_present": true,
+    "post_transaction_ping_loss_percent": 0.0
+  },
+  "test_approval_method": "synthetic approval record prepared before latency timer; no human interaction latency included",
+  "initial_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "BLOCK",
+    "s2-p3": "FORWARD"
+  },
+  "discovered_trunk_links": [
+    [
+      "s1-p2",
+      "s2-p1"
+    ],
+    [
+      "s1-p3",
+      "s2-p2"
+    ]
+  ]
+}

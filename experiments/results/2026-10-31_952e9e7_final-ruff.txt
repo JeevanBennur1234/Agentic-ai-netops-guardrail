@@ -1,0 +1,7 @@
+date: 2026-10-31
+commit: 952e9e7c27ff4d700256fb455e2b97db5c22269e
+model: none-lint
+command: wsl.exe -d Ubuntu-22.04 --cd /home/bennurjeevan/netops_guardrail .venv/bin/ruff check .
+phase: final P2 verification after live OVS benchmark harness
+
+All checks passed!
