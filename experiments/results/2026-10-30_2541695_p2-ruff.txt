@@ -1,0 +1,100 @@
+date: 2026-10-30
+commit: 2541695baa2d1790c144736a4495bc6d4f59ec78
+model: none-lint
+command: .venv/bin/ruff check .
+
+E401 [*] Multiple imports on one line
+ --> src/netops_guardrail/experiments/evaluate_llm_scenarios.py:3:1
+  |
+1 | #!/usr/bin/env python3
+2 | """Frozen-prompt LLM evaluation against labelled scenarios and the project safety gate."""
+3 | import argparse, csv, copy, hashlib, json, os, subprocess, time, urllib.request
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4 | from datetime import datetime, timezone
+5 | from pathlib import Path
+  |
+help: Split imports
+   |
+2  | """Frozen-prompt LLM evaluation against labelled scenarios and the project safety gate."""
+   - import argparse, csv, copy, hashlib, json, os, subprocess, time, urllib.request
+3  + import argparse
+4  + import csv
+5  + import copy
+6  + import hashlib
+7  + import json
+8  + import os
+9  + import subprocess
+10 + import time
+11 + import urllib.request
+12 | from datetime import datetime, timezone
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> src/netops_guardrail/experiments/evaluate_llm_scenarios.py:3:1
+   |
+ 1 |   #!/usr/bin/env python3
+ 2 |   """Frozen-prompt LLM evaluation against labelled scenarios and the project safety gate."""
+ 3 | / import argparse, csv, copy, hashlib, json, os, subprocess, time, urllib.request
+ 4 | | from datetime import datetime, timezone
+ 5 | | from pathlib import Path
+ 6 | | from jsonschema import ValidationError, validate
+ 7 | | from netops_guardrail.agent.remediation_agent import INTENT_SCHEMA
+ 8 | | from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+ 9 | | from netops_guardrail.experiments.topologies import build_redundant_topology_data, build_star_topology_data
+10 | | from netops_guardrail.verifier.safety_verifier import build_topology
+11 | | from netops_guardrail.netops_paths import NETOPS_HOME
+   | |_____________________________________________________^
+12 |
+13 |   ROOT = NETOPS_HOME
+   |
+help: Organize imports
+   |
+2  | """Frozen-prompt LLM evaluation against labelled scenarios and the project safety gate."""
+   - import argparse, csv, copy, hashlib, json, os, subprocess, time, urllib.request
+3  + import argparse
+4  + import copy
+5  + import csv
+6  + import hashlib
+7  + import json
+8  + import os
+9  + import subprocess
+10 + import time
+11 + import urllib.request
+12 | from datetime import datetime, timezone
+13 | from pathlib import Path
+14 +
+15 | from jsonschema import ValidationError, validate
+16 +
+17 | from netops_guardrail.agent.remediation_agent import INTENT_SCHEMA
+18 | from netops_guardrail.controller.decision_gate import apply_intent_to_graph
+   - from netops_guardrail.experiments.topologies import build_redundant_topology_data, build_star_topology_data
+   - from netops_guardrail.verifier.safety_verifier import build_topology
+19 + from netops_guardrail.experiments.topologies import (
+20 +     build_redundant_topology_data,
+21 +     build_star_topology_data,
+22 + )
+23 | from netops_guardrail.netops_paths import NETOPS_HOME
+24 + from netops_guardrail.verifier.safety_verifier import build_topology
+25 |
+   |
+
+F401 [*] `datetime.timezone` imported but unused
+ --> src/netops_guardrail/experiments/evaluate_llm_scenarios.py:4:32
+  |
+2 | """Frozen-prompt LLM evaluation against labelled scenarios and the project safety gate."""
+3 | import argparse, csv, copy, hashlib, json, os, subprocess, time, urllib.request
+4 | from datetime import datetime, timezone
+  |                                ^^^^^^^^
+5 | from pathlib import Path
+6 | from jsonschema import ValidationError, validate
+  |
+help: Remove unused import: `datetime.timezone`
+  |
+3 | import argparse, csv, copy, hashlib, json, os, subprocess, time, urllib.request
+  - from datetime import datetime, timezone
+4 + from datetime import datetime
+5 | from pathlib import Path
+  |
+
+Found 3 errors.
+[*] 3 fixable with `--fix`.

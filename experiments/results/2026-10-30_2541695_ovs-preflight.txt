@@ -1,0 +1,77 @@
+date: 2026-10-30T20:08:36+05:30
+commit: 2541695baa2d1790c144736a4495bc6d4f59ec78
+model: none (OVS environment preflight)
+command: sudo -n ovs-vsctl show; pgrep -af mininet; pgrep -af ryu-manager; sudo -n ovs-vsctl list-br; sudo -n ovs-vsctl --columns=name,interfaces list Port
+
+=== ovs-vsctl show ===
+96be0ca0-1936-4d6e-b8d3-fd2709c4e654
+    Bridge s1
+        Controller "ptcp:6654"
+        Controller "tcp:127.0.0.1:6653"
+        fail_mode: secure
+        Port s1-eth3
+            Interface s1-eth3
+                error: "could not open network device s1-eth3 (No such device)"
+        Port s1-eth1
+            Interface s1-eth1
+                error: "could not open network device s1-eth1 (No such device)"
+        Port s1-eth2
+            Interface s1-eth2
+                error: "could not open network device s1-eth2 (No such device)"
+        Port s1
+            Interface s1
+                type: internal
+    Bridge s2
+        Controller "ptcp:6655"
+        Controller "tcp:127.0.0.1:6653"
+        fail_mode: secure
+        Port s2
+            Interface s2
+                type: internal
+        Port s2-eth3
+            Interface s2-eth3
+                error: "could not open network device s2-eth3 (No such device)"
+        Port s2-eth1
+            Interface s2-eth1
+                error: "could not open network device s2-eth1 (No such device)"
+        Port s2-eth2
+            Interface s2-eth2
+                error: "could not open network device s2-eth2 (No such device)"
+    ovs_version: "2.17.12"
+
+=== mininet processes ===
+473 bash -lc cd /home/bennurjeevan/netops_guardrail && (printf 'date: 2026-10-30T20:08:36+05:30\ncommit: 2541695baa2d1790c144736a4495bc6d4f59ec78\nmodel: none (OVS environment preflight)\ncommand: sudo -n ovs-vsctl show; pgrep -af mininet; pgrep -af ryu-manager; sudo -n ovs-vsctl list-br; sudo -n ovs-vsctl --columns=name,interfaces list Port\n\n=== ovs-vsctl show ===\n'; sudo -n ovs-vsctl show; printf '\n=== mininet processes ===\n'; pgrep -af mininet || true; printf '\n=== ryu processes ===\n'; pgrep -af ryu-manager || true; printf '\n=== bridge list ===\n'; sudo -n ovs-vsctl list-br; printf '\n=== ports ===\n'; sudo -n ovs-vsctl --columns=name,interfaces list Port) > experiments/results/2026-10-30_2541695_ovs-preflight.txt && cat experiments/results/2026-10-30_2541695_ovs-preflight.txt && echo '=== TESTS ===' && make test && echo '=== LINT ===' && make lint
+479 bash -lc cd /home/bennurjeevan/netops_guardrail && (printf 'date: 2026-10-30T20:08:36+05:30\ncommit: 2541695baa2d1790c144736a4495bc6d4f59ec78\nmodel: none (OVS environment preflight)\ncommand: sudo -n ovs-vsctl show; pgrep -af mininet; pgrep -af ryu-manager; sudo -n ovs-vsctl list-br; sudo -n ovs-vsctl --columns=name,interfaces list Port\n\n=== ovs-vsctl show ===\n'; sudo -n ovs-vsctl show; printf '\n=== mininet processes ===\n'; pgrep -af mininet || true; printf '\n=== ryu processes ===\n'; pgrep -af ryu-manager || true; printf '\n=== bridge list ===\n'; sudo -n ovs-vsctl list-br; printf '\n=== ports ===\n'; sudo -n ovs-vsctl --columns=name,interfaces list Port) > experiments/results/2026-10-30_2541695_ovs-preflight.txt && cat experiments/results/2026-10-30_2541695_ovs-preflight.txt && echo '=== TESTS ===' && make test && echo '=== LINT ===' && make lint
+
+=== ryu processes ===
+473 bash -lc cd /home/bennurjeevan/netops_guardrail && (printf 'date: 2026-10-30T20:08:36+05:30\ncommit: 2541695baa2d1790c144736a4495bc6d4f59ec78\nmodel: none (OVS environment preflight)\ncommand: sudo -n ovs-vsctl show; pgrep -af mininet; pgrep -af ryu-manager; sudo -n ovs-vsctl list-br; sudo -n ovs-vsctl --columns=name,interfaces list Port\n\n=== ovs-vsctl show ===\n'; sudo -n ovs-vsctl show; printf '\n=== mininet processes ===\n'; pgrep -af mininet || true; printf '\n=== ryu processes ===\n'; pgrep -af ryu-manager || true; printf '\n=== bridge list ===\n'; sudo -n ovs-vsctl list-br; printf '\n=== ports ===\n'; sudo -n ovs-vsctl --columns=name,interfaces list Port) > experiments/results/2026-10-30_2541695_ovs-preflight.txt && cat experiments/results/2026-10-30_2541695_ovs-preflight.txt && echo '=== TESTS ===' && make test && echo '=== LINT ===' && make lint
+479 bash -lc cd /home/bennurjeevan/netops_guardrail && (printf 'date: 2026-10-30T20:08:36+05:30\ncommit: 2541695baa2d1790c144736a4495bc6d4f59ec78\nmodel: none (OVS environment preflight)\ncommand: sudo -n ovs-vsctl show; pgrep -af mininet; pgrep -af ryu-manager; sudo -n ovs-vsctl list-br; sudo -n ovs-vsctl --columns=name,interfaces list Port\n\n=== ovs-vsctl show ===\n'; sudo -n ovs-vsctl show; printf '\n=== mininet processes ===\n'; pgrep -af mininet || true; printf '\n=== ryu processes ===\n'; pgrep -af ryu-manager || true; printf '\n=== bridge list ===\n'; sudo -n ovs-vsctl list-br; printf '\n=== ports ===\n'; sudo -n ovs-vsctl --columns=name,interfaces list Port) > experiments/results/2026-10-30_2541695_ovs-preflight.txt && cat experiments/results/2026-10-30_2541695_ovs-preflight.txt && echo '=== TESTS ===' && make test && echo '=== LINT ===' && make lint
+
+=== bridge list ===
+s1
+s2
+
+=== ports ===
+name                : s1-eth1
+interfaces          : [281d68bb-9287-4cc5-8d1f-6660000c1512]
+
+name                : s2-eth2
+interfaces          : [8f2158b6-29be-4147-acda-25988e217f54]
+
+name                : s2-eth1
+interfaces          : [8e3e3457-c137-4e87-8e60-7c77157de727]
+
+name                : s1-eth3
+interfaces          : [821f34c3-24c8-4855-a5ff-03a0d658f4c3]
+
+name                : s1-eth2
+interfaces          : [5ce32bae-2063-4b3c-8bf0-29828ff0af59]
+
+name                : s2-eth3
+interfaces          : [e235dba1-e4aa-484b-be09-4438a871a93a]
+
+name                : s2
+interfaces          : [06cc6188-2664-4fe2-9ab7-235a5b211829]
+
+name                : s1
+interfaces          : [58af01e9-235d-4ecd-9509-f2fbcba8cba3]

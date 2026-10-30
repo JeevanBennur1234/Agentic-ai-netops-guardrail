@@ -1,0 +1,10 @@
+date: 2026-10-30
+commit: 2541695baa2d1790c144736a4495bc6d4f59ec78
+model: none-regression-test
+command: .venv/bin/pytest -q
+worktree: includes telemetry output-path correction and failover event instrumentation
+
+........................................................................ [ 40%]
+..............................s......................................... [ 81%]
+................................                                         [100%]
+175 passed, 1 skipped in 1.25s

@@ -1,0 +1,151 @@
+{
+    "switches": {
+        "1": {
+            "ports": {
+                "4294967294": {
+                    "rx_packets": 0,
+                    "tx_packets": 0,
+                    "rx_bytes": 0,
+                    "tx_bytes": 0
+                },
+                "1": {
+                    "rx_packets": 8,
+                    "tx_packets": 26,
+                    "rx_bytes": 716,
+                    "tx_bytes": 1756
+                },
+                "2": {
+                    "rx_packets": 19,
+                    "tx_packets": 25,
+                    "rx_bytes": 1306,
+                    "tx_bytes": 1666
+                },
+                "3": {
+                    "rx_packets": 19,
+                    "tx_packets": 25,
+                    "rx_bytes": 1306,
+                    "tx_bytes": 1666
+                }
+            },
+            "flows": [
+                {
+                    "priority": 65535,
+                    "packet_count": 20,
+                    "byte_count": 1200
+                },
+                {
+                    "priority": 65535,
+                    "packet_count": 3,
+                    "byte_count": 180
+                },
+                {
+                    "priority": 0,
+                    "packet_count": 0,
+                    "byte_count": 0
+                }
+            ],
+            "port_status": {
+                "1": {
+                    "state": "MISSING",
+                    "reason": "DELETE",
+                    "link_down": false,
+                    "admin_down": false
+                },
+                "2": {
+                    "state": "MISSING",
+                    "reason": "DELETE",
+                    "link_down": false,
+                    "admin_down": false
+                },
+                "3": {
+                    "state": "MISSING",
+                    "reason": "DELETE",
+                    "link_down": false,
+                    "admin_down": false
+                }
+            },
+            "stp_port_states": {
+                "1": "DISABLE",
+                "2": "DISABLE",
+                "3": "DISABLE"
+            }
+        },
+        "2": {
+            "ports": {
+                "4294967294": {
+                    "rx_packets": 0,
+                    "tx_packets": 0,
+                    "rx_bytes": 0,
+                    "tx_bytes": 0
+                },
+                "1": {
+                    "rx_packets": 25,
+                    "tx_packets": 19,
+                    "rx_bytes": 1666,
+                    "tx_bytes": 1306
+                },
+                "2": {
+                    "rx_packets": 25,
+                    "tx_packets": 19,
+                    "rx_bytes": 1666,
+                    "tx_bytes": 1306
+                },
+                "3": {
+                    "rx_packets": 8,
+                    "tx_packets": 25,
+                    "rx_bytes": 716,
+                    "tx_bytes": 1696
+                }
+            },
+            "flows": [
+                {
+                    "priority": 65535,
+                    "packet_count": 18,
+                    "byte_count": 1080
+                },
+                {
+                    "priority": 65535,
+                    "packet_count": 14,
+                    "byte_count": 840
+                },
+                {
+                    "priority": 65534,
+                    "packet_count": 6,
+                    "byte_count": 496
+                },
+                {
+                    "priority": 0,
+                    "packet_count": 4,
+                    "byte_count": 240
+                }
+            ],
+            "port_status": {
+                "3": {
+                    "state": "MISSING",
+                    "reason": "DELETE",
+                    "link_down": false,
+                    "admin_down": false
+                },
+                "1": {
+                    "state": "MISSING",
+                    "reason": "DELETE",
+                    "link_down": false,
+                    "admin_down": false
+                },
+                "2": {
+                    "state": "MISSING",
+                    "reason": "DELETE",
+                    "link_down": false,
+                    "admin_down": false
+                }
+            },
+            "stp_port_states": {
+                "1": "DISABLE",
+                "2": "DISABLE",
+                "3": "DISABLE"
+            }
+        }
+    },
+    "links": [],
+    "updated_at_utc": "2026-10-30T15:10:24.404793+00:00"
+}

@@ -1,0 +1,9 @@
+date: 2026-10-30
+commit: 2541695baa2d1790c144736a4495bc6d4f59ec78
+model: none-live-OVS-Mininet
+command: sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src NETOPS_FAILOVER_OBSERVATION_SECONDS=90 NETOPS_FAILOVER_RESULT_PATH=/home/bennurjeevan/netops_guardrail/experiments/results/2026-10-30_2541695_failover_trial_01.json /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_active_failover.py
+
+Starting isolated dual-trunk Mininet topology...
+Baseline pingall loss: 100.0%
+Live failover evidence: /home/bennurjeevan/netops_guardrail/experiments/results/2026-10-30_2541695_failover_trial_01.json
+Stopping only the Mininet topology created by this test...

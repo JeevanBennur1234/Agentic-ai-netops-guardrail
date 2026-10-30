@@ -9,10 +9,10 @@
 
 Manually labelled synthetic cases only; not a representative dataset or a measurement of LLM decision quality.
 
-## Executor transaction benchmark
+## SIMULATED Executor transaction benchmark (in-memory fake OVS runner)
 
-- Repetitions: 30
-- Mean: 0.277 ms; median: 0.221 ms; p95: 0.38 ms
+- Repetitions: 30 (SIMULATED transactions; no real OVS commands executed)
+- **SIMULATED timings:** mean 0.277 ms; median 0.221 ms; p95: 0.38 ms
 - Successful simulated transactions: 30 / 30
 - Host OVS modified: no
 - Live connectivity measured: no

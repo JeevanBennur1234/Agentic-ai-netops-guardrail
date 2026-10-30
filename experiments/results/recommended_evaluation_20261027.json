@@ -199,6 +199,7 @@
     "caveat": "Manually labelled synthetic cases only; not a representative dataset or a measurement of LLM decision quality."
   },
   "executor_transaction_benchmark": {
+    "evidence_label": "SIMULATED",
     "type": "simulated_executor_transaction",
     "repetitions_requested": 30,
     "stats": {

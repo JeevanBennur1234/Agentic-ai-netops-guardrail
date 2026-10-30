@@ -1,0 +1,4 @@
+date: 2026-10-30
+commit: 2541695baa2d1790c144736a4495bc6d4f59ec78
+model: none (fresh controller telemetry snapshot)
+command: copy root telemetry/data/latest.json after the corrected controller output path and a successful baseline-only topology run

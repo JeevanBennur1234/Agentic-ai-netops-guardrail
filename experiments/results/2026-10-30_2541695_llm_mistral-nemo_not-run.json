@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "date": "2026-10-30",
+    "commit_hash": "2541695baa2d1790c144736a4495bc6d4f59ec78",
+    "model_name": "mistral-nemo:latest",
+    "command": "NOT RUN: no inference command issued because host memory preflight showed only 7.8 GB total physical RAM; model artifact is approximately 7.07 GB and is a 12.2B Q4_0 model",
+    "scenario_file": "experiments/results/2026-10-30_2541695_llm_scenarios_labeled.json",
+    "scenario_count": 30
+  },
+  "result": "NOT_RUN_INSUFFICIENT_RAM",
+  "reason": "Available host memory is insufficient for a reliable inference run of this model while Windows, WSL, OVS, and other services are running. The model file alone is about 7.07 GB; actual runtime memory is larger than the file size. I did not load the model or silently skip failed inference attempts.",
+  "metrics": null
+}

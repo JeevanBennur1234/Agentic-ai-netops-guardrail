@@ -1,0 +1,2 @@
+date,commit_hash,model_name,command,result,n,median_ms,p95_ms,p99_ms,reason
+2026-10-30,2541695baa2d1790c144736a4495bc6d4f59ec78,none,"NOT RUN: sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_redundant_topology.py",INCONCLUSIVE,0,,, ,"Baseline connectivity failed at 50.0% packet loss; no executor mutation attempted because latency and postcondition results would be unsafe and uninterpretable."

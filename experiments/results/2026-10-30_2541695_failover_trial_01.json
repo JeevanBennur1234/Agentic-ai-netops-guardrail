@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "date": "2026-10-30T20:20:53+05:30",
+    "commit_hash": "2541695baa2d1790c144736a4495bc6d4f59ec78",
+    "model_name": "none (live OVS/Mininet experiment)",
+    "command": "sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src NETOPS_FAILOVER_OBSERVATION_SECONDS=90 NETOPS_FAILOVER_RESULT_PATH=/home/bennurjeevan/netops_guardrail/experiments/results/2026-10-30_2541695_failover_trial_01.json /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_active_failover.py",
+    "observation_window_seconds": 90.0,
+    "testbed": "LIVE Mininet + OVS + Ryu"
+  },
+  "events": [],
+  "started_at_utc": "2026-10-30T14:50:53.013487+00:00",
+  "test": "OpenFlow active-trunk shutdown and STP failover",
+  "active_trunk_interfaces": [
+    "s1-eth2",
+    "s2-eth1"
+  ],
+  "result": "FAIL",
+  "initial_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "BLOCK",
+    "s2-p3": "FORWARD"
+  },
+  "baseline_ping_loss_percent": 100.0,
+  "failure_reason": "Baseline connectivity failed before fault injection.",
+  "finished_at_utc": "2026-10-30T14:51:00.390872+00:00"
+}

@@ -1,0 +1,659 @@
+date: 2026-10-30
+commit: 2541695baa2d1790c144736a4495bc6d4f59ec78
+model: none (OVS configuration backup)
+command: ovs-vsctl show; ovs-vsctl list-br; ovs-vsctl list Bridge; ovs-vsctl list Port; ovs-vsctl list Interface; ovs-vsctl list Controller; ovs-ofctl -O OpenFlow13 dump-flows s1/s2
+
+=== SHOW ===
+96be0ca0-1936-4d6e-b8d3-fd2709c4e654
+    Bridge s1
+        Controller "ptcp:6654"
+        Controller "tcp:127.0.0.1:6653"
+        fail_mode: secure
+        Port s1-eth3
+            Interface s1-eth3
+                error: "could not open network device s1-eth3 (No such device)"
+        Port s1-eth1
+            Interface s1-eth1
+                error: "could not open network device s1-eth1 (No such device)"
+        Port s1-eth2
+            Interface s1-eth2
+                error: "could not open network device s1-eth2 (No such device)"
+        Port s1
+            Interface s1
+                type: internal
+    Bridge s2
+        Controller "ptcp:6655"
+        Controller "tcp:127.0.0.1:6653"
+        fail_mode: secure
+        Port s2
+            Interface s2
+                type: internal
+        Port s2-eth3
+            Interface s2-eth3
+                error: "could not open network device s2-eth3 (No such device)"
+        Port s2-eth1
+            Interface s2-eth1
+                error: "could not open network device s2-eth1 (No such device)"
+        Port s2-eth2
+            Interface s2-eth2
+                error: "could not open network device s2-eth2 (No such device)"
+    ovs_version: "2.17.12"
+=== BRIDGES ===
+s1
+s2
+=== BRIDGE RECORDS ===
+_uuid               : 6e8cbbae-1b59-44b3-ab33-164c821647d6
+auto_attach         : []
+controller          : [92c85881-dd91-4714-bc6f-af856d16761b, e24b6902-e5ac-4a58-88a9-fa72089c597b]
+datapath_id         : "0000000000000002"
+datapath_type       : ""
+datapath_version    : "<unknown>"
+external_ids        : {}
+fail_mode           : secure
+flood_vlans         : []
+flow_tables         : {}
+ipfix               : []
+mcast_snooping_enable: false
+mirrors             : []
+name                : s2
+netflow             : []
+other_config        : {datapath-id="0000000000000002", disable-in-band="true", dp-desc=s2}
+ports               : [23b92de7-99a0-448c-93a9-619aecce6687, 2c871da7-d7d0-4fac-adea-7e18ae23d5c0, 606c2f72-9079-47d4-86a4-1e69822f840f, c206a768-6d23-4753-aed7-5ca68318c1e9]
+protocols           : [OpenFlow13]
+rstp_enable         : false
+rstp_status         : {}
+sflow               : []
+status              : {}
+stp_enable          : false
+
+_uuid               : 1f59990f-03b6-45e3-ada2-6d4a429fc001
+auto_attach         : []
+controller          : [1a4370e3-de8c-45ff-b2a6-899b6fd25d89, 245c53f7-20b4-4b2c-b495-0bfbb2074049]
+datapath_id         : "0000000000000001"
+datapath_type       : ""
+datapath_version    : "<unknown>"
+external_ids        : {}
+fail_mode           : secure
+flood_vlans         : []
+flow_tables         : {}
+ipfix               : []
+mcast_snooping_enable: false
+mirrors             : []
+name                : s1
+netflow             : []
+other_config        : {datapath-id="0000000000000001", disable-in-band="true", dp-desc=s1}
+ports               : [2fb6aded-b1cb-442b-858d-5ea061d8725e, 3ebf65c0-cdf9-4555-8b55-136244d2ed95, 5c28ec9e-e26b-47cf-873c-62ab06bc8782, fcf48a4f-8f5e-4115-b5c4-939710f7ebb9]
+protocols           : [OpenFlow13]
+rstp_enable         : false
+rstp_status         : {}
+sflow               : []
+status              : {}
+stp_enable          : false
+=== PORT RECORDS ===
+_uuid               : 3ebf65c0-cdf9-4555-8b55-136244d2ed95
+bond_active_slave   : []
+bond_downdelay      : 0
+bond_fake_iface     : false
+bond_mode           : []
+bond_updelay        : 0
+cvlans              : []
+external_ids        : {}
+fake_bridge         : false
+interfaces          : [281d68bb-9287-4cc5-8d1f-6660000c1512]
+lacp                : []
+mac                 : []
+name                : s1-eth1
+other_config        : {}
+protected           : false
+qos                 : []
+rstp_statistics     : {}
+rstp_status         : {}
+statistics          : {}
+status              : {}
+tag                 : []
+trunks              : []
+vlan_mode           : []
+
+_uuid               : c206a768-6d23-4753-aed7-5ca68318c1e9
+bond_active_slave   : []
+bond_downdelay      : 0
+bond_fake_iface     : false
+bond_mode           : []
+bond_updelay        : 0
+cvlans              : []
+external_ids        : {}
+fake_bridge         : false
+interfaces          : [8f2158b6-29be-4147-acda-25988e217f54]
+lacp                : []
+mac                 : []
+name                : s2-eth2
+other_config        : {}
+protected           : false
+qos                 : []
+rstp_statistics     : {}
+rstp_status         : {}
+statistics          : {}
+status              : {}
+tag                 : []
+trunks              : []
+vlan_mode           : []
+
+_uuid               : 606c2f72-9079-47d4-86a4-1e69822f840f
+bond_active_slave   : []
+bond_downdelay      : 0
+bond_fake_iface     : false
+bond_mode           : []
+bond_updelay        : 0
+cvlans              : []
+external_ids        : {}
+fake_bridge         : false
+interfaces          : [8e3e3457-c137-4e87-8e60-7c77157de727]
+lacp                : []
+mac                 : []
+name                : s2-eth1
+other_config        : {}
+protected           : false
+qos                 : []
+rstp_statistics     : {}
+rstp_status         : {}
+statistics          : {}
+status              : {}
+tag                 : []
+trunks              : []
+vlan_mode           : []
+
+_uuid               : 2fb6aded-b1cb-442b-858d-5ea061d8725e
+bond_active_slave   : []
+bond_downdelay      : 0
+bond_fake_iface     : false
+bond_mode           : []
+bond_updelay        : 0
+cvlans              : []
+external_ids        : {}
+fake_bridge         : false
+interfaces          : [821f34c3-24c8-4855-a5ff-03a0d658f4c3]
+lacp                : []
+mac                 : []
+name                : s1-eth3
+other_config        : {}
+protected           : false
+qos                 : []
+rstp_statistics     : {}
+rstp_status         : {}
+statistics          : {}
+status              : {}
+tag                 : []
+trunks              : []
+vlan_mode           : []
+
+_uuid               : 5c28ec9e-e26b-47cf-873c-62ab06bc8782
+bond_active_slave   : []
+bond_downdelay      : 0
+bond_fake_iface     : false
+bond_mode           : []
+bond_updelay        : 0
+cvlans              : []
+external_ids        : {}
+fake_bridge         : false
+interfaces          : [5ce32bae-2063-4b3c-8bf0-29828ff0af59]
+lacp                : []
+mac                 : []
+name                : s1-eth2
+other_config        : {}
+protected           : false
+qos                 : []
+rstp_statistics     : {}
+rstp_status         : {}
+statistics          : {}
+status              : {}
+tag                 : []
+trunks              : []
+vlan_mode           : []
+
+_uuid               : 2c871da7-d7d0-4fac-adea-7e18ae23d5c0
+bond_active_slave   : []
+bond_downdelay      : 0
+bond_fake_iface     : false
+bond_mode           : []
+bond_updelay        : 0
+cvlans              : []
+external_ids        : {}
+fake_bridge         : false
+interfaces          : [e235dba1-e4aa-484b-be09-4438a871a93a]
+lacp                : []
+mac                 : []
+name                : s2-eth3
+other_config        : {}
+protected           : false
+qos                 : []
+rstp_statistics     : {}
+rstp_status         : {}
+statistics          : {}
+status              : {}
+tag                 : []
+trunks              : []
+vlan_mode           : []
+
+_uuid               : 23b92de7-99a0-448c-93a9-619aecce6687
+bond_active_slave   : []
+bond_downdelay      : 0
+bond_fake_iface     : false
+bond_mode           : []
+bond_updelay        : 0
+cvlans              : []
+external_ids        : {}
+fake_bridge         : false
+interfaces          : [06cc6188-2664-4fe2-9ab7-235a5b211829]
+lacp                : []
+mac                 : []
+name                : s2
+other_config        : {}
+protected           : false
+qos                 : []
+rstp_statistics     : {}
+rstp_status         : {}
+statistics          : {}
+status              : {}
+tag                 : []
+trunks              : []
+vlan_mode           : []
+
+_uuid               : fcf48a4f-8f5e-4115-b5c4-939710f7ebb9
+bond_active_slave   : []
+bond_downdelay      : 0
+bond_fake_iface     : false
+bond_mode           : []
+bond_updelay        : 0
+cvlans              : []
+external_ids        : {}
+fake_bridge         : false
+interfaces          : [58af01e9-235d-4ecd-9509-f2fbcba8cba3]
+lacp                : []
+mac                 : []
+name                : s1
+other_config        : {}
+protected           : false
+qos                 : []
+rstp_statistics     : {}
+rstp_status         : {}
+statistics          : {}
+status              : {}
+tag                 : []
+trunks              : []
+vlan_mode           : []
+=== INTERFACE RECORDS ===
+_uuid               : 06cc6188-2664-4fe2-9ab7-235a5b211829
+admin_state         : down
+bfd                 : {}
+bfd_status          : {}
+cfm_fault           : []
+cfm_fault_status    : []
+cfm_flap_count      : []
+cfm_health          : []
+cfm_mpid            : []
+cfm_remote_mpids    : []
+cfm_remote_opstate  : []
+duplex              : []
+error               : []
+external_ids        : {}
+ifindex             : 5
+ingress_policing_burst: 0
+ingress_policing_kpkts_burst: 0
+ingress_policing_kpkts_rate: 0
+ingress_policing_rate: 0
+lacp_current        : []
+link_resets         : 0
+link_speed          : []
+link_state          : down
+lldp                : {}
+mac                 : []
+mac_in_use          : "ae:bb:8c:6e:b3:44"
+mtu                 : 1500
+mtu_request         : []
+name                : s2
+ofport              : 65534
+ofport_request      : []
+options             : {}
+other_config        : {}
+statistics          : {collisions=0, rx_bytes=0, rx_crc_err=0, rx_dropped=0, rx_errors=0, rx_frame_err=0, rx_missed_errors=0, rx_multicast_packets=0, rx_over_err=0, rx_packets=0, tx_bytes=0, tx_dropped=0, tx_errors=0, tx_packets=0}
+status              : {driver_name=openvswitch}
+type                : internal
+
+_uuid               : 58af01e9-235d-4ecd-9509-f2fbcba8cba3
+admin_state         : down
+bfd                 : {}
+bfd_status          : {}
+cfm_fault           : []
+cfm_fault_status    : []
+cfm_flap_count      : []
+cfm_health          : []
+cfm_mpid            : []
+cfm_remote_mpids    : []
+cfm_remote_opstate  : []
+duplex              : []
+error               : []
+external_ids        : {}
+ifindex             : 4
+ingress_policing_burst: 0
+ingress_policing_kpkts_burst: 0
+ingress_policing_kpkts_rate: 0
+ingress_policing_rate: 0
+lacp_current        : []
+link_resets         : 0
+link_speed          : []
+link_state          : down
+lldp                : {}
+mac                 : []
+mac_in_use          : "0e:99:59:1f:e3:45"
+mtu                 : 1500
+mtu_request         : []
+name                : s1
+ofport              : 65534
+ofport_request      : []
+options             : {}
+other_config        : {}
+statistics          : {collisions=0, rx_bytes=0, rx_crc_err=0, rx_dropped=0, rx_errors=0, rx_frame_err=0, rx_missed_errors=0, rx_multicast_packets=0, rx_over_err=0, rx_packets=0, tx_bytes=0, tx_dropped=0, tx_errors=0, tx_packets=0}
+status              : {driver_name=openvswitch}
+type                : internal
+
+_uuid               : e235dba1-e4aa-484b-be09-4438a871a93a
+admin_state         : []
+bfd                 : {}
+bfd_status          : {}
+cfm_fault           : []
+cfm_fault_status    : []
+cfm_flap_count      : []
+cfm_health          : []
+cfm_mpid            : []
+cfm_remote_mpids    : []
+cfm_remote_opstate  : []
+duplex              : []
+error               : "could not open network device s2-eth3 (No such device)"
+external_ids        : {}
+ifindex             : []
+ingress_policing_burst: 0
+ingress_policing_kpkts_burst: 0
+ingress_policing_kpkts_rate: 0
+ingress_policing_rate: 0
+lacp_current        : []
+link_resets         : []
+link_speed          : []
+link_state          : []
+lldp                : {}
+mac                 : []
+mac_in_use          : []
+mtu                 : []
+mtu_request         : []
+name                : s2-eth3
+ofport              : -1
+ofport_request      : 3
+options             : {}
+other_config        : {}
+statistics          : {}
+status              : {}
+type                : ""
+
+_uuid               : 821f34c3-24c8-4855-a5ff-03a0d658f4c3
+admin_state         : []
+bfd                 : {}
+bfd_status          : {}
+cfm_fault           : []
+cfm_fault_status    : []
+cfm_flap_count      : []
+cfm_health          : []
+cfm_mpid            : []
+cfm_remote_mpids    : []
+cfm_remote_opstate  : []
+duplex              : []
+error               : "could not open network device s1-eth3 (No such device)"
+external_ids        : {}
+ifindex             : []
+ingress_policing_burst: 0
+ingress_policing_kpkts_burst: 0
+ingress_policing_kpkts_rate: 0
+ingress_policing_rate: 0
+lacp_current        : []
+link_resets         : []
+link_speed          : []
+link_state          : []
+lldp                : {}
+mac                 : []
+mac_in_use          : []
+mtu                 : []
+mtu_request         : []
+name                : s1-eth3
+ofport              : -1
+ofport_request      : 3
+options             : {}
+other_config        : {}
+statistics          : {}
+status              : {}
+type                : ""
+
+_uuid               : 281d68bb-9287-4cc5-8d1f-6660000c1512
+admin_state         : []
+bfd                 : {}
+bfd_status          : {}
+cfm_fault           : []
+cfm_fault_status    : []
+cfm_flap_count      : []
+cfm_health          : []
+cfm_mpid            : []
+cfm_remote_mpids    : []
+cfm_remote_opstate  : []
+duplex              : []
+error               : "could not open network device s1-eth1 (No such device)"
+external_ids        : {}
+ifindex             : []
+ingress_policing_burst: 0
+ingress_policing_kpkts_burst: 0
+ingress_policing_kpkts_rate: 0
+ingress_policing_rate: 0
+lacp_current        : []
+link_resets         : []
+link_speed          : []
+link_state          : []
+lldp                : {}
+mac                 : []
+mac_in_use          : []
+mtu                 : []
+mtu_request         : []
+name                : s1-eth1
+ofport              : -1
+ofport_request      : 1
+options             : {}
+other_config        : {}
+statistics          : {}
+status              : {}
+type                : ""
+
+_uuid               : 5ce32bae-2063-4b3c-8bf0-29828ff0af59
+admin_state         : []
+bfd                 : {}
+bfd_status          : {}
+cfm_fault           : []
+cfm_fault_status    : []
+cfm_flap_count      : []
+cfm_health          : []
+cfm_mpid            : []
+cfm_remote_mpids    : []
+cfm_remote_opstate  : []
+duplex              : []
+error               : "could not open network device s1-eth2 (No such device)"
+external_ids        : {}
+ifindex             : []
+ingress_policing_burst: 0
+ingress_policing_kpkts_burst: 0
+ingress_policing_kpkts_rate: 0
+ingress_policing_rate: 0
+lacp_current        : []
+link_resets         : []
+link_speed          : []
+link_state          : []
+lldp                : {}
+mac                 : []
+mac_in_use          : []
+mtu                 : []
+mtu_request         : []
+name                : s1-eth2
+ofport              : -1
+ofport_request      : 2
+options             : {}
+other_config        : {}
+statistics          : {}
+status              : {}
+type                : ""
+
+_uuid               : 8f2158b6-29be-4147-acda-25988e217f54
+admin_state         : []
+bfd                 : {}
+bfd_status          : {}
+cfm_fault           : []
+cfm_fault_status    : []
+cfm_flap_count      : []
+cfm_health          : []
+cfm_mpid            : []
+cfm_remote_mpids    : []
+cfm_remote_opstate  : []
+duplex              : []
+error               : "could not open network device s2-eth2 (No such device)"
+external_ids        : {}
+ifindex             : []
+ingress_policing_burst: 0
+ingress_policing_kpkts_burst: 0
+ingress_policing_kpkts_rate: 0
+ingress_policing_rate: 0
+lacp_current        : []
+link_resets         : []
+link_speed          : []
+link_state          : []
+lldp                : {}
+mac                 : []
+mac_in_use          : []
+mtu                 : []
+mtu_request         : []
+name                : s2-eth2
+ofport              : -1
+ofport_request      : 2
+options             : {}
+other_config        : {}
+statistics          : {}
+status              : {}
+type                : ""
+
+_uuid               : 8e3e3457-c137-4e87-8e60-7c77157de727
+admin_state         : []
+bfd                 : {}
+bfd_status          : {}
+cfm_fault           : []
+cfm_fault_status    : []
+cfm_flap_count      : []
+cfm_health          : []
+cfm_mpid            : []
+cfm_remote_mpids    : []
+cfm_remote_opstate  : []
+duplex              : []
+error               : "could not open network device s2-eth1 (No such device)"
+external_ids        : {}
+ifindex             : []
+ingress_policing_burst: 0
+ingress_policing_kpkts_burst: 0
+ingress_policing_kpkts_rate: 0
+ingress_policing_rate: 0
+lacp_current        : []
+link_resets         : []
+link_speed          : []
+link_state          : []
+lldp                : {}
+mac                 : []
+mac_in_use          : []
+mtu                 : []
+mtu_request         : []
+name                : s2-eth1
+ofport              : -1
+ofport_request      : 1
+options             : {}
+other_config        : {}
+statistics          : {}
+status              : {}
+type                : ""
+=== CONTROLLER RECORDS ===
+_uuid               : 92c85881-dd91-4714-bc6f-af856d16761b
+connection_mode     : []
+controller_burst_limit: []
+controller_queue_size: []
+controller_rate_limit: []
+enable_async_messages: []
+external_ids        : {}
+inactivity_probe    : []
+is_connected        : false
+local_gateway       : []
+local_ip            : []
+local_netmask       : []
+max_backoff         : 1000
+other_config        : {}
+role                : []
+status              : {}
+target              : "ptcp:6655"
+type                : []
+
+_uuid               : e24b6902-e5ac-4a58-88a9-fa72089c597b
+connection_mode     : []
+controller_burst_limit: []
+controller_queue_size: []
+controller_rate_limit: []
+enable_async_messages: []
+external_ids        : {}
+inactivity_probe    : []
+is_connected        : false
+local_gateway       : []
+local_ip            : []
+local_netmask       : []
+max_backoff         : 1000
+other_config        : {}
+role                : []
+status              : {last_error="Connection refused", state=BACKOFF}
+target              : "tcp:127.0.0.1:6653"
+type                : []
+
+_uuid               : 1a4370e3-de8c-45ff-b2a6-899b6fd25d89
+connection_mode     : []
+controller_burst_limit: []
+controller_queue_size: []
+controller_rate_limit: []
+enable_async_messages: []
+external_ids        : {}
+inactivity_probe    : []
+is_connected        : false
+local_gateway       : []
+local_ip            : []
+local_netmask       : []
+max_backoff         : 1000
+other_config        : {}
+role                : []
+status              : {}
+target              : "ptcp:6654"
+type                : []
+
+_uuid               : 245c53f7-20b4-4b2c-b495-0bfbb2074049
+connection_mode     : []
+controller_burst_limit: []
+controller_queue_size: []
+controller_rate_limit: []
+enable_async_messages: []
+external_ids        : {}
+inactivity_probe    : []
+is_connected        : false
+local_gateway       : []
+local_ip            : []
+local_netmask       : []
+max_backoff         : 1000
+other_config        : {}
+role                : []
+status              : {last_error="Connection refused", state=BACKOFF}
+target              : "tcp:127.0.0.1:6653"
+type                : []
+=== FLOW DUMP S1 ===
+OFPST_FLOW reply (OF1.3) (xid=0x2):
+=== FLOW DUMP S2 ===
+OFPST_FLOW reply (OF1.3) (xid=0x2):

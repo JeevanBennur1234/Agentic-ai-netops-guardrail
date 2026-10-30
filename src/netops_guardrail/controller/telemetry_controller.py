@@ -57,7 +57,7 @@ class TelemetryController(app_manager.RyuApp):
         # Write to this checkout by default, not the current user's home.
         # Ryu is commonly launched via sudo, where "~" resolves to /root and
         # silently splits the controller from the verifier's telemetry file.
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
         self.output_file = os.environ.get(
             "NETOPS_TELEMETRY_PATH",
             os.path.join(project_root, "telemetry", "data", "latest.json"),

@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "date": "2026-10-30",
+    "commit_hash": "2541695baa2d1790c144736a4495bc6d4f59ec78",
+    "model_name": "none (real OVS executor latency experiment)",
+    "command": "NOT RUN: preflight with sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_redundant_topology.py failed; baseline ping loss was 50.0%",
+    "testbed": "LIVE Mininet + Open vSwitch + Ryu"
+  },
+  "result": "INCONCLUSIVE",
+  "reason": "Real-OVS executor mutations were not measured because the baseline connectivity check failed at 50.0% packet loss. Running a trunk-blocking transaction against a baseline that is already losing packets would make latency and postcondition results unsafe and uninterpretable. No executor mutation was attempted.",
+  "n": 0,
+  "median_ms": null,
+  "p95_ms": null,
+  "p99_ms": null,
+  "simulated_benchmark_reference": "experiments/results/recommended_evaluation_20261027.json (evidence_label=SIMULATED; not a real-OVS result)"
+}

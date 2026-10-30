@@ -94,6 +94,6 @@ The live test scripts require Ryu listening on 127.0.0.1:6653, sudo/root access,
 
 - Describe the graph checker as topology-aware verification, not as equivalent to HSA, VeriFlow or NetKAT.
 - Report 12/12 only as accuracy on the 12 manually labelled synthetic cases.
-- Report the 0.259 ms mean only as the current executor software-path latency under an in-memory fake OVS runner; it is not live OVS performance.
+- Report the **SIMULATED** 0.259 ms mean only as executor software-path timing under an in-memory fake OVS runner; it is not live OVS performance.
 - State that automatic active-trunk failover failed in the current experiment even though rollback after restoring the original trunk succeeded.
 - Do not state production readiness until the failover gap, telemetry consistency, fault-injected rollback and larger evaluation are addressed.

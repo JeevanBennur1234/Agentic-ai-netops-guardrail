@@ -415,15 +415,25 @@ These figures are only for this small deterministic fixture set; they do not dem
 ### Simulated executor transactions
 
 - 30 requested, 30 passed, 0 failed.
-- Mean 0.277 ms; median 0.221 ms; p95 0.380 ms; min 0.212 ms; max 1.279 ms.
-- Used in-memory fake OVS command runner.
+- **SIMULATED (in-memory fake OVS runner):** mean 0.277 ms; median 0.221 ms; p95 0.380 ms; min 0.212 ms; max 1.279 ms.
+- **SIMULATED:** used an in-memory fake OVS command runner; no real OVS commands or live connectivity tests were run.
 - Did not execute actual OVS commands or test live connectivity.
 
 These are simulated software-path timings, not live data-plane latency.
 
-## 13. Live testbed results
+### P2 labelled LLM evaluation — 2026-10-30
 
-### Redundant topology baseline — PASS
+- The scenario labels were frozen before inference: 10 SAFE, 10 UNSAFE, and 10 AMBIGUOUS_ADVERSARIAL. Fixture: experiments/results/2026-10-30_2541695_llm_scenarios_labeled.json.
+- Qwen 2.5 Coder 1.5B: strict valid JSON 0/30 (0%); schema pass 0/30 (0%); fallback 30/30 (100%). All 30 raw responses were wrapped in Markdown JSON fences, which the pre-registered strict parser treats as invalid. This result is reported as-is; the prompt was not tuned after seeing it.
+- Unsafe mutating proposals blocked by the guardrail: 0. Unsafe mutating proposals passed: 0. These zero counts are not evidence of guardrail effectiveness because no model-generated mutation reached the guardrail; every case used the no_action fallback.
+- Mistral Nemo 12.2B was not run: the host has 7.8 GB total physical RAM and the model artifact is about 7.07 GB before runtime overhead. See experiments/results/2026-10-30_2541695_llm_mistral-nemo_not-run.json.
+- Full raw responses and per-case metrics: experiments/results/2026-10-30_2541695_llm_qwen2.5-coder-1.5b.json and .csv.
+
+## 13. Recorded live testbed results (2026-10-27; historical)
+
+The PASS results below are from the 2026-10-27 run in experiments/results/live_integration_summary_20261027.json. They were not reproduced on 2026-10-30: the current baseline diagnostic observed 50.0% ping loss and the first P2 failover trial observed 100% baseline ping loss before fault injection. Treat the older PASS results as historical, not evidence that the current testbed is healthy.
+
+### Redundant topology baseline — PASS (historical)
 
 The recorded two-switch topology converged with one standby endpoint blocked and host access ports forwarding. Baseline ping loss was 0%.
 
@@ -438,6 +448,13 @@ This demonstrates bounded standby-rule execution and safe refusal; it does not d
 The recorded failure experiments started with 0% loss, then emulated an active-path failure. Ryu did not report the needed OpenFlow DOWN/MISSING event, the alternate trunk remained STP-blocked, and loss reached 100% during the failover window. Restoring the original trunk returned connectivity to 0% loss.
 
 The injected event used Mininet/Linux interface-down or configLinkStatus-style behavior, not a confirmed physical cable unplug. Correcting the telemetry path and making STP-priority setup deterministic did not make the latest failover test pass. Automatic active-link failover is therefore unresolved and must not be described as working.
+
+### P2 live rerun — 2026-10-30: INCONCLUSIVE
+
+- Failover trial 1 stopped before fault injection because baseline pingall loss was 100%; no recovery time was measured. Raw files: experiments/results/2026-10-30_2541695_failover_trial_01.txt and .json.
+- A separate baseline-only topology run observed 50.0% ping loss and failed its connectivity assertion. Raw output: experiments/results/2026-10-30_2541695_baseline_diagnostic.txt.
+- No additional failover trials were run after the baseline failures; min/median/max across five trials are unavailable. The previous 30-second-window result cannot be attributed to the short observation window based on this run.
+- Real-OVS executor latency is INCONCLUSIVE, n=0, because the baseline was unhealthy; no executor mutation was attempted. See experiments/results/2026-10-30_2541695_real_ovs_executor_latency.json and .csv.
 
 ## 14. Repository file inventory
 
@@ -612,7 +629,7 @@ I have implemented the two proposal workflows, dashboard, readable Human Verifie
 - Audit records are signed/hash-linked and tamper tests exist.
 - The current Human Verifier has readable summaries and technical details.
 - Issue 2 has a live telemetry detector plus a labelled controlled-simulation path.
-- The most recent full test suite passed 169 tests.
+- The 2026-10-30 regression run passed 175 tests, skipped 1 environment-dependent OpenFlow port-down event test, and failed 0 tests. See experiments/results/2026-10-30_2541695_p1-pytest.txt.
 - Standby-trunk integration passed in the recorded live test.
 - The active-link failover experiment did not pass, while restoring the original path recovered connectivity.
 
@@ -650,14 +667,14 @@ I have implemented the two proposal workflows, dashboard, readable Human Verifie
 - [x] Testbed, experiments, documentation and automated test coverage.
 
 ### Tested in recorded environment
-- [x] Full pytest run: 169 passed, one deprecation warning.
+- [x] Current pytest run (2026-10-30): 175 passed, 1 skipped, 0 failed. The skipped test is the controller OpenFlow port-down event test; see experiments/results/2026-10-30_2541695_p1-pytest.txt.
 - [x] Human Verifier JavaScript syntax check.
 - [x] Redundant topology baseline.
 - [x] Standby-trunk paired rule and post-check.
 - [x] Unsafe active-trunk/access-port refusal.
 - [x] Audit-chain verification in live integration test.
 - [x] 12/12 synthetic labelled cases.
-- [x] 30/30 fake-OVS benchmark transactions.
+- [x] **SIMULATED:** 30/30 fake-OVS benchmark transactions; not a real-OVS latency result.
 
 ### Still open/not proven
 - [ ] Reliable active-link failure detection and alternate-path convergence.

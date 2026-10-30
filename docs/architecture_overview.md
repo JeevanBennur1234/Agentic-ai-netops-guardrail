@@ -153,5 +153,5 @@ Still unresolved:
 - The latest live triangle run used Mininet `configLinkStatus(..., "down")`; baseline ping loss was 0%, but the controller did not report an OpenFlow port DOWN/MISSING event, STP left the alternate blocked, and ping loss reached 100% during the 30-second failover window. Re-enabling the original link restored 0% loss; this is rollback/recovery, not successful automatic failover.
 - A previous wrong telemetry destination under sudo was fixed: Ryu now writes to the project-local snapshot by default, adds an update timestamp, and makes the atomically replaced snapshot readable by the project user. The latest live test after this path fix still did not fail over.
 - These are emulated/admin-down failures, not a physical cable-unplug test. Automatic active-link failover remains an open Phase 2 blocker.
-- The approximately 0.26 ms executor benchmark uses an in-memory fake OVS runner; it is not real OVS latency.
+- **SIMULATED:** the approximately 0.26 ms executor benchmark uses an in-memory fake OVS runner; it is not real OVS latency.
 - Production readiness is not established.

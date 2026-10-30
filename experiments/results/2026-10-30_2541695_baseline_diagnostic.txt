@@ -1,0 +1,17 @@
+date: 2026-10-30
+commit: 2541695baa2d1790c144736a4495bc6d4f59ec78
+model: none-live-OVS-Mininet
+command: sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_redundant_topology.py
+
+Starting isolated two-switch, dual-trunk Mininet topology...
+STP port states:
+  s1-p1: FORWARD
+  s1-p2: FORWARD
+  s1-p3: FORWARD
+  s2-p1: FORWARD
+  s2-p2: BLOCK
+  s2-p3: FORWARD
+Running host reachability test (pingall)...
+Observed packet loss: 50.0%
+FAIL: hosts remain disconnected after STP convergence.
+Stopping only the Mininet topology created by this test...

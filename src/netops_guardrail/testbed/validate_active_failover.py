@@ -7,6 +7,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 
 from mininet.log import setLogLevel
 from mininet.net import Mininet
@@ -18,7 +19,7 @@ PROJECT_ROOT = NETOPS_HOME
 from netops_guardrail.testbed.redundant_topo import RedundantTopo
 
 TELEMETRY_PATH = PROJECT_ROOT / "telemetry/data/latest.json"
-RESULT_PATH = PROJECT_ROOT / "experiments/results/live_active_failover_latest.json"
+RESULT_PATH = Path(os.environ.get("NETOPS_FAILOVER_RESULT_PATH", str(PROJECT_ROOT / "experiments/results/live_active_failover_latest.json")))
 TRUNK_PORTS = {("1", "2"), ("1", "3"), ("2", "1"), ("2", "2")}
 ACCESS_PORTS = {("1", "1"), ("2", "3")}
 ACTIVE_TRUNK = (("s1", "s1-eth2", "1", "2"), ("s2", "s2-eth1", "2", "1"))
@@ -49,6 +50,17 @@ def pingall(net):
     return float(net.pingAll(timeout=1))
 
 
+def log_event(report, name, started_at, **details):
+    item = {
+        "event": name,
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+        "elapsed_seconds": round(time.monotonic() - started_at, 3),
+        **details,
+    }
+    report.setdefault("events", []).append(item)
+    print(json.dumps(item, sort_keys=True), flush=True)
+
+
 def main():
     if os.geteuid() != 0:
         print("ERROR: run this test as root so Mininet can configure namespaces.")
@@ -65,7 +77,17 @@ def main():
             print(f"ERROR: OVS bridge {bridge} already exists; refusing to touch it.")
             return 2
 
+    commit_result = run(["git", "-C", str(PROJECT_ROOT), "rev-parse", "HEAD"])
     report = {
+        "metadata": {
+            "date": datetime.now().astimezone().isoformat(timespec="seconds"),
+            "commit_hash": commit_result.stdout.strip() or "unknown",
+            "model_name": "none (live OVS/Mininet experiment)",
+            "command": os.environ.get("NETOPS_EXPERIMENT_COMMAND", " ".join(sys.argv)),
+            "observation_window_seconds": float(os.environ.get("NETOPS_FAILOVER_OBSERVATION_SECONDS", "25")),
+            "testbed": "LIVE Mininet + OVS + Ryu",
+        },
+        "events": [],
         "started_at_utc": datetime.now(timezone.utc).isoformat(),
         "test": "OpenFlow active-trunk shutdown and STP failover",
         "active_trunk_interfaces": ["s1-eth2", "s2-eth1"],
@@ -117,6 +139,7 @@ def main():
         # forwarding trunk. This is intentionally different from an OpenFlow
         # drop rule: STP can now observe a real port/link-down event.
         started_at = time.monotonic()
+        log_event(report, "link_down_command_started", started_at, interfaces=["s1 port 2", "s2 port 1"])
         for switch_name, intf_name, _switch_id, port_id in (ACTIVE_TRUNK[0], ACTIVE_TRUNK[1]):
             # Use OpenFlow port admin state so Ryu receives OFPPortStatus and
             # can reconcile its STP model; Linux ifconfig-down left OVS's
@@ -131,23 +154,46 @@ def main():
                     f"{result.stderr.strip()}"
                 )
                 return 1
+        log_event(report, "link_down", started_at, interfaces=["s1 port 2", "s2 port 1"])
         print("Injected physical failure on active trunk A (s1-eth2 <-> s2-eth1).")
 
-        deadline = time.monotonic() + 25
+        observation_seconds = float(os.environ.get("NETOPS_FAILOVER_OBSERVATION_SECONDS", "25"))
+        deadline = time.monotonic() + observation_seconds
         recovered = False
         recovery_loss = 100.0
         recovered_states = {}
+        previous_states = dict(initial_states)
+        first_ping_failure_seen = False
+        first_ping_success_seen = False
+        seen_port_down = set()
         while time.monotonic() < deadline:
-            recovered_states = state_map(read_telemetry())
-            alt_forward = all(
-                recovered_states.get(port) == "FORWARD"
-                for port in FAILOVER_TRUNK_STATES
-            )
-            if alt_forward:
-                recovery_loss = pingall(net)
-                if recovery_loss == 0.0:
-                    recovered = True
-                    break
+            telemetry = read_telemetry()
+            recovered_states = state_map(telemetry)
+            telemetry_updated = telemetry.get("updated_at_utc")
+            for port, state in sorted(recovered_states.items()):
+                old_state = previous_states.get(port)
+                if old_state != state:
+                    log_event(report, "stp_port_state_change", started_at, switch=port[0], port=port[1], previous_state=old_state, new_state=state, telemetry_updated_at_utc=telemetry_updated)
+            previous_states = dict(recovered_states)
+            for switch_id, port_id in (("1", "2"), ("2", "1")):
+                status = telemetry.get("switches", {}).get(switch_id, {}).get("port_status", {}).get(port_id, {})
+                if status and (status.get("state") in {"DOWN", "MISSING"} or status.get("link_down") or status.get("admin_down")):
+                    key = (switch_id, port_id, status.get("state"), status.get("reason"))
+                    if key not in seen_port_down:
+                        seen_port_down.add(key)
+                        log_event(report, "of_port_down_event_observed", started_at, switch=switch_id, port=port_id, port_status=status, telemetry_updated_at_utc=telemetry_updated)
+            recovery_loss = pingall(net)
+            if recovery_loss > 0.0 and not first_ping_failure_seen:
+                first_ping_failure_seen = True
+                log_event(report, "first_ping_failure", started_at, ping_loss_percent=recovery_loss, since_link_down_seconds=round(time.monotonic() - started_at, 3))
+            elif recovery_loss == 0.0 and first_ping_failure_seen and not first_ping_success_seen:
+                first_ping_success_seen = True
+                log_event(report, "first_ping_success_after_failure", started_at, ping_loss_percent=recovery_loss, since_link_down_seconds=round(time.monotonic() - started_at, 3))
+            alt_forward = all(recovered_states.get(port) == "FORWARD" for port in FAILOVER_TRUNK_STATES)
+            if alt_forward and recovery_loss == 0.0:
+                recovered = True
+                log_event(report, "validated_recovery", started_at, since_link_down_seconds=round(time.monotonic() - started_at, 3))
+                break
             time.sleep(0.5)
 
         recovery_seconds = round(time.monotonic() - started_at, 3)
@@ -163,17 +209,20 @@ def main():
             return 0
 
         report["failover_failure_reason"] = (
-            "STP did not converge the alternate trunk to FORWARD with 0% pingall loss "
-            "within 25 seconds after the physical link failure."
+            f"STP did not converge the alternate trunk to FORWARD with 0% pingall loss "
+            f"within {observation_seconds:g} seconds after the physical link failure."
         )
+        log_event(report, "observation_window_expired", started_at, observation_seconds=observation_seconds)
         print("FAIL: STP failover was not demonstrated; attempting explicit rollback by restoring trunk A.")
 
         rollback_started = time.monotonic()
+        log_event(report, "rollback_started", started_at, interfaces=["s1 port 2", "s2 port 1"])
         for switch_name, _intf_name, _switch_id, port_id in (ACTIVE_TRUNK[0], ACTIVE_TRUNK[1]):
-            run([
+            result = run([
                 "ovs-ofctl", "-O", "OpenFlow13", "mod-port",
                 switch_name, str(port_id), "up",
             ])
+            log_event(report, "rollback_mod_port_up", started_at, switch=switch_name, port=port_id, returncode=result.returncode, stderr=result.stderr.strip())
 
         rollback_deadline = time.monotonic() + 20
         rollback_recovered = False
@@ -189,6 +238,7 @@ def main():
                 rollback_loss = pingall(net)
                 if rollback_loss == 0.0:
                     rollback_recovered = True
+                    log_event(report, "rollback_connectivity_restored", started_at, ping_loss_percent=rollback_loss)
                     break
             time.sleep(0.5)
 
