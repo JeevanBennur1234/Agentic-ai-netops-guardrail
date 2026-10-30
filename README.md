@@ -77,7 +77,7 @@ python3.10 -m venv "$NETOPS_HOME/.venv"
 source "$NETOPS_HOME/.venv/bin/activate"
 # Ryu 4.34 requires an older setuptools API during its build.
 python -m pip install --upgrade pip
-python -m pip install "setuptools<70" wheel
+python -m pip install "setuptools==67.6.1" wheel
 python -m pip install --no-build-isolation -r requirements.txt
 
 python -m pytest -q
