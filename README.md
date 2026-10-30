@@ -89,7 +89,7 @@ For the local observability dashboard, activate the environment above and run:
 "$NETOPS_HOME/start_local_observability.sh"
 ```
 
-The launcher creates local development credentials under your user configuration directory, outside the repository. For a live testbed, start the Ryu controller and Mininet/OVS using [`docs/live_demo_runbook_2026-10-28.md`](docs/live_demo_runbook_2026-10-28.md). Live network tests can alter the lab topology and are intentionally not part of the default CI job.
+The launcher creates local development credentials under your user configuration directory, outside the repository. For a live testbed, start the Ryu controller and Mininet/OVS using [`docs/live_demo_runbook.md`](docs/live_demo_runbook.md). Live network tests can alter the lab topology and are intentionally not part of the default CI job.
 
 ## Tests
 
