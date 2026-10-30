@@ -1,0 +1,39 @@
+date: 2026-10-30
+commit: 4e6bc80c2f566538eac969605622dd7c759b7574
+model: none-live-OVS-Mininet
+command: sudo -n env PYTHONPATH=/home/bennurjeevan/netops_guardrail/src NETOPS_FAILOVER_OBSERVATION_SECONDS=90 NETOPS_FAILOVER_RESULT_PATH=/home/bennurjeevan/netops_guardrail/experiments/results/2026-10-30_4e6bc80_failover_trial_01.json /usr/bin/python3 /home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_active_failover.py
+
+Starting isolated dual-trunk Mininet topology...
+Baseline pingall loss: 0.0%
+{"elapsed_seconds": 0.0, "event": "link_down_command_started", "interfaces": ["s1 port 2", "s2 port 1"], "timestamp_utc": "2026-10-30T15:13:53.588+00:00"}
+{"elapsed_seconds": 0.015, "event": "link_down", "interfaces": ["s1 port 2", "s2 port 1"], "timestamp_utc": "2026-10-30T15:13:53.603+00:00"}
+Injected physical failure on active trunk A (s1-eth2 <-> s2-eth1).
+{"elapsed_seconds": 2.025, "event": "first_ping_failure", "ping_loss_percent": 100.0, "since_link_down_seconds": 2.025, "timestamp_utc": "2026-10-30T15:13:55.613+00:00"}
+{"elapsed_seconds": 2.527, "event": "stp_port_state_change", "new_state": "LISTEN", "port": "1", "previous_state": "FORWARD", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00", "timestamp_utc": "2026-10-30T15:13:56.115+00:00"}
+{"elapsed_seconds": 2.527, "event": "stp_port_state_change", "new_state": "LISTEN", "port": "2", "previous_state": "FORWARD", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00", "timestamp_utc": "2026-10-30T15:13:56.115+00:00"}
+{"elapsed_seconds": 2.527, "event": "stp_port_state_change", "new_state": "LISTEN", "port": "3", "previous_state": "FORWARD", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00", "timestamp_utc": "2026-10-30T15:13:56.115+00:00"}
+{"elapsed_seconds": 2.527, "event": "stp_port_state_change", "new_state": "LISTEN", "port": "1", "previous_state": "FORWARD", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00", "timestamp_utc": "2026-10-30T15:13:56.115+00:00"}
+{"elapsed_seconds": 2.527, "event": "stp_port_state_change", "new_state": "LISTEN", "port": "2", "previous_state": "BLOCK", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00", "timestamp_utc": "2026-10-30T15:13:56.115+00:00"}
+{"elapsed_seconds": 2.527, "event": "stp_port_state_change", "new_state": "LISTEN", "port": "3", "previous_state": "FORWARD", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00", "timestamp_utc": "2026-10-30T15:13:56.115+00:00"}
+{"elapsed_seconds": 5.034, "event": "stp_port_state_change", "new_state": "LEARN", "port": "1", "previous_state": "LISTEN", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00", "timestamp_utc": "2026-10-30T15:13:58.622+00:00"}
+{"elapsed_seconds": 5.034, "event": "stp_port_state_change", "new_state": "LEARN", "port": "2", "previous_state": "LISTEN", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00", "timestamp_utc": "2026-10-30T15:13:58.622+00:00"}
+{"elapsed_seconds": 5.034, "event": "stp_port_state_change", "new_state": "LEARN", "port": "3", "previous_state": "LISTEN", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00", "timestamp_utc": "2026-10-30T15:13:58.622+00:00"}
+{"elapsed_seconds": 5.034, "event": "stp_port_state_change", "new_state": "LEARN", "port": "1", "previous_state": "LISTEN", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00", "timestamp_utc": "2026-10-30T15:13:58.622+00:00"}
+{"elapsed_seconds": 5.034, "event": "stp_port_state_change", "new_state": "LEARN", "port": "2", "previous_state": "LISTEN", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00", "timestamp_utc": "2026-10-30T15:13:58.622+00:00"}
+{"elapsed_seconds": 5.034, "event": "stp_port_state_change", "new_state": "LEARN", "port": "3", "previous_state": "LISTEN", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00", "timestamp_utc": "2026-10-30T15:13:58.622+00:00"}
+{"elapsed_seconds": 9.05, "event": "stp_port_state_change", "new_state": "FORWARD", "port": "1", "previous_state": "LEARN", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00", "timestamp_utc": "2026-10-30T15:14:05.568+00:00"}
+{"elapsed_seconds": 9.05, "event": "stp_port_state_change", "new_state": "FORWARD", "port": "2", "previous_state": "LEARN", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00", "timestamp_utc": "2026-10-30T15:14:05.568+00:00"}
+{"elapsed_seconds": 9.05, "event": "stp_port_state_change", "new_state": "FORWARD", "port": "3", "previous_state": "LEARN", "switch": "1", "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00", "timestamp_utc": "2026-10-30T15:14:05.568+00:00"}
+{"elapsed_seconds": 9.05, "event": "stp_port_state_change", "new_state": "FORWARD", "port": "1", "previous_state": "LEARN", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00", "timestamp_utc": "2026-10-30T15:14:05.568+00:00"}
+{"elapsed_seconds": 9.05, "event": "stp_port_state_change", "new_state": "BLOCK", "port": "2", "previous_state": "LEARN", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00", "timestamp_utc": "2026-10-30T15:14:05.568+00:00"}
+{"elapsed_seconds": 9.05, "event": "stp_port_state_change", "new_state": "FORWARD", "port": "3", "previous_state": "LEARN", "switch": "2", "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00", "timestamp_utc": "2026-10-30T15:14:05.568+00:00"}
+{"after_observed_failure": true, "elapsed_seconds": 9.063, "event": "first_ping_success_after_failure", "ping_loss_percent": 0.0, "since_link_down_seconds": 9.063, "timestamp_utc": "2026-10-30T15:14:05.581+00:00"}
+{"elapsed_seconds": 90.287, "event": "observation_window_expired", "observation_seconds": 90.0, "timestamp_utc": "2026-10-30T15:15:32.668+00:00"}
+FAIL: STP failover was not demonstrated; attempting explicit rollback by restoring trunk A.
+{"elapsed_seconds": 90.288, "event": "rollback_started", "interfaces": ["s1 port 2", "s2 port 1"], "timestamp_utc": "2026-10-30T15:15:32.668+00:00"}
+{"elapsed_seconds": 90.295, "event": "rollback_mod_port_up", "port": "2", "returncode": 0, "stderr": "", "switch": "s1", "timestamp_utc": "2026-10-30T15:15:32.675+00:00"}
+{"elapsed_seconds": 90.299, "event": "rollback_mod_port_up", "port": "1", "returncode": 0, "stderr": "", "switch": "s2", "timestamp_utc": "2026-10-30T15:15:32.680+00:00"}
+{"elapsed_seconds": 90.303, "event": "rollback_connectivity_restored", "ping_loss_percent": 0.0, "timestamp_utc": "2026-10-30T15:15:32.683+00:00"}
+PASS: rollback restored host reachability in 0.015s.
+Live failover evidence: /home/bennurjeevan/netops_guardrail/experiments/results/2026-10-30_4e6bc80_failover_trial_01.json
+Stopping only the Mininet topology created by this test...

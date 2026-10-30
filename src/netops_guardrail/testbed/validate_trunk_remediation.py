@@ -32,6 +32,7 @@ PROJECT_ROOT = NETOPS_HOME
 
 from netops_guardrail.audit.audit_trail import AuditTrail  # noqa: E402
 from netops_guardrail.controller.decision_gate import apply_intent_to_graph  # noqa: E402
+from netops_guardrail.controller.human_verifier import HumanApprovalStore  # noqa: E402
 from netops_guardrail.executor.remediation_executor import RemediationExecutor  # noqa: E402
 from netops_guardrail.testbed.redundant_topo import RedundantTopo  # noqa: E402
 from netops_guardrail.verifier.safety_verifier import build_topology  # noqa: E402
@@ -131,6 +132,7 @@ def main():
     )
     net.addController("c0", controller=RemoteController, ip="127.0.0.1", port=6653)
 
+    approval_tempdir = None
     try:
         print("Starting redundant topology and waiting for STP...")
         net.start()
@@ -194,12 +196,33 @@ def main():
         def topology_provider(phase="pre"):
             return (post_graph if phase == "post" else graph, required_hosts)
 
+        # Use the real approval-store lifecycle in this isolated testbed. The
+        # approval is synthetic test input; only the OVS transaction is live.
+        approval_tempdir = tempfile.TemporaryDirectory(prefix="netops-p2-approval-")
+        approval_store = HumanApprovalStore(path=str(Path(approval_tempdir.name) / "approvals.json"))
+        proposal = approval_store.create_proposal(
+            intent, verifier_result, str(TELEMETRY_PATH), requested_by="p2-live-ovs-latency-test"
+        )
+        approval_store.decide(
+            proposal["proposal_id"],
+            "approve",
+            approver_id="p2-test-operator",
+            reason="Pre-registered synthetic approval for isolated live OVS measurement",
+            proposal_fingerprint_value=proposal["proposal_fingerprint"],
+        )
         executor = RemediationExecutor(
             telemetry_path=str(TELEMETRY_PATH),
             topology_provider=topology_provider,
             connectivity_checker=lambda: net.pingAll(timeout=2) == 0,
+            approval_store=approval_store,
         )
-        execution = executor.execute(intent, decision, verifier_result)
+        execution_started = time.perf_counter()
+        execution = executor.execute(
+            intent, decision, verifier_result, approval_id=proposal["proposal_id"]
+        )
+        execution_latency_ms = (time.perf_counter() - execution_started) * 1000.0
+        print(f"REAL_OVS_EXECUTOR_LATENCY_MS={execution_latency_ms:.3f}")
+        print("TEST_APPROVAL_METHOD=synthetic approval record prepared before latency timer")
         print("Trunk remediation result:")
         print(json.dumps(execution, indent=2))
 
@@ -319,6 +342,8 @@ def main():
     finally:
         print("Stopping the temporary Mininet topology...")
         net.stop()
+        if approval_tempdir is not None:
+            approval_tempdir.cleanup()
 
 
 if __name__ == "__main__":

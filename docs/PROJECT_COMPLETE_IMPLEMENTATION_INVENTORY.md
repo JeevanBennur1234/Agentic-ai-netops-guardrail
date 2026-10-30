@@ -449,12 +449,12 @@ The recorded failure experiments started with 0% loss, then emulated an active-p
 
 The injected event used Mininet/Linux interface-down or configLinkStatus-style behavior, not a confirmed physical cable unplug. Correcting the telemetry path and making STP-priority setup deterministic did not make the latest failover test pass. Automatic active-link failover is therefore unresolved and must not be described as working.
 
-### P2 live rerun — 2026-10-30: INCONCLUSIVE
+### P2 live rerun — 2026-10-30: FAILOVER_FAILED_ROLLBACK_PASS (5/5 trials)
 
 - Failover trial 1 stopped before fault injection because baseline pingall loss was 100%; no recovery time was measured. Raw files: experiments/results/2026-10-30_2541695_failover_trial_01.txt and .json.
 - A separate baseline-only topology run observed 50.0% ping loss and failed its connectivity assertion. Raw output: experiments/results/2026-10-30_2541695_baseline_diagnostic.txt.
-- No additional failover trials were run after the baseline failures; min/median/max across five trials are unavailable. The previous 30-second-window result cannot be attributed to the short observation window based on this run.
-- Real-OVS executor latency is INCONCLUSIVE, n=0, because the baseline was unhealthy; no executor mutation was attempted. See experiments/results/2026-10-30_2541695_real_ovs_executor_latency.json and .csv.
+- Five post-fix 90-second failover trials completed with 0% baseline loss. All five returned FAILOVER_FAILED_ROLLBACK_PASS; the alternate endpoint s2-p2 remained BLOCK in all five. Validated recovery min/median/max are N/A. First ping failure occurred 2.013 / 2.015 / 2.025 seconds after link-down (min/median/max); first ping success occurred 9.033 / 9.037 / 9.063 seconds after link-down, but that ping success was not a validated failover. One of five trials logged an OpenFlow port-down event; rollback restored connectivity in all five. See experiments/results/2026-10-30_4e6bc80_failover_summary.json.
+- Real-OVS executor latency is still INCONCLUSIVE, n=0 at this checkpoint. The follow-up baseline-only check passed, but the live executor latency run has not yet completed. See experiments/results/2026-10-30_2541695_real_ovs_executor_latency.json and .csv.
 
 ## 14. Repository file inventory
 

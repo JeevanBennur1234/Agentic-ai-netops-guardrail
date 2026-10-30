@@ -1,0 +1,1078 @@
+{
+  "metadata": {
+    "date": "2026-10-30T21:00:02+05:30",
+    "commit_hash": "4e6bc80c2f566538eac969605622dd7c759b7574",
+    "model_name": "none (live OVS/Mininet failover summary)",
+    "command": "cd /home/bennurjeevan/netops_guardrail && .venv/bin/python experiments/summarize_failover_results.py",
+    "source_files": [
+      "2026-10-30_4e6bc80_failover_trial_01.json",
+      "2026-10-30_4e6bc80_failover_trial_02.json",
+      "2026-10-30_4e6bc80_failover_trial_03.json",
+      "2026-10-30_4e6bc80_failover_trial_04.json",
+      "2026-10-30_4e6bc80_failover_trial_05.json"
+    ],
+    "observation_window_seconds": 90,
+    "testbed": "LIVE Mininet + OVS + Ryu"
+  },
+  "summary": {
+    "trials": 5,
+    "valid_baseline_trials": 5,
+    "failover_passes": 0,
+    "failover_not_recovered": 5,
+    "inconclusive_trials": 0,
+    "validated_recovery_min_seconds": null,
+    "validated_recovery_median_seconds": null,
+    "validated_recovery_max_seconds": null,
+    "rollback_recovered_trials": 5,
+    "of_port_down_event_trials": 1,
+    "of_port_down_event_count": 1,
+    "alternate_path_forwarding_trials": 0,
+    "first_ping_failure_seconds": [
+      2.025,
+      2.015,
+      2.013,
+      2.015,
+      2.014
+    ],
+    "first_ping_failure_min_seconds": 2.013,
+    "first_ping_failure_median_seconds": 2.015,
+    "first_ping_failure_max_seconds": 2.025,
+    "first_ping_success_seconds": [
+      9.063,
+      9.036,
+      9.033,
+      9.039,
+      9.037
+    ],
+    "first_ping_success_min_seconds": 9.033,
+    "first_ping_success_median_seconds": 9.037,
+    "first_ping_success_max_seconds": 9.063
+  },
+  "trials": [
+    {
+      "trial": 1,
+      "result_file": "2026-10-30_4e6bc80_failover_trial_01.json",
+      "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "link_down_timestamp_utc": "2026-10-30T15:13:53.603+00:00",
+      "first_ping_failure_timestamp_utc": "2026-10-30T15:13:55.613+00:00",
+      "first_ping_failure_seconds_after_link_down": 2.025,
+      "first_ping_success_timestamp_utc": "2026-10-30T15:14:05.581+00:00",
+      "first_ping_success_seconds_after_link_down": 9.063,
+      "of_port_down_events": [],
+      "stp_state_changes": [
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:56.115+00:00",
+          "elapsed_seconds": 2.527,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:56.115+00:00",
+          "elapsed_seconds": 2.527,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:56.115+00:00",
+          "elapsed_seconds": 2.527,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:56.115+00:00",
+          "elapsed_seconds": 2.527,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:56.115+00:00",
+          "elapsed_seconds": 2.527,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "BLOCK",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:56.115+00:00",
+          "elapsed_seconds": 2.527,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:53.804012+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:58.622+00:00",
+          "elapsed_seconds": 5.034,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:58.622+00:00",
+          "elapsed_seconds": 5.034,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:58.622+00:00",
+          "elapsed_seconds": 5.034,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:58.622+00:00",
+          "elapsed_seconds": 5.034,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:58.622+00:00",
+          "elapsed_seconds": 5.034,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:13:58.622+00:00",
+          "elapsed_seconds": 5.034,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:13:57.830808+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:14:05.568+00:00",
+          "elapsed_seconds": 9.05,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:14:05.568+00:00",
+          "elapsed_seconds": 9.05,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:14:05.568+00:00",
+          "elapsed_seconds": 9.05,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:14:05.568+00:00",
+          "elapsed_seconds": 9.05,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:14:05.568+00:00",
+          "elapsed_seconds": 9.05,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "BLOCK",
+          "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:14:05.568+00:00",
+          "elapsed_seconds": 9.05,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:14:05.289520+00:00"
+        }
+      ],
+      "stp_state_change_count": 18,
+      "alternate_s2_p2_state_after_failure": "BLOCK",
+      "post_failure_ping_loss_percent": 0.0,
+      "failover_recovered": false,
+      "recovery_time_seconds": null,
+      "rollback_recovered": true,
+      "rollback_recovery_time_seconds": 0.015,
+      "failure_reason": "STP did not converge the alternate trunk to FORWARD with 0% pingall loss within 90 seconds after the physical link failure."
+    },
+    {
+      "trial": 2,
+      "result_file": "2026-10-30_4e6bc80_failover_trial_02.json",
+      "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "link_down_timestamp_utc": "2026-10-30T15:16:25.404+00:00",
+      "first_ping_failure_timestamp_utc": "2026-10-30T15:16:27.412+00:00",
+      "first_ping_failure_seconds_after_link_down": 2.015,
+      "first_ping_success_timestamp_utc": "2026-10-30T15:16:34.433+00:00",
+      "first_ping_success_seconds_after_link_down": 9.036,
+      "of_port_down_events": [],
+      "stp_state_changes": [
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:27.913+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:25.675855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:27.913+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:25.675855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:27.913+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:25.675855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:27.913+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:25.675855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:27.913+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "BLOCK",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:25.675855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:27.913+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:25.675855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:30.418+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:29.510627+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:30.418+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:29.510627+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:30.418+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:29.510627+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:30.418+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:29.510627+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:30.418+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:29.510627+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:30.418+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:29.510627+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:34.429+00:00",
+          "elapsed_seconds": 9.033,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:33.512327+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:34.430+00:00",
+          "elapsed_seconds": 9.033,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:33.512327+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:34.430+00:00",
+          "elapsed_seconds": 9.033,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:33.512327+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:34.430+00:00",
+          "elapsed_seconds": 9.033,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:33.512327+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:34.430+00:00",
+          "elapsed_seconds": 9.033,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "BLOCK",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:33.512327+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:16:34.430+00:00",
+          "elapsed_seconds": 9.033,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:16:33.512327+00:00"
+        }
+      ],
+      "stp_state_change_count": 18,
+      "alternate_s2_p2_state_after_failure": "BLOCK",
+      "post_failure_ping_loss_percent": 0.0,
+      "failover_recovered": false,
+      "recovery_time_seconds": null,
+      "rollback_recovered": true,
+      "rollback_recovery_time_seconds": 0.008,
+      "failure_reason": "STP did not converge the alternate trunk to FORWARD with 0% pingall loss within 90 seconds after the physical link failure."
+    },
+    {
+      "trial": 3,
+      "result_file": "2026-10-30_4e6bc80_failover_trial_03.json",
+      "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "link_down_timestamp_utc": "2026-10-30T15:18:40.117+00:00",
+      "first_ping_failure_timestamp_utc": "2026-10-30T15:18:42.122+00:00",
+      "first_ping_failure_seconds_after_link_down": 2.013,
+      "first_ping_success_timestamp_utc": "2026-10-30T15:18:49.142+00:00",
+      "first_ping_success_seconds_after_link_down": 9.033,
+      "of_port_down_events": [],
+      "stp_state_changes": [
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:42.623+00:00",
+          "elapsed_seconds": 2.513,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:42.541367+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:42.623+00:00",
+          "elapsed_seconds": 2.513,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:42.541367+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:42.623+00:00",
+          "elapsed_seconds": 2.513,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:42.541367+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:42.623+00:00",
+          "elapsed_seconds": 2.513,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:42.541367+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:42.623+00:00",
+          "elapsed_seconds": 2.513,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "BLOCK",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:42.541367+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:42.623+00:00",
+          "elapsed_seconds": 2.513,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:42.541367+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:45.127+00:00",
+          "elapsed_seconds": 5.018,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:44.219805+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:45.127+00:00",
+          "elapsed_seconds": 5.018,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:44.219805+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:45.127+00:00",
+          "elapsed_seconds": 5.018,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:44.219805+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:45.127+00:00",
+          "elapsed_seconds": 5.018,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:44.219805+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:45.127+00:00",
+          "elapsed_seconds": 5.018,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:44.219805+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:45.127+00:00",
+          "elapsed_seconds": 5.018,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:44.219805+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:49.139+00:00",
+          "elapsed_seconds": 9.03,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:48.221883+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:49.139+00:00",
+          "elapsed_seconds": 9.03,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:48.221883+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:49.139+00:00",
+          "elapsed_seconds": 9.03,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:48.221883+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:49.139+00:00",
+          "elapsed_seconds": 9.03,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:48.221883+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:49.139+00:00",
+          "elapsed_seconds": 9.03,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "BLOCK",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:48.221883+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:18:49.139+00:00",
+          "elapsed_seconds": 9.03,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:18:48.221883+00:00"
+        }
+      ],
+      "stp_state_change_count": 18,
+      "alternate_s2_p2_state_after_failure": "BLOCK",
+      "post_failure_ping_loss_percent": 0.0,
+      "failover_recovered": false,
+      "recovery_time_seconds": null,
+      "rollback_recovered": true,
+      "rollback_recovery_time_seconds": 0.01,
+      "failure_reason": "STP did not converge the alternate trunk to FORWARD with 0% pingall loss within 90 seconds after the physical link failure."
+    },
+    {
+      "trial": 4,
+      "result_file": "2026-10-30_4e6bc80_failover_trial_04.json",
+      "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "link_down_timestamp_utc": "2026-10-30T15:20:43.669+00:00",
+      "first_ping_failure_timestamp_utc": "2026-10-30T15:20:48.600+00:00",
+      "first_ping_failure_seconds_after_link_down": 2.015,
+      "first_ping_success_timestamp_utc": "2026-10-30T15:20:55.624+00:00",
+      "first_ping_success_seconds_after_link_down": 9.039,
+      "of_port_down_events": [
+        {
+          "event": "of_port_down_event_observed",
+          "timestamp_utc": "2026-10-30T15:20:43.670+00:00",
+          "elapsed_seconds": 0.01,
+          "switch": "1",
+          "port": "2",
+          "port_status": {
+            "state": "DOWN",
+            "reason": "MODIFY",
+            "link_down": false,
+            "admin_down": true
+          },
+          "telemetry_updated_at_utc": "2026-10-30T15:20:43.665908+00:00"
+        }
+      ],
+      "stp_state_changes": [
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:49.101+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:46.694592+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:49.101+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:46.694592+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:49.101+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:46.694592+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:49.101+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:46.694592+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:49.101+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "BLOCK",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:46.694592+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:49.101+00:00",
+          "elapsed_seconds": 2.516,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:46.694592+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:51.606+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:50.703919+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:51.606+00:00",
+          "elapsed_seconds": 5.022,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:50.703919+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:51.606+00:00",
+          "elapsed_seconds": 5.022,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:50.703919+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:51.606+00:00",
+          "elapsed_seconds": 5.022,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:50.703919+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:51.606+00:00",
+          "elapsed_seconds": 5.022,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:50.703919+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:51.606+00:00",
+          "elapsed_seconds": 5.022,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:50.703919+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:55.619+00:00",
+          "elapsed_seconds": 9.034,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:54.703643+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:55.619+00:00",
+          "elapsed_seconds": 9.035,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:54.703643+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:55.619+00:00",
+          "elapsed_seconds": 9.035,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:54.703643+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:55.619+00:00",
+          "elapsed_seconds": 9.035,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:54.703643+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:55.619+00:00",
+          "elapsed_seconds": 9.035,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "BLOCK",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:54.703643+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:20:55.619+00:00",
+          "elapsed_seconds": 9.035,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:20:54.703643+00:00"
+        }
+      ],
+      "stp_state_change_count": 18,
+      "alternate_s2_p2_state_after_failure": "BLOCK",
+      "post_failure_ping_loss_percent": 0.0,
+      "failover_recovered": false,
+      "recovery_time_seconds": null,
+      "rollback_recovered": true,
+      "rollback_recovery_time_seconds": 0.01,
+      "failure_reason": "STP did not converge the alternate trunk to FORWARD with 0% pingall loss within 90 seconds after the physical link failure."
+    },
+    {
+      "trial": 5,
+      "result_file": "2026-10-30_4e6bc80_failover_trial_05.json",
+      "result": "FAILOVER_FAILED_ROLLBACK_PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "link_down_timestamp_utc": "2026-10-30T15:23:00.685+00:00",
+      "first_ping_failure_timestamp_utc": "2026-10-30T15:23:02.691+00:00",
+      "first_ping_failure_seconds_after_link_down": 2.014,
+      "first_ping_success_timestamp_utc": "2026-10-30T15:23:09.714+00:00",
+      "first_ping_success_seconds_after_link_down": 9.037,
+      "of_port_down_events": [],
+      "stp_state_changes": [
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:03.191+00:00",
+          "elapsed_seconds": 2.515,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:00.791855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:03.192+00:00",
+          "elapsed_seconds": 2.515,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:00.791855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:03.192+00:00",
+          "elapsed_seconds": 2.515,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:00.791855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:03.192+00:00",
+          "elapsed_seconds": 2.515,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:00.791855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:03.192+00:00",
+          "elapsed_seconds": 2.515,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "BLOCK",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:00.791855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:03.192+00:00",
+          "elapsed_seconds": 2.515,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "FORWARD",
+          "new_state": "LISTEN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:00.791855+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:05.697+00:00",
+          "elapsed_seconds": 5.02,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:04.798120+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:05.697+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:04.798120+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:05.697+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:04.798120+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:05.697+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:04.798120+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:05.697+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:04.798120+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:05.697+00:00",
+          "elapsed_seconds": 5.021,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LISTEN",
+          "new_state": "LEARN",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:04.798120+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:09.711+00:00",
+          "elapsed_seconds": 9.034,
+          "switch": "1",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:09.663759+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:09.711+00:00",
+          "elapsed_seconds": 9.034,
+          "switch": "1",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:09.663759+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:09.711+00:00",
+          "elapsed_seconds": 9.034,
+          "switch": "1",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:09.663759+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:09.711+00:00",
+          "elapsed_seconds": 9.034,
+          "switch": "2",
+          "port": "1",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:09.663759+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:09.711+00:00",
+          "elapsed_seconds": 9.034,
+          "switch": "2",
+          "port": "2",
+          "previous_state": "LEARN",
+          "new_state": "BLOCK",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:09.663759+00:00"
+        },
+        {
+          "event": "stp_port_state_change",
+          "timestamp_utc": "2026-10-30T15:23:09.711+00:00",
+          "elapsed_seconds": 9.034,
+          "switch": "2",
+          "port": "3",
+          "previous_state": "LEARN",
+          "new_state": "FORWARD",
+          "telemetry_updated_at_utc": "2026-10-30T15:23:09.663759+00:00"
+        }
+      ],
+      "stp_state_change_count": 18,
+      "alternate_s2_p2_state_after_failure": "BLOCK",
+      "post_failure_ping_loss_percent": 0.0,
+      "failover_recovered": false,
+      "recovery_time_seconds": null,
+      "rollback_recovered": true,
+      "rollback_recovery_time_seconds": 0.011,
+      "failure_reason": "STP did not converge the alternate trunk to FORWARD with 0% pingall loss within 90 seconds after the physical link failure."
+    }
+  ]
+}

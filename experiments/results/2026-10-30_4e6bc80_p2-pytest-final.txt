@@ -1,0 +1,10 @@
+date: 2026-10-30
+commit: 4e6bc80c2f566538eac969605622dd7c759b7574
+model: none-regression-test
+command: .venv/bin/pytest -q
+worktree: P2 evidence summary and real-OVS test harness update
+
+........................................................................ [ 40%]
+..............................s......................................... [ 81%]
+................................                                         [100%]
+175 passed, 1 skipped in 1.65s
