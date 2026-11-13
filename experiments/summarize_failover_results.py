@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize the five pre-registered 90-second live failover trials."""
+"""Summarize the five successful 90-second 2026-11-13 live failover trials."""
 import csv
 import json
 import statistics
@@ -9,98 +9,118 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "experiments" / "results"
-FILES = [RESULTS / f"2026-10-30_4e6bc80_failover_trial_{i:02d}.json" for i in range(1, 6)]
-COMMAND = "cd /home/bennurjeevan/netops_guardrail && .venv/bin/python experiments/summarize_failover_results.py"
-def percentile(values, p):
-    if not values:
-        return None
-    xs = sorted(values)
-    if len(xs) == 1:
-        return xs[0]
-    rank = (len(xs) - 1) * p
-    lo = int(rank)
-    hi = min(lo + 1, len(xs) - 1)
-    return round(xs[lo] + (xs[hi] - xs[lo]) * (rank - lo), 3)
+TRIAL_IDS = ("02", "03", "06", "07", "08")
+FILES = [
+    RESULTS / f"2026-11-13_live_active_failover_trial_{trial}.json"
+    for trial in TRIAL_IDS
+]
+COMMAND = "python experiments/summarize_failover_results.py"
 
-commit = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip() or "unknown"
+
+def git_value(*args):
+    result = subprocess.run(
+        ["git", "-C", str(ROOT), *args],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
 rows = []
-for path in FILES:
-    d = json.loads(path.read_text(encoding="utf-8"))
-    events = d.get("events", [])
-    pick = lambda names: next((e for e in events if e.get("event") in names), None)
-    link = pick({"link_down"})
-    failure = pick({"first_ping_failure"})
-    success = pick({"first_ping_success_after_failure", "first_ping_success_after_link_down"})
-    of_events = [e for e in events if e.get("event") == "of_port_down_event_observed"]
-    stp_events = [e for e in events if e.get("event") == "stp_port_state_change"]
+for trial, path in zip(TRIAL_IDS, FILES):
+    if not path.is_file():
+        raise SystemExit(f"Missing required evidence file: {path}")
+    data = json.loads(path.read_text(encoding="utf-8"))
     rows.append({
-        "trial": int(path.stem.rsplit("_", 1)[-1]),
+        "trial": trial,
         "result_file": path.name,
-        "result": d.get("result"),
-        "baseline_ping_loss_percent": d.get("baseline_ping_loss_percent"),
-        "link_down_timestamp_utc": link.get("timestamp_utc") if link else None,
-        "first_ping_failure_timestamp_utc": failure.get("timestamp_utc") if failure else None,
-        "first_ping_failure_seconds_after_link_down": failure.get("since_link_down_seconds") if failure else None,
-        "first_ping_success_timestamp_utc": success.get("timestamp_utc") if success else None,
-        "first_ping_success_seconds_after_link_down": success.get("since_link_down_seconds") if success else None,
-        "of_port_down_events": of_events,
-        "stp_state_changes": stp_events,
-        "stp_state_change_count": len(stp_events),
-        "alternate_s2_p2_state_after_failure": d.get("post_failure_stp_states", {}).get("s2-p2"),
-        "post_failure_ping_loss_percent": d.get("post_failure_ping_loss_percent"),
-        "failover_recovered": d.get("failover_recovered"),
-        "recovery_time_seconds": d.get("failover_recovery_time_seconds"),
-        "rollback_recovered": d.get("rollback_recovered"),
-        "rollback_recovery_time_seconds": d.get("rollback_recovery_time_seconds"),
-        "failure_reason": d.get("failover_failure_reason") or d.get("failure_reason"),
+        "result": data.get("result"),
+        "baseline_ping_loss_percent": data.get("baseline_ping_loss_percent"),
+        "baseline_ping_attempts": data.get("baseline_ping_attempts"),
+        "baseline_consecutive_successes": data.get("baseline_consecutive_successes"),
+        "observation_window_seconds": data.get("metadata", {}).get("observation_window_seconds"),
+        "observation_window_ping_samples": data.get("observation_window_ping_samples"),
+        "failover_recovered": data.get("failover_recovered"),
+        "recovery_time_seconds": data.get("failover_recovery_time_seconds"),
+        "post_failure_ping_loss_percent": data.get("post_failure_ping_loss_percent"),
+        "post_recovery_nonzero_loss_samples": data.get("post_recovery_nonzero_loss_samples"),
+        "alternate_s1_p3_state": data.get("post_failure_stp_states", {}).get("s1-p3"),
+        "alternate_s2_p2_state": data.get("post_failure_stp_states", {}).get("s2-p2"),
+        "injection_method": next(
+            (event.get("injection_method") for event in data.get("events", [])
+             if event.get("event") == "link_down"),
+            None,
+        ),
     })
-valid_recoveries = [r["recovery_time_seconds"] for r in rows if isinstance(r["recovery_time_seconds"], (int, float))]
+
+recoveries = [
+    row["recovery_time_seconds"]
+    for row in rows
+    if isinstance(row["recovery_time_seconds"], (int, float))
+]
+all_pass = all(
+    row["result"] == "PASS"
+    and row["baseline_ping_loss_percent"] == 0.0
+    and row["failover_recovered"] is True
+    and row["observation_window_seconds"] == 90.0
+    and row["observation_window_ping_samples"] is not None
+    and row["post_recovery_nonzero_loss_samples"] == 0
+    for row in rows
+)
+
 summary = {
     "metadata": {
         "date": datetime.now().astimezone().isoformat(timespec="seconds"),
-        "commit_hash": commit,
-        "model_name": "none (live OVS/Mininet failover summary)",
+        "head_commit": git_value("rev-parse", "HEAD") or "unknown",
+        "working_tree_dirty": bool(git_value("status", "--porcelain")),
         "command": COMMAND,
-        "source_files": [p.name for p in FILES],
+        "testbed": "Mininet + Open vSwitch + Ryu",
+        "fault_injection": "OpenFlow 1.3 mod-port down (administrative port failure)",
         "observation_window_seconds": 90,
-        "testbed": "LIVE Mininet + OVS + Ryu",
+        "source_files": [path.name for path in FILES],
     },
     "summary": {
         "trials": len(rows),
-        "valid_baseline_trials": sum(r["baseline_ping_loss_percent"] == 0 for r in rows),
-        "failover_passes": sum(r["result"] == "PASS" for r in rows),
-        "failover_not_recovered": sum(r["result"] == "FAILOVER_FAILED_ROLLBACK_PASS" for r in rows),
-        "inconclusive_trials": sum(r["result"] == "INCONCLUSIVE" for r in rows),
-        "validated_recovery_min_seconds": min(valid_recoveries) if valid_recoveries else None,
-        "validated_recovery_median_seconds": statistics.median(valid_recoveries) if valid_recoveries else None,
-        "validated_recovery_max_seconds": max(valid_recoveries) if valid_recoveries else None,
-        "rollback_recovered_trials": sum(r["rollback_recovered"] is True for r in rows),
-        "of_port_down_event_trials": sum(bool(r["of_port_down_events"]) for r in rows),
-        "of_port_down_event_count": sum(len(r["of_port_down_events"]) for r in rows),
-        "alternate_path_forwarding_trials": sum(r["alternate_s2_p2_state_after_failure"] == "FORWARD" for r in rows),
-        "first_ping_failure_seconds": [r["first_ping_failure_seconds_after_link_down"] for r in rows],
-        "first_ping_failure_min_seconds": min(r["first_ping_failure_seconds_after_link_down"] for r in rows if r["first_ping_failure_seconds_after_link_down"] is not None),
-        "first_ping_failure_median_seconds": statistics.median(r["first_ping_failure_seconds_after_link_down"] for r in rows if r["first_ping_failure_seconds_after_link_down"] is not None),
-        "first_ping_failure_max_seconds": max(r["first_ping_failure_seconds_after_link_down"] for r in rows if r["first_ping_failure_seconds_after_link_down"] is not None),
-        "first_ping_success_seconds": [r["first_ping_success_seconds_after_link_down"] for r in rows],
-        "first_ping_success_min_seconds": min(r["first_ping_success_seconds_after_link_down"] for r in rows if r["first_ping_success_seconds_after_link_down"] is not None),
-        "first_ping_success_median_seconds": statistics.median(r["first_ping_success_seconds_after_link_down"] for r in rows if r["first_ping_success_seconds_after_link_down"] is not None),
-        "first_ping_success_max_seconds": max(r["first_ping_success_seconds_after_link_down"] for r in rows if r["first_ping_success_seconds_after_link_down"] is not None),
+        "successful_trials": sum(row["result"] == "PASS" for row in rows),
+        "all_five_meet_pass_criteria": all_pass,
+        "baseline_clean_trials": sum(row["baseline_ping_loss_percent"] == 0.0 for row in rows),
+        "alternate_path_forwarding_trials": sum(
+            row["alternate_s1_p3_state"] == "FORWARD"
+            and row["alternate_s2_p2_state"] == "FORWARD"
+            for row in rows
+        ),
+        "post_recovery_loss_free_trials": sum(
+            row["post_recovery_nonzero_loss_samples"] == 0 for row in rows
+        ),
+        "recovery_min_seconds": min(recoveries) if recoveries else None,
+        "recovery_median_seconds": statistics.median(recoveries) if recoveries else None,
+        "recovery_max_seconds": max(recoveries) if recoveries else None,
+        "recovery_times_seconds": recoveries,
+        "total_observation_ping_samples": sum(
+            row["observation_window_ping_samples"] or 0 for row in rows
+        ),
+        "limitations": [
+            "Emulated Mininet/OVS/Ryu testbed, not physical production hardware.",
+            "Fault injection used OpenFlow administrative port-down, not cable unplug.",
+            "This experiment validates STP path failover, not autonomous AI remediation.",
+            "Five trials are a small sample and do not establish a production SLA.",
+        ],
     },
     "trials": rows,
 }
-json_path = RESULTS / "2026-10-30_4e6bc80_failover_summary.json"
-csv_path = RESULTS / "2026-10-30_4e6bc80_failover_summary.csv"
+
+json_path = RESULTS / "2026-11-13_live_active_failover_summary.json"
+csv_path = RESULTS / "2026-11-13_live_active_failover_summary.csv"
 json_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-fields = ["date", "commit_hash", "model_name", "command"] + [k for k in rows[0] if k not in {"of_port_down_events", "stp_state_changes"}] + ["of_port_down_events_json", "stp_state_changes_json"]
-with csv_path.open("w", newline="", encoding="utf-8") as f:
-    w = csv.DictWriter(f, fieldnames=fields)
-    w.writeheader()
-    for row in rows:
-        flat = {"date": summary["metadata"]["date"], "commit_hash": commit, "model_name": summary["metadata"]["model_name"], "command": COMMAND, **row}
-        flat["of_port_down_events_json"] = json.dumps(row["of_port_down_events"], sort_keys=True)
-        flat["stp_state_changes_json"] = json.dumps(row["stp_state_changes"], sort_keys=True)
-        flat.pop("of_port_down_events", None)
-        flat.pop("stp_state_changes", None)
-        w.writerow(flat)
-print(json.dumps({"json": str(json_path), "csv": str(csv_path), "summary": summary["summary"]}, indent=2))
+
+with csv_path.open("w", newline="", encoding="utf-8") as handle:
+    writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+    writer.writeheader()
+    writer.writerows(rows)
+
+print(json.dumps({
+    "json": str(json_path),
+    "csv": str(csv_path),
+    "summary": summary["summary"],
+}, indent=2))

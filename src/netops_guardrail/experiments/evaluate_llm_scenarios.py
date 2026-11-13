@@ -79,7 +79,7 @@ def compact_topology(t):
         "updated_at_utc": t.get("updated_at_utc"),
     }
 def ask_model(model, prompt):
-    payload = {"model":model, "prompt":prompt, "stream":False, "options":{"temperature":0, "num_predict":220}}
+    payload = {"model":model, "prompt":prompt, "stream":False, "format":"json", "options":{"temperature":0, "num_predict":220}}
     req = urllib.request.Request(API, data=json.dumps(payload).encode(), headers={"Content-Type":"application/json"}, method="POST")
     with urllib.request.urlopen(req, timeout=180) as resp:
         data = json.loads(resp.read().decode("utf-8"))
@@ -88,15 +88,23 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--model", required=True)
     p.add_argument("--output", required=True)
+    p.add_argument("--limit", type=int, default=0, help="Run only the first N scenarios (0 means all).")
     a = p.parse_args()
+    if a.limit < 0:
+        p.error("--limit must be 0 or greater")
     date = datetime.now().astimezone().isoformat(timespec="seconds")
     commit = run(["git","-C",str(ROOT),"rev-parse","HEAD"]).stdout.strip() or "unknown"
     fixture = json.loads(SCENARIOS.read_text(encoding="utf-8"))
+    scenarios = fixture["scenarios"][:a.limit] if a.limit else fixture["scenarios"]
+    if not scenarios:
+        p.error("the scenario fixture contains no cases")
     scenario_hash = hashlib.sha256(SCENARIOS.read_bytes()).hexdigest()
     prompt_hash = hashlib.sha256(SYSTEM_PROMPT.encode()).hexdigest()
     command = f"cd {ROOT} && PYTHONPATH=src .venv/bin/python src/netops_guardrail/experiments/evaluate_llm_scenarios.py --model {a.model} --output {a.output}"
+    if a.limit:
+        command += f" --limit {a.limit}"
     results = []
-    for i, case in enumerate(fixture["scenarios"], 1):
+    for i, case in enumerate(scenarios, 1):
         tel = topology(case["topology_profile"])
         user_context = {
             "alert_text_untrusted": case["alert_text"],
@@ -165,7 +173,7 @@ def main():
     passed = [x for x in unsafe_mutating if x["guardrail_safe"] is True]
     output = {
         "metadata":{"date":date,"commit_hash":commit,"model_name":a.model,"command":command,"ollama_url":API,
-                    "scenario_file":str(SCENARIOS),"scenario_file_sha256":scenario_hash,"system_prompt_sha256":prompt_hash,
+                    "response_format":"json","scenario_file":str(SCENARIOS),"scenario_file_sha256":scenario_hash,"system_prompt_sha256":prompt_hash,
                     "labeling_precedes_inference":True,"scenario_count":n},
         "summary":{"valid_json_count":json_n,"valid_json_rate":json_n/n if n else None,
                    "schema_pass_count":schema_n,"schema_pass_rate":schema_n/n if n else None,

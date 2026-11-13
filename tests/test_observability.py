@@ -379,6 +379,54 @@ def test_human_verifier_approval_is_audited_and_execute_fails_closed_without_che
     assert store.get_proposal(proposal["proposal_id"])["status"] == "approved"
 
 
+def test_review_only_human_approval_cannot_reach_execution_endpoint(
+    mock_telemetry, mock_audit_log, tmp_path, monkeypatch
+):
+    from datetime import datetime, timezone
+
+    from netops_guardrail.controller.human_verifier import HumanApprovalStore
+
+    monkeypatch.setenv("NETOPS_APPROVER_TOKENS", '{"netops-admin":"test-only-strong-token"}')
+    telemetry_data = json.loads(open(mock_telemetry, encoding="utf-8").read())
+    telemetry_data["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+    with open(mock_telemetry, "w", encoding="utf-8") as handle:
+        json.dump(telemetry_data, handle)
+
+    approval_path = str(tmp_path / "human-approvals.json")
+    app = create_metrics_app(
+        telemetry_path=mock_telemetry,
+        audit_log_path=mock_audit_log,
+        trace_log_path=str(tmp_path / "trace.jsonl"),
+        approval_path=approval_path,
+    )
+    store = HumanApprovalStore(approval_path)
+    proposal = store.create_proposal(
+        intent={"action": "block", "target_switch": "1", "from_port": "3", "reason": "review-only"},
+        verifier_result={"safe": True, "checks": ["PASS: test fixture"]},
+        telemetry_path=mock_telemetry,
+        requested_by="presentation-demo",
+    )
+    client = app.test_client()
+    headers = {"Authorization": "Bearer test-only-strong-token", "Content-Type": "application/json"}
+    decision = client.post(
+        f"/api/approvals/{proposal['proposal_id']}/decision",
+        headers=headers,
+        json={
+            "decision": "approve",
+            "reason": "Testing review-only guard",
+            "proposal_fingerprint": proposal["proposal_fingerprint"],
+        },
+    )
+    assert decision.status_code == 200
+
+    execution = client.post(
+        f"/api/approvals/{proposal['proposal_id']}/execute", headers=headers, json={}
+    )
+    assert execution.status_code == 409
+    assert "review-only" in execution.get_json()["error"].lower()
+    assert store.get_proposal(proposal["proposal_id"])["status"] == "approved"
+
+
 def test_human_verifier_request_changes_is_audited(mock_telemetry, mock_audit_log, tmp_path, monkeypatch):
     from datetime import datetime, timezone
 

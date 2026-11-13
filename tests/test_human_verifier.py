@@ -80,6 +80,34 @@ def test_human_approval_is_bound_and_single_use(tmp_path):
         )
 
 
+def test_review_only_approval_cannot_be_validated_or_consumed(tmp_path):
+    telemetry_path = write_telemetry(tmp_path / "telemetry.json")
+    store = HumanApprovalStore(tmp_path / "approvals.json")
+    proposal = store.create_proposal(
+        intent={
+            "action": "block",
+            "target_switch": "1",
+            "from_port": "3",
+            "reason": "review-only demonstration",
+        },
+        verifier_result={"safe": True, "checks": ["PASS: test fixture"]},
+        telemetry_path=telemetry_path,
+        requested_by="unit-test",
+        execution_allowed=False,
+    )
+    approve(store, proposal)
+
+    with pytest.raises(ApprovalError, match="review-only"):
+        store.validate_approved(
+            proposal["proposal_id"], proposal["intent"], proposal["verifier_result"], telemetry_path
+        )
+    with pytest.raises(ApprovalError, match="review-only"):
+        store.consume_approval(
+            proposal["proposal_id"], proposal["intent"], proposal["verifier_result"], telemetry_path
+        )
+    assert store.get_proposal(proposal["proposal_id"])["status"] == "approved"
+
+
 def test_human_approval_rejects_tampered_intent(tmp_path):
     telemetry_path = write_telemetry(tmp_path / "telemetry.json")
     store = HumanApprovalStore(tmp_path / "approvals.json")

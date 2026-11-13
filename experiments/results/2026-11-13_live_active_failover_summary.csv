@@ -1,0 +1,6 @@
+trial,result_file,result,baseline_ping_loss_percent,baseline_ping_attempts,baseline_consecutive_successes,observation_window_seconds,observation_window_ping_samples,failover_recovered,recovery_time_seconds,post_failure_ping_loss_percent,post_recovery_nonzero_loss_samples,altenate_s1_p3_state,altenate_s2_p2_state,injection_method
+02,2026-11-13_live_active_failover_trial_02.json,PASS,0.0,,,90.0,165,True,9.048,0.0,0,FORWARD,FORWARD,OpenFlow 1.3 mod-port down (administrative port failure)
+03,2026-11-13_live_active_failover_trial_03.json,PASS,0.0,,,90.0,164,True,9.058,0.0,0,FORWARD,FORWARD,OpenFlow 1.3 mod-port down (administrative port failure)
+06,2026-11-13_live_active_failover_trial_06.json,PASS,0.0,,,90.0,162,True,10.131,0.0,0,FORWARD,FORWARD,OpenFlow 1.3 mod-port down (administrative port failure)
+07,2026-11-13_live_active_failover_trial_07.json,PASS,0.0,3,3,90.0,165,True,9.042,0.0,0,FORWARD,FORWARD,OpenFlow 1.3 mod-port down (administrative port failure)
+08,2026-11-13_live_active_failover_trial_08.json,PASS,0.0,3,3,90.0,165,True,9.042,0.0,0,FORWARD,FORWARD,OpenFlow 1.3 mod-port down (administrative port failure)

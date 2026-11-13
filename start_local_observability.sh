@@ -49,7 +49,7 @@ export NETOPS_APPROVER_TOKENS="$("$PY" -c 'import json,os; print(json.dumps({"ne
 # Running observability/server.py sets sys.path[0] to observability/, so explicitly
 # expose the repository root for importing testbed.live_connectivity.
 export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
-export NETOPS_CONNECTIVITY_CHECKER='testbed.live_connectivity:check_host_connectivity'
+export NETOPS_CONNECTIVITY_CHECKER='netops_guardrail.testbed.live_connectivity:check_host_connectivity'
 
 if [[ -z "${NETOPS_APPROVER_TOKEN:-}" || -z "${NETOPS_CHAOS_API_TOKEN:-}" ]]; then
   echo "ERROR: required local tokens are missing." >&2
@@ -66,4 +66,4 @@ echo "Human Verifier token: $NETOPS_APPROVER_TOKEN"
 echo "Lab operator token:   $NETOPS_CHAOS_API_TOKEN"
 echo "Tokens are stored in $SECRETS_FILE (directory mode 700, file mode 600)."
 echo "Keep this terminal open. These are local development credentials; do not share them."
-exec "$PY" observability/server.py
+exec "$PY" "$ROOT/src/netops_guardrail/observability/server.py"

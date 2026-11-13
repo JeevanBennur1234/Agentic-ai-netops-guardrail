@@ -96,6 +96,10 @@ class TelemetryController(app_manager.RyuApp):
             {"ports": {}, "flows": []}
         )
         switch_telemetry["port_status"] = {}
+        # A recreated Mininet topology reuses datapath IDs and port numbers.
+        # Never let STP states from the previous bridge instance satisfy a
+        # fresh test's convergence check.
+        switch_telemetry["stp_port_states"] = {}
 
         self.logger.info(
             "SWITCH CONNECTED: datapath_id=%s",
@@ -157,6 +161,31 @@ class TelemetryController(app_manager.RyuApp):
         )
 
         datapath.send_msg(flow_mod)
+
+    def _flush_learning_state(self, reason):
+        """Invalidate learned L2 paths after a topology/port transition."""
+        mac_table = getattr(self, "mac_to_port", {})
+        learned_macs = {
+            mac
+            for table in mac_table.values()
+            for mac in table
+        }
+        for datapath in list(getattr(self, "datapaths", {}).values()):
+            ofproto = datapath.ofproto
+            parser = datapath.ofproto_parser
+            for mac in learned_macs:
+                delete = parser.OFPFlowMod(
+                    datapath=datapath,
+                    command=ofproto.OFPFC_DELETE,
+                    table_id=0,
+                    out_port=ofproto.OFPP_ANY,
+                    out_group=ofproto.OFPG_ANY,
+                    match=parser.OFPMatch(eth_dst=mac),
+                )
+                datapath.send_msg(delete)
+        if hasattr(self, "mac_to_port"):
+            self.mac_to_port.clear()
+        self.logger.warning("L2 LEARNING STATE FLUSHED: reason=%s", reason)
 
     # ==========================================================
     # PACKET-IN / L2 LEARNING SWITCH
@@ -306,6 +335,8 @@ class TelemetryController(app_manager.RyuApp):
             "OPENFLOW PORT STATUS: switch=%s port=%s state=%s reason=%s link_down=%s admin_down=%s",
             switch_id, port_id, state_name, reason, link_down, admin_down
         )
+        if state_name in ("DOWN", "MISSING"):
+            self._flush_learning_state(f"port-{state_name.lower()}:{switch_id}/{port_id}")
         self._write_telemetry()
 
     # ==========================================================
@@ -347,6 +378,8 @@ class TelemetryController(app_manager.RyuApp):
             "STP PORT STATE: switch=%s port=%s state=%s",
             switch_id, port_id, state_name
         )
+        if state_name in ("DISABLE", "FORWARD"):
+            self._flush_learning_state(f"stp-{state_name.lower()}:{switch_id}/{port_id}")
         self._write_telemetry()
 
     # ==========================================================

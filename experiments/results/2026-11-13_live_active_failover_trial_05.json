@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "date": "2026-11-13T14:02:53+05:30",
+    "commit_hash": "c6831e2a86da7fccb81b9c03c9ffed3ad7144135",
+    "model_name": "none (live OVS/Mininet experiment)",
+    "command": "/home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_active_failover.py",
+    "observation_window_seconds": 90.0,
+    "testbed": "LIVE Mininet + OVS + Ryu"
+  },
+  "events": [],
+  "started_at_utc": "2026-11-13T08:32:53.602955+00:00",
+  "test": "Mininet-emulated active-trunk link failure and STP failover",
+  "active_trunk_interfaces": [
+    "s1-eth2",
+    "s2-eth1"
+  ],
+  "result": "INCONCLUSIVE",
+  "initial_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "BLOCK",
+    "s2-p3": "FORWARD"
+  },
+  "baseline_ping_loss_percent": 100.0,
+  "failure_reason": "Baseline connectivity failed before fault injection.",
+  "finished_at_utc": "2026-11-13T08:33:09.930346+00:00"
+}

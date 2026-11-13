@@ -1,4 +1,4 @@
-ryu
+ryu==4.34
 networkx
 flask
 ecdsa

@@ -1,5 +1,8 @@
 # Live Demo Runbook - Agentic AI-NetOps Guardrail
 
+> **Current status update — 2026-11-13:** The active-trunk failover experiment now has five successful 90-second Mininet + OVS + Ryu trials (02, 03, 06, 07, 08), with 9.042–10.131 second recovery and no post-recovery loss samples. Fault injection is OpenFlow 1.3 administrative port-down, not physical cable unplug. The previous sections below contain older demo guidance and historical limitations; use the current package paths under `src/netops_guardrail/` when running scripts. Do not present the old 30-second failover failure as the current result.
+
+
 > Before running these examples, set NETOPS_HOME to the repository root and activate the Python environment: export NETOPS_HOME="$(pwd)" followed by source "$NETOPS_HOME/.venv/bin/activate".
 
 Date: 2026-10-28
@@ -7,7 +10,7 @@ Date: 2026-10-28
 ## Promise and safety boundary
 This demo covers the web dashboard, live Mininet/OVS telemetry, a verifier-approved proposal in the Human Verifier queue, a safe standby-trunk remediation test, automated tests, and synthetic evaluation results.
 
-Do not claim active-link failover works. The latest interface-down experiment failed to reconverge. Do not run that failure injection as a live success demo.
+The active-trunk failover has now passed five 90-second Mininet + OVS + Ryu trials using OpenFlow 1.3 administrative port-down. Show the recorded evidence and state the qualification: this is emulated STP failover, not a physical cable-unplug or AI-driven remediation test.
 
 ## 0. Pre-flight
 Use WSL Ubuntu-22.04. Project root: $NETOPS_HOME
@@ -84,7 +87,7 @@ $VIRTUAL_ENV/bin/python testbed/create_demo_approval.py
 ~~~
 The helper checks telemetry freshness (maximum 30 seconds), both discovered trunks, access-port forwarding, a STP-blocked trunk endpoint, and the existing automated verifier. It creates a pending Human Verifier proposal and signed audit entry. It never calls the executor or modifies OVS flows.
 
-Open /approvals, click Refresh, authenticate if prompted, and show the proposal intent, verifier result, topology/proposal fingerprints, and expiry. For the safest demo choose Request changes or Reject proposal and enter an audit reason. If you choose Approve proposal, stop at the approved state; do not click Execute approved action unless a genuine environment-specific connectivity checker has been configured.
+Open /approvals, click Refresh, authenticate if prompted, and show the proposal intent, verifier result, topology/proposal fingerprints, and expiry. For the safest demo choose Request changes or Reject proposal and enter an audit reason. This helper creates a review-only proposal (`execution_allowed=false`): approval demonstrates the human decision and audit trail only. The UI hides execution and the API rejects execution for this proposal, even if approved. Use the separate live-remediation validator for execution testing.
 
 If helper says telemetry is stale or links are missing, do not alter timestamps manually. Keep Mininet running, wait for Ryu link discovery and telemetry refresh, then retry once.
 
@@ -117,7 +120,7 @@ $VIRTUAL_ENV/bin/pytest -q
 $VIRTUAL_ENV/bin/python experiments/evaluate_guardrail_cases.py
 cat experiments/results/recommended_evaluation_20261027.md
 ~~~
-Latest verified baseline: 155 tests passed. The evaluation uses 12 manually labelled synthetic cases and 30 executor transactions using an in-memory fake OVS runner. The 30 transactions are not 30 live OVS changes; reported latency is simulated software-path timing, not data-plane latency.
+Latest verified local baseline: 176 tests passed. The Qwen structured-output run passed strict JSON and schema validation for 30/30 defined synthetic scenarios with 0 fallbacks; 2 unsafe mutating proposals were blocked by the independent guardrail and 0 passed. This is synthetic evaluation, not general AI accuracy or live OVS execution. The 30 executor transactions in the older evaluation use an in-memory fake OVS runner and are not live OVS changes.
 
 To show the known limitation without injecting another live failure:
 ~~~bash

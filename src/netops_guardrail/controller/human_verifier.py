@@ -174,7 +174,9 @@ class HumanApprovalStore:
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
 
-    def create_proposal(self, intent, verifier_result, telemetry_path, requested_by="agent"):
+    def create_proposal(
+        self, intent, verifier_result, telemetry_path, requested_by="agent", execution_allowed=True
+    ):
         if not isinstance(intent, dict) or intent.get("action") != "block":
             raise ApprovalError("Only a validated block proposal requires this human approval workflow")
         if not isinstance(verifier_result, dict) or verifier_result.get("safe") is not True:
@@ -189,6 +191,7 @@ class HumanApprovalStore:
             "created_at": now.isoformat(),
             "expires_at": (now + timedelta(seconds=self.ttl_seconds)).isoformat(),
             "requested_by": str(requested_by)[:128],
+            "execution_allowed": bool(execution_allowed),
             "intent": copy.deepcopy(intent),
             "verifier_result": copy.deepcopy(verifier_result),
             "topology_fingerprint": topology_fp,
@@ -200,7 +203,8 @@ class HumanApprovalStore:
             proposals = self._read()
             for existing in proposals:
                 if (existing.get("status") == "pending"
-                        and existing.get("proposal_fingerprint") == fingerprint):
+                        and existing.get("proposal_fingerprint") == fingerprint
+                        and bool(existing.get("execution_allowed", True)) == bool(execution_allowed)):
                     if not self._is_expired(existing):
                         return copy.deepcopy(existing)
                     existing["status"] = "expired"
@@ -277,6 +281,8 @@ class HumanApprovalStore:
             raise ApprovalError("Human approval not found")
         if proposal.get("status") != "approved":
             raise ApprovalError(f"Human approval is not usable (status={proposal.get('status')})")
+        if proposal.get("execution_allowed", True) is False or proposal.get("requested_by") == "presentation-demo":
+            raise ApprovalError("This proposal is review-only; network execution is disabled")
         if self._is_expired(proposal):
             raise ApprovalError("Human approval expired; a fresh review is required")
         current_topology_fp = topology_fingerprint_from_path(telemetry_path)
@@ -296,6 +302,8 @@ class HumanApprovalStore:
                 raise ApprovalError("Human approval not found")
             if proposal.get("status") != "approved":
                 raise ApprovalError(f"Human approval is not usable (status={proposal.get('status')})")
+            if proposal.get("execution_allowed", True) is False or proposal.get("requested_by") == "presentation-demo":
+                raise ApprovalError("This proposal is review-only; network execution is disabled")
             if self._is_expired(proposal):
                 proposal["status"] = "expired"
                 self._write(proposals)

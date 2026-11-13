@@ -1,12 +1,13 @@
 """Topology and fault injection routes for NetOps Guardrail."""
 import hmac
+import importlib
 import json
 import os
 import subprocess
+import sys
 
 from flask import Blueprint, current_app, jsonify, request
 
-import netops_guardrail.observability.server as server_module
 from netops_guardrail.controller.standby_anomaly import inspect_standby_forwarding
 from netops_guardrail.verifier.safety_verifier import build_topology
 
@@ -56,7 +57,7 @@ def api_chaos_inject_loop():
         return jsonify({"error": "Confirmation required. Call with ?confirm=true to continue."}), 400
 
     for bridge in ("s1", "s2"):
-        check = server_module.subprocess.run(
+        check = subprocess.run(
             ["sudo", "-n", "ovs-vsctl", "br-exists", bridge],
             shell=False, capture_output=True, text=True, check=False, timeout=3,
         )
@@ -72,7 +73,7 @@ def api_chaos_inject_loop():
             "error": "Fault injection disabled: configure a real NETOPS_CONNECTIVITY_CHECKER=module:function first."
         }), 503
     try:
-        checker_module = server_module.importlib.import_module(module_name)
+        checker_module = importlib.import_module(module_name)
         connectivity_checker = getattr(checker_module, function_name)
         if not callable(connectivity_checker):
             raise TypeError("configured connectivity checker is not callable")
@@ -93,7 +94,7 @@ def api_chaos_inject_loop():
     ]
     for command in commands:
         try:
-            result = server_module.subprocess.run(
+            result = subprocess.run(
                 command, shell=False, capture_output=True, text=True,
                 check=False, timeout=4,
             )
@@ -175,7 +176,7 @@ def api_chaos_inject_loop():
         "reason": "Re-isolate the restored standby trunk while preserving the primary trunk and host reachability.",
     }
     try:
-        pipeline = server_module.decide(
+        pipeline = sys.modules["netops_guardrail.observability.server"].decide(
             telemetry_path=collector.telemetry_path,
             execute_approved=False,
             audit_logger=audit,
@@ -225,7 +226,7 @@ def api_issue2_standby_forwarding():
     allow_simulation = payload.get("allow_controlled_simulation") is True
 
     for bridge in ("s1", "s2"):
-        check = server_module.subprocess.run(
+        check = subprocess.run(
             ["sudo", "-n", "ovs-vsctl", "br-exists", bridge],
             shell=False, capture_output=True, text=True, check=False, timeout=3,
         )
@@ -243,7 +244,7 @@ def api_issue2_standby_forwarding():
             "network_mutation_attempted": False,
         }), 503
     try:
-        checker_module = server_module.importlib.import_module(module_name)
+        checker_module = importlib.import_module(module_name)
         connectivity_checker = getattr(checker_module, function_name)
         if not callable(connectivity_checker) or connectivity_checker() is not True:
             return jsonify({
@@ -257,7 +258,7 @@ def api_issue2_standby_forwarding():
         }), 503
 
     for bridge, port in (("s1", "3"), ("s2", "2")):
-        result = server_module.subprocess.run(
+        result = subprocess.run(
             ["sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "dump-flows", bridge],
             shell=False, capture_output=True, text=True, check=False, timeout=3,
         )
@@ -321,7 +322,7 @@ def api_issue2_standby_forwarding():
         ),
     }
     try:
-        pipeline = server_module.decide(
+        pipeline = sys.modules["netops_guardrail.observability.server"].decide(
             telemetry_path=collector.telemetry_path,
             execute_approved=False,
             audit_logger=audit,

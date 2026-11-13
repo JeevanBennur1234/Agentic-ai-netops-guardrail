@@ -1,4 +1,7 @@
 # Phase 1 Presentation Update Notes
+
+> **Current status update — 2026-11-13:** Update slides to reflect five successful 90-second active-trunk failover trials in the Mininet + OVS + Ryu testbed (trials 02, 03, 06, 07, 08). Recovery was 9.042–10.131 seconds; zero post-recovery packet-loss samples were observed. The injected failure was OpenFlow 1.3 administrative port-down, not physical cable unplug. This demonstrates STP failover in the emulated testbed, not an AI agent autonomously performing remediation. The old failover-failed wording later in this note is historical and superseded. Latest local regression: 176 tests passed. See `docs/CLAIMS_EVIDENCE.md`.
+
 Date: 2026-10-27
 
 This note is for updating the slides after the current implementation review. It is not a claim that the supplied PowerPoint has already been edited.
@@ -6,10 +9,10 @@ This note is for updating the slides after the current implementation review. It
 ## Slide 8 - Expected Outcomes
 
 Change wording that sounds fully delivered to a status-aware version:
-- Working prototype: the core prototype modules are implemented; live active-trunk failover remains unresolved.
+- Working prototype: the core prototype modules are implemented; five 90-second active-trunk failover trials passed in the Mininet + OVS + Ryu emulated testbed.
 - Invariant checker: topology-level connectivity/reachability checks, loop reporting/policy and STP-aware forwarding-edge handling are implemented. Do not call it a complete formal OpenFlow verifier.
 - Tamper-evident audit: hash/signature audit implementation and audit-chain tests exist.
-- Fault injection: synthetic adversarial cases and live Mininet experiments exist; current active-trunk failure test fails over unsuccessfully but confirms rollback recovery.
+- Fault injection: synthetic adversarial cases and five repeatable live Mininet/OVS/Ryu active-trunk administrative-down failover trials passed; physical cable-unplug and AI-driven failover remain unverified.
 - Comparative evaluation: initial synthetic and component-level measurements exist; no broad manual-vs-autonomous statistical comparison is complete.
 
 ## Slide 10 - Current Progress
@@ -26,7 +29,7 @@ Suggested status table:
 | AI agent | Local Ollama intent proposer with schema and target validation | agent/remediation_agent.py |
 | Ryu integration | Telemetry and STP-state integration; decision pipeline and polling supervisor exist | controller/telemetry_controller.py; controller/decision_gate.py; controller/remediation_service.py |
 | Fault injection | Synthetic cases and live failure/rollback harnesses exist | experiments/evaluate_guardrail_cases.py; testbed/validate_triangle_failover.py |
-| Live active-link failover | Not passed; rollback recovery passed | experiments/results/live_triangle_failover_latest.json |
+| Live active-link failover | Five 90-second trials passed in Mininet + OVS + Ryu; 9.042–10.131 s recovery, zero post-recovery loss samples | experiments/results/2026-11-13_live_active_failover_trial_02/03/06/07/08.json (OpenFlow administrative-down emulation) |
 
 ## Slide 7 - Proposed Methodology
 
@@ -44,19 +47,19 @@ Avoid:
 - "formally proves the whole network is safe"
 - "100% accurate"
 - "production ready"
-- "successful active trunk failover"
+- "production-guaranteed or AI-driven active trunk failover"
 - "no existing open verifier"
 
 Prefer:
 - "topology-level safety gate"
-- "12 manually labelled synthetic cases passed; this does not measure LLM accuracy"
+- "Qwen structured-output evaluation: 30/30 valid JSON and schema passes, 0 fallbacks on the defined synthetic set; 2 unsafe mutating proposals blocked by the independent guardrail, 0 passed. This is not general AI accuracy."
 - "30/30 simulated executor transactions passed; fake OVS command runner"
-- "active failover not demonstrated; rollback restored connectivity"
+- "five 90-second Mininet + OVS + Ryu active-trunk administrative-down failover trials passed; physical cable-unplug and AI-driven failover are not claimed"
 
 
 ## Latest live test result
 
-The two-switch topology/host-connectivity test and the paired trunk-rule safety test passed. The active-trunk administrative-down experiment on a three-switch ring did not fail over: host ping loss rose to 100% with the alternate trunk still STP-blocked. Restoring the original trunk returned ping loss to 0%. This was not a physical cable-unplug test. Show this as an unresolved result and do not list active failover as completed.
+The dual-trunk active-link failover harness passed five 90-second trials (02, 03, 06, 07, 08) after OpenFlow 1.3 administrative port-down on the primary trunk. The alternate STP path reached FORWARD and host connectivity recovered in 9.042–10.131 seconds, with zero post-recovery loss samples. This is emulated administrative-down evidence, not physical cable-unplug coverage or AI-driven remediation.
 
 
 ## Additional live guardrail evidence

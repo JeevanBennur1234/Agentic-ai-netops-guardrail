@@ -1,0 +1,130 @@
+{
+  "metadata": {
+    "date": "2026-11-13T14:54:13+05:30",
+    "head_commit": "c6831e2a86da7fccb81b9c03c9ffed3ad7144135",
+    "working_tree_dirty": true,
+    "command": "python experiments/summarize_failover_results.py",
+    "testbed": "Mininet + Open vSwitch + Ryu",
+    "fault_injection": "OpenFlow 1.3 mod-port down (administrative port failure)",
+    "observation_window_seconds": 90,
+    "source_files": [
+      "2026-11-13_live_active_failover_trial_02.json",
+      "2026-11-13_live_active_failover_trial_03.json",
+      "2026-11-13_live_active_failover_trial_06.json",
+      "2026-11-13_live_active_failover_trial_07.json",
+      "2026-11-13_live_active_failover_trial_08.json"
+    ]
+  },
+  "summary": {
+    "trials": 5,
+    "successful_trials": 5,
+    "all_five_meet_pass_criteria": true,
+    "baseline_clean_trials": 5,
+    "alternate_path_forwarding_trials": 5,
+    "post_recovery_loss_free_trials": 5,
+    "recovery_min_seconds": 9.042,
+    "recovery_median_seconds": 9.048,
+    "recovery_max_seconds": 10.131,
+    "recovery_times_seconds": [
+      9.048,
+      9.058,
+      10.131,
+      9.042,
+      9.042
+    ],
+    "total_observation_ping_samples": 821,
+    "limitations": [
+      "Emulated Mininet/OVS/Ryu testbed, not physical production hardware.",
+      "Fault injection used OpenFlow administrative port-down, not cable unplug.",
+      "This experiment validates STP path failover, not autonomous AI remediation.",
+      "Five trials are a small sample and do not establish a production SLA."
+    ]
+  },
+  "trials": [
+    {
+      "trial": "02",
+      "result_file": "2026-11-13_live_active_failover_trial_02.json",
+      "result": "PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "baseline_ping_attempts": null,
+      "baseline_consecutive_successes": null,
+      "observation_window_seconds": 90.0,
+      "observation_window_ping_samples": 165,
+      "failover_recovered": true,
+      "recovery_time_seconds": 9.048,
+      "post_failure_ping_loss_percent": 0.0,
+      "post_recovery_nonzero_loss_samples": 0,
+      "alternate_s1_p3_state": "FORWARD",
+      "alternate_s2_p2_state": "FORWARD",
+      "injection_method": "OpenFlow 1.3 mod-port down (administrative port failure)"
+    },
+    {
+      "trial": "03",
+      "result_file": "2026-11-13_live_active_failover_trial_03.json",
+      "result": "PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "baseline_ping_attempts": null,
+      "baseline_consecutive_successes": null,
+      "observation_window_seconds": 90.0,
+      "observation_window_ping_samples": 164,
+      "failover_recovered": true,
+      "recovery_time_seconds": 9.058,
+      "post_failure_ping_loss_percent": 0.0,
+      "post_recovery_nonzero_loss_samples": 0,
+      "alternate_s1_p3_state": "FORWARD",
+      "alternate_s2_p2_state": "FORWARD",
+      "injection_method": "OpenFlow 1.3 mod-port down (administrative port failure)"
+    },
+    {
+      "trial": "06",
+      "result_file": "2026-11-13_live_active_failover_trial_06.json",
+      "result": "PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "baseline_ping_attempts": null,
+      "baseline_consecutive_successes": null,
+      "observation_window_seconds": 90.0,
+      "observation_window_ping_samples": 162,
+      "failover_recovered": true,
+      "recovery_time_seconds": 10.131,
+      "post_failure_ping_loss_percent": 0.0,
+      "post_recovery_nonzero_loss_samples": 0,
+      "alternate_s1_p3_state": "FORWARD",
+      "alternate_s2_p2_state": "FORWARD",
+      "injection_method": "OpenFlow 1.3 mod-port down (administrative port failure)"
+    },
+    {
+      "trial": "07",
+      "result_file": "2026-11-13_live_active_failover_trial_07.json",
+      "result": "PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "baseline_ping_attempts": 3,
+      "baseline_consecutive_successes": 3,
+      "observation_window_seconds": 90.0,
+      "observation_window_ping_samples": 165,
+      "failover_recovered": true,
+      "recovery_time_seconds": 9.042,
+      "post_failure_ping_loss_percent": 0.0,
+      "post_recovery_nonzero_loss_samples": 0,
+      "alternate_s1_p3_state": "FORWARD",
+      "alternate_s2_p2_state": "FORWARD",
+      "injection_method": "OpenFlow 1.3 mod-port down (administrative port failure)"
+    },
+    {
+      "trial": "08",
+      "result_file": "2026-11-13_live_active_failover_trial_08.json",
+      "result": "PASS",
+      "baseline_ping_loss_percent": 0.0,
+      "baseline_ping_attempts": 3,
+      "baseline_consecutive_successes": 3,
+      "observation_window_seconds": 90.0,
+      "observation_window_ping_samples": 165,
+      "failover_recovered": true,
+      "recovery_time_seconds": 9.042,
+      "post_failure_ping_loss_percent": 0.0,
+      "post_recovery_nonzero_loss_samples": 0,
+      "alternate_s1_p3_state": "FORWARD",
+      "alternate_s2_p2_state": "FORWARD",
+      "injection_method": "OpenFlow 1.3 mod-port down (administrative port failure)"
+    }
+  ]
+}

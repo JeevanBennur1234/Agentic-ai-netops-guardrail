@@ -208,20 +208,74 @@
 
     #topology-canvas {
       flex: 1;
+      min-height: 260px;
       width: 100%;
       height: 100%;
-      background: radial-gradient(ellipse at center, rgba(31, 41, 55, 0.5) 0%, rgba(9, 13, 22, 0.9) 100%);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(30, 64, 175, .14), transparent 48%),
+        linear-gradient(145deg, #07111f, #0b1424 55%, #0a1020);
     }
-
+    #topology-canvas::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background-image: radial-gradient(rgba(148, 163, 184, .45) .7px, transparent .7px);
+      background-size: 22px 22px;
+      z-index: 0;
+    }
+    #topology-canvas .vis-network { position: relative; z-index: 1; }
+    #packet-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
     .topology-legend {
       padding: 8px 16px;
-      background: rgba(17, 24, 39, 0.8);
+      background: rgba(17, 24, 39, .8);
       border-top: 1px solid var(--border-color);
-      font-size: 0.75rem;
+      font-size: .72rem;
       display: flex;
-      gap: 16px;
+      flex-wrap: wrap;
+      gap: 8px 14px;
       align-items: center;
     }
+    .legend-swatch {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+    .packet-sim-panel {
+      padding: 10px 14px;
+      border-top: 1px solid rgba(6, 182, 212, .18);
+      background: linear-gradient(120deg, rgba(8, 47, 73, .28), rgba(15, 23, 42, .8));
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .packet-sim-title { color: #e2e8f0; font-size: .8rem; font-weight: 700; }
+    .packet-sim-note { color: #94a3b8; font-size: .68rem; margin-top: 3px; }
+    .packet-sim-state { color: #7dd3fc; font-size: .72rem; }
+    .packet-stat {
+      padding: 5px 9px;
+      border: 1px solid rgba(71, 85, 105, .5);
+      border-radius: 8px;
+      background: rgba(2, 6, 23, .42);
+      min-width: 76px;
+    }
+    .packet-stat strong { display: block; color: #f1f5f9; font-size: .9rem; font-variant-numeric: tabular-nums; }
+    .packet-stat span { color: #94a3b8; font-size: .6rem; text-transform: uppercase; letter-spacing: .05em; }
 
     .legend-item {
       display: flex;
@@ -659,18 +713,26 @@
           <div class="spinner"></div>
           <span>Connecting to live topology...</span>
         </div>
+        <canvas id="packet-overlay" aria-hidden="true"></canvas>
       </div>
       <div class="topology-legend">
-        <div class="legend-item">
-          <div class="legend-box"></div>
-          <span>Switch Node (s#)</span>
+        <div class="legend-item"><i class="legend-swatch" style="background:#38bdf8"></i><span>Switch</span></div>
+        <div class="legend-item"><i class="legend-swatch" style="background:#34d399"></i><span>Port</span></div>
+        <div class="legend-item"><i class="legend-swatch" style="background:#fbbf24"></i><span>Host</span></div>
+        <div class="legend-item"><i class="legend-swatch" style="background:#22c55e"></i><span>Forwarding trunk</span></div>
+        <div class="legend-item"><i class="legend-swatch" style="background:#f59e0b"></i><span>STP blocked / standby</span></div>
+      </div>
+      <div class="packet-sim-panel">
+        <div>
+          <div class="packet-sim-title">◉ Packet Transfer Simulation</div>
+          <div class="packet-sim-state" id="packet-sim-state">Ready · h1 → h2 · visual simulation only</div>
+          <div class="packet-sim-note">Animated markers illustrate packet movement; no traffic is injected into Mininet/OVS.</div>
         </div>
-        <div class="legend-item">
-          <div class="legend-circle"></div>
-          <span>Port Node (s#-p#)</span>
-        </div>
-        <div class="legend-item" style="margin-left: auto; color: var(--text-muted);">
-          <span>Dynamic Inter-Switch Discovery</span>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+          <div class="packet-stat"><strong id="packet-count">0</strong><span>Simulated packets</span></div>
+          <div class="packet-stat"><strong id="packet-route">—</strong><span>Selected path</span></div>
+          <button id="packet-start" class="scenario-btn" onclick="startPacketSimulation()">▶ Start</button>
+          <button id="packet-stop" class="scenario-btn" onclick="stopPacketSimulation()" disabled>■ Stop</button>
         </div>
       </div>
     </section>
@@ -726,90 +788,301 @@
     let nodesDataSet = null;
     let edgesDataSet = null;
     let topologyInitialized = false;
+    let currentTopology = null;
+    let currentTelemetry = null;
     let lastTraceSafeState = null;
     let selectedAuditIndex = null;
     let auditRecordsCache = [];
+    let packetTimer = null;
+    let packetAnimationFrame = null;
+    let packetSequence = 0;
+    let simulatedPacketCount = 0;
+    let simulatedPackets = [];
+    let packetSimulationRunning = false;
+
+    // Fixed coordinates keep the network diagram still while live status colors update.
+    function fixedNodePosition(id) {
+      const positions = {
+        h1: [-510, 0], h2: [510, 0],
+        s1: [-180, 0], s2: [180, 0],
+        's1-p1': [-345, 0], 's1-p2': [-45, -105], 's1-p3': [-45, 105],
+        's2-p1': [45, -105], 's2-p2': [45, 105], 's2-p3': [345, 0]
+      };
+      if (positions[id]) return { x: positions[id][0], y: positions[id][1] };
+      const portMatch = /^s(\d+)-p(\d+)$/.exec(id);
+      if (portMatch) {
+        const switchIndex = Number(portMatch[1]);
+        const portIndex = Number(portMatch[2]);
+        const centerX = switchIndex === 1 ? -180 : switchIndex === 2 ? 180 : (switchIndex - 1) * 360 - 180;
+        const angle = ((portIndex - 1) / 4) * Math.PI * 2 - Math.PI / 2;
+        return { x: centerX + Math.cos(angle) * 125, y: Math.sin(angle) * 125 };
+      }
+      const switchMatch = /^s(\d+)$/.exec(id);
+      if (switchMatch) {
+        const index = Number(switchMatch[1]);
+        return { x: index === 1 ? -180 : index === 2 ? 180 : (index - 1) * 360 - 180, y: 0 };
+      }
+      return { x: 0, y: 0 };
+    }
+
+    function syncDataSet(dataSet, items) {
+      const incomingIds = new Set(items.map(item => item.id));
+      const removeIds = dataSet.getIds().filter(id => !incomingIds.has(id));
+      if (removeIds.length) dataSet.remove(removeIds);
+      dataSet.update(items);
+    }
+
+    function getPortState(nodeId) {
+      const match = /^s(\d+)-p(\d+)$/.exec(nodeId || '');
+      if (!match || !currentTelemetry?.switches) return 'UNKNOWN';
+      return String(currentTelemetry.switches[match[1]]?.stp_port_states?.[match[2]] || 'UNKNOWN').toUpperCase();
+    }
 
     // =========================================================================
-    // 1. TOPOLOGY GRAPH (Poll GET /api/topology every 2s)
+    // 1. TOPOLOGY GRAPH (live state polling, fixed layout)
     // =========================================================================
     async function updateTopology() {
       try {
-        const res = await fetch('/api/topology');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const [topologyResponse, statusResponse] = await Promise.all([
+          fetch('/api/topology'),
+          fetch('/api/status')
+        ]);
+        if (!topologyResponse.ok || !statusResponse.ok) throw new Error('Topology/status endpoint unavailable');
+        const data = await topologyResponse.json();
+        const status = await statusResponse.json();
+        currentTopology = data;
+        currentTelemetry = status.telemetry || {};
 
         const loader = document.getElementById('topo-loader');
         if (loader) loader.style.display = 'none';
 
-        const visNodes = (data.nodes || []).map(n => {
-          const isSwitch = n.type === 'switch';
+        const visNodes = (data.nodes || []).map(node => {
+          const isSwitch = node.type === 'switch';
+          const isPort = node.type === 'port';
+          const position = fixedNodePosition(node.id);
+          const state = isPort ? getPortState(node.id) : 'UNKNOWN';
+          const blocked = state === 'BLOCK' || state === 'DISABLE';
+          const background = isSwitch ? '#0c4a6e' : isPort
+            ? (blocked ? '#78350f' : state === 'FORWARD' ? '#065f46' : '#164e63')
+            : '#334155';
+          const border = isSwitch ? '#38bdf8' : isPort
+            ? (blocked ? '#f59e0b' : state === 'FORWARD' ? '#34d399' : '#67e8f9')
+            : '#64748b';
           return {
-            id: n.id,
-            label: isSwitch ? `Switch ${n.id}` : n.id,
+            id: node.id,
+            label: isSwitch ? `SWITCH\n${node.id.toUpperCase()}` : isPort ? `${node.id.split('-').pop().toUpperCase()}\n${state}` : node.id,
+            x: position.x, y: position.y,
+            fixed: { x: true, y: true }, physics: false,
             shape: isSwitch ? 'box' : 'dot',
-            size: isSwitch ? 30 : 16,
-            color: isSwitch ? {
-              background: '#2563eb',
-              border: '#60a5fa',
-              highlight: { background: '#1d4ed8', border: '#93c5fd' }
-            } : {
-              background: '#06b6d4',
-              border: '#22d3ee',
-              highlight: { background: '#0891b2', border: '#67e8f9' }
+            size: isSwitch ? 30 : 19,
+            margin: isSwitch ? 13 : 5,
+            color: {
+              background, border,
+              highlight: { background, border: '#e2e8f0' }
             },
-            font: {
-              color: '#ffffff',
-              size: isSwitch ? 14 : 12,
-              bold: isSwitch
-            },
-            margin: isSwitch ? 10 : 5
+            borderWidth: 2,
+            shadow: { enabled: true, color: 'rgba(2, 6, 23, .65)', size: isSwitch ? 16 : 8, x: 0, y: 4 },
+            font: { color: blocked ? '#fde68a' : '#e0f2fe', size: isSwitch ? 14 : 10, bold: true, face: 'Arial' },
+            title: isPort ? `${node.id} · STP ${state}` : node.id
           };
         });
 
-        const visEdges = (data.edges || []).map((e, idx) => ({
-          id: `e-${e.source}-${e.target}`,
-          from: e.source,
-          to: e.target,
-          color: { color: '#64748b', highlight: '#38bdf8' },
-          width: 2.5
-        }));
+        // The demo testbed has two Mininet endpoints attached to these access ports.
+        if ((data.nodes || []).some(node => node.id === 's1-p1')) {
+          const p = fixedNodePosition('h1');
+          visNodes.push({
+            id: 'h1', label: 'HOST h1\n10.0.0.1', x: p.x, y: p.y,
+            fixed: { x: true, y: true }, physics: false, shape: 'box', margin: 12,
+            color: { background: '#78350f', border: '#fbbf24' }, borderWidth: 2,
+            font: { color: '#fef3c7', size: 12, bold: true }
+          });
+        }
+        if ((data.nodes || []).some(node => node.id === 's2-p3')) {
+          const p = fixedNodePosition('h2');
+          visNodes.push({
+            id: 'h2', label: 'HOST h2\n10.0.0.2', x: p.x, y: p.y,
+            fixed: { x: true, y: true }, physics: false, shape: 'box', margin: 12,
+            color: { background: '#78350f', border: '#fbbf24' }, borderWidth: 2,
+            font: { color: '#fef3c7', size: 12, bold: true }
+          });
+        }
+
+        const visEdges = (data.edges || []).map(edge => {
+          const sourceMatch = /^s(\d+)-p(\d+)$/.exec(edge.source);
+          const targetMatch = /^s(\d+)-p(\d+)$/.exec(edge.target);
+          const isTrunk = Boolean(sourceMatch && targetMatch);
+          const sourceState = isTrunk ? getPortState(edge.source) : 'UNKNOWN';
+          const targetState = isTrunk ? getPortState(edge.target) : 'UNKNOWN';
+          const blocked = isTrunk && ['BLOCK', 'DISABLE'].includes(sourceState) || isTrunk && ['BLOCK', 'DISABLE'].includes(targetState);
+          const forwarding = isTrunk && sourceState === 'FORWARD' && targetState === 'FORWARD';
+          const lineColor = blocked ? '#f59e0b' : forwarding ? '#34d399' : isTrunk ? '#38bdf8' : '#475569';
+          return {
+            id: `e-${[edge.source, edge.target].sort().join('--')}`,
+            from: edge.source, to: edge.target,
+            color: { color: lineColor, opacity: .95 },
+            width: forwarding ? 4 : 2,
+            dashes: blocked ? [7, 5] : false,
+            label: isTrunk ? (blocked ? 'STP BLOCKED' : forwarding ? 'FORWARDING' : 'TRUNK') : '',
+            font: { color: lineColor, size: 10, bold: true, background: '#0b1424', strokeWidth: 0 },
+            smooth: false,
+            title: isTrunk ? `${edge.source} ↔ ${edge.target} · ${blocked ? 'STP blocked' : forwarding ? 'forwarding' : 'trunk'}` : ''
+          };
+        });
+        if (visNodes.some(node => node.id === 'h1') && visNodes.some(node => node.id === 's1-p1')) {
+          visEdges.push({ id: 'host-h1', from: 'h1', to: 's1-p1', color: { color: '#fbbf24' }, width: 2, dashes: [5, 5], smooth: false });
+        }
+        if (visNodes.some(node => node.id === 'h2') && visNodes.some(node => node.id === 's2-p3')) {
+          visEdges.push({ id: 'host-h2', from: 's2-p3', to: 'h2', color: { color: '#fbbf24' }, width: 2, dashes: [5, 5], smooth: false });
+        }
+
+        const container = document.getElementById('topology-canvas');
+        const options = {
+          physics: { enabled: false },
+          layout: { improvedLayout: false, randomSeed: 7 },
+          interaction: { hover: true, dragNodes: false, dragView: true, zoomView: true, selectable: false },
+          nodes: { chosen: false },
+          edges: { smooth: false, selectionWidth: 0, hoverWidth: 0 }
+        };
 
         if (!topologyInitialized) {
           nodesDataSet = new vis.DataSet(visNodes);
           edgesDataSet = new vis.DataSet(visEdges);
-
-          const container = document.getElementById('topology-canvas');
-          const networkData = { nodes: nodesDataSet, edges: edgesDataSet };
-          const options = {
-            physics: {
-              stabilization: true,
-              barnesHut: {
-                gravitationalConstant: -2200,
-                centralGravity: 0.35,
-                springLength: 90,
-                springConstant: 0.045
-              }
-            },
-            interaction: {
-              hover: true,
-              zoomView: true
-            }
-          };
-
-          networkInstance = new vis.Network(container, networkData, options);
+          networkInstance = new vis.Network(container, { nodes: nodesDataSet, edges: edgesDataSet }, options);
           topologyInitialized = true;
+          networkInstance.once('afterDrawing', () => {
+            networkInstance.fit({ animation: false });
+            resizePacketOverlay();
+          });
         } else {
-          // Efficient incremental update to avoid canvas flicker
-          nodesDataSet.clear();
-          nodesDataSet.add(visNodes);
-          edgesDataSet.clear();
-          edgesDataSet.add(visEdges);
+          // Keep the same DataSets and fixed coordinates; update only telemetry styling.
+          syncDataSet(nodesDataSet, visNodes);
+          syncDataSet(edgesDataSet, visEdges);
+          networkInstance.redraw();
         }
+        updatePacketRouteLabel();
       } catch (err) {
         console.warn('Topology fetch error:', err);
       }
     }
+
+    function getPacketPath() {
+      if (!currentTopology || !currentTelemetry) return null;
+      const trunkEdges = (currentTopology.edges || []).filter(edge =>
+        /^s\d+-p\d+$/.test(edge.source) && /^s\d+-p\d+$/.test(edge.target)
+      );
+      const candidates = trunkEdges.map(edge => ({
+        source: edge.source,
+        target: edge.target,
+        active: getPortState(edge.source) === 'FORWARD' && getPortState(edge.target) === 'FORWARD'
+      }));
+      const selected = candidates.find(edge => edge.active);
+      if (!selected) return null;
+      let source = selected.source;
+      let target = selected.target;
+      if (source.startsWith('s2-') && target.startsWith('s1-')) [source, target] = [target, source];
+      const targetSwitch = target.split('-')[0];
+      return {
+        nodes: ['h1', 's1-p1', 's1', source, target, targetSwitch, 's2-p3', 'h2'],
+        label: selected.active ? 'Forwarding' : 'Fallback'
+      };
+    }
+
+    function updatePacketRouteLabel() {
+      const element = document.getElementById('packet-route');
+      const route = getPacketPath();
+      if (element) element.textContent = route ? route.label : 'Unavailable';
+    }
+
+    function resizePacketOverlay() {
+      const canvas = document.getElementById('packet-overlay');
+      const container = document.getElementById('topology-canvas');
+      if (!canvas || !container) return;
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.max(1, Math.floor(container.clientWidth * ratio));
+      canvas.height = Math.max(1, Math.floor(container.clientHeight * ratio));
+      canvas.style.width = container.clientWidth + 'px';
+      canvas.style.height = container.clientHeight + 'px';
+      canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function drawSimulatedPackets(now) {
+      const canvas = document.getElementById('packet-overlay');
+      if (!canvas || !networkInstance) return;
+      const context = canvas.getContext('2d');
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      context.clearRect(0, 0, width, height);
+
+      simulatedPackets = simulatedPackets.filter(packet => now - packet.startedAt < packet.duration);
+      for (const packet of simulatedPackets) {
+        const positions = networkInstance.getPositions(packet.nodes);
+        const points = packet.nodes.map(id => positions[id] ? networkInstance.canvasToDOM(positions[id]) : null);
+        if (points.some(point => !point)) continue;
+        const progress = Math.min(.999, (now - packet.startedAt) / packet.duration);
+        const scaled = progress * (points.length - 1);
+        const segment = Math.min(points.length - 2, Math.floor(scaled));
+        const local = scaled - segment;
+        const x = points[segment].x + (points[segment + 1].x - points[segment].x) * local;
+        const y = points[segment].y + (points[segment + 1].y - points[segment].y) * local;
+        const pulse = 1 + Math.sin(now / 90 + packet.id) * .25;
+        context.beginPath();
+        context.arc(x, y, 5.5 * pulse, 0, Math.PI * 2);
+        context.fillStyle = '#67e8f9';
+        context.shadowColor = '#22d3ee';
+        context.shadowBlur = 16;
+        context.fill();
+        context.shadowBlur = 0;
+        context.beginPath();
+        context.arc(x, y, 2, 0, Math.PI * 2);
+        context.fillStyle = '#ffffff';
+        context.fill();
+      }
+      if (packetSimulationRunning || simulatedPackets.length) {
+        packetAnimationFrame = requestAnimationFrame(drawSimulatedPackets);
+      } else {
+        packetAnimationFrame = null;
+      }
+    }
+
+    function startPacketSimulation() {
+      if (packetSimulationRunning) return;
+      const route = getPacketPath();
+      if (!route) {
+        document.getElementById('packet-sim-state').textContent = 'Waiting for a discovered inter-switch path';
+        return;
+      }
+      packetSimulationRunning = true;
+      document.getElementById('packet-start').disabled = true;
+      document.getElementById('packet-stop').disabled = false;
+      document.getElementById('packet-sim-state').textContent = 'Simulating h1 → h2 · visual markers only · no live traffic generated';
+      const emitPacket = () => {
+        const activeRoute = getPacketPath();
+        if (!activeRoute) {
+          stopPacketSimulation();
+          return;
+        }
+        simulatedPackets.push({ id: ++packetSequence, startedAt: performance.now(), duration: 1900, nodes: activeRoute.nodes });
+        simulatedPacketCount += 1;
+        document.getElementById('packet-count').textContent = simulatedPacketCount.toLocaleString();
+      };
+      emitPacket();
+      packetTimer = setInterval(emitPacket, 500);
+      if (!packetAnimationFrame) packetAnimationFrame = requestAnimationFrame(drawSimulatedPackets);
+    }
+
+    function stopPacketSimulation() {
+      packetSimulationRunning = false;
+      if (packetTimer) clearInterval(packetTimer);
+      packetTimer = null;
+      document.getElementById('packet-start').disabled = false;
+      document.getElementById('packet-stop').disabled = true;
+      document.getElementById('packet-sim-state').textContent = 'Paused · visual simulation only · no live traffic generated';
+    }
+
+    window.addEventListener('resize', () => {
+      resizePacketOverlay();
+      if (networkInstance) networkInstance.redraw();
+    });
 
     function approvalInfoForTrace(record) {
       return record?.human_approval ||

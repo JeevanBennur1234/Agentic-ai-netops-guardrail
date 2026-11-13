@@ -1,0 +1,55 @@
+--- a/ryu/lib/stplib.py
++++ b/ryu/lib/stplib.py
+@@ -288,7 +288,10 @@
+         # only in desc.config. Treat either signal as a failed port.
+         link_down_flg = bool(port.state & getattr(dp.ofproto, 'OFPPS_LINK_DOWN', 1))
+         admin_down_flg = bool(port.config & getattr(dp.ofproto, 'OFPPC_PORT_DOWN', 1))
+-        port_status = (port.state, port.config)
++        # Compare only physical carrier/admin state. STP's own OFPPortMod
++        # updates NO_RECV/NO_FWD/NO_PACKET_IN in port.config; those are not
++        # physical link transitions and must not trigger bridge.link_up().
++        port_status = (link_down_flg, admin_down_flg)
+ 
+         if dp.id in self.bridge_list:
+             bridge = self.bridge_list[dp.id]
+@@ -430,6 +433,13 @@
+             ofctl = OfCtl_v1_2later(self.dp)
+             ofctl.add_bpdu_pkt_in_flow()
+ 
++    def _get_port_link_status(self, ofport):
++        """Return only physical/admin state, excluding STP-managed config bits."""
++        ofproto = self.dp.ofproto
++        link_down = bool(ofport.state & getattr(ofproto, 'OFPPS_LINK_DOWN', 1))
++        admin_down = bool(ofport.config & getattr(ofproto, 'OFPPC_PORT_DOWN', 1))
++        return (link_down, admin_down)
++
+     @property
+     def is_root_bridge(self):
+         return bool(self.bridge_id.value == self.root_priority.root_id.value)
+@@ -448,7 +458,7 @@
+                                               self.bridge_id,
+                                               self.bridge_times,
+                                               ofport)
+-            self.ports_state[ofport.port_no] = (ofport.state, ofport.config)
++            self.ports_state[ofport.port_no] = self._get_port_link_status(ofport)
+ 
+     def port_delete(self, ofp_port):
+         self.link_down(ofp_port)
+@@ -459,7 +469,7 @@
+     def link_up(self, ofp_port):
+         port = self.ports[ofp_port.port_no]
+         port.up(DESIGNATED_PORT, self.root_priority, self.root_times)
+-        self.ports_state[ofp_port.port_no] = (ofp_port.state, ofp_port.config)
++        self.ports_state[ofp_port.port_no] = self._get_port_link_status(ofp_port)
+ 
+     def link_down(self, ofp_port):
+         """ DESIGNATED_PORT/NON_DESIGNATED_PORT: change status to DISABLE.
+@@ -471,7 +481,7 @@
+         # miss a genuine root-link failure. The algorithm excludes disabled
+         # ports and selects the best remaining BPDU candidate.
+         port.down(PORT_STATE_DISABLE, msg_init=True)
+-        self.ports_state[ofp_port.port_no] = (ofp_port.state, ofp_port.config)
++        self.ports_state[ofp_port.port_no] = self._get_port_link_status(ofp_port)
+         self.recalculate_spanning_tree(init=False)
+ 
+     def packet_in_handler(self, msg):

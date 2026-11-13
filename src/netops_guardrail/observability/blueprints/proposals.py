@@ -1,11 +1,12 @@
 """Human proposals and remediation decision routes for NetOps Guardrail."""
+import importlib
 import json
 import os
+import sys
 from datetime import datetime, timezone
 
 from flask import Blueprint, current_app, jsonify, render_template, request
 
-import netops_guardrail.observability.server as server_module
 from netops_guardrail.controller.human_verifier import ApprovalError
 from netops_guardrail.observability.blueprints.auth import authenticated_approver
 from netops_guardrail.verifier.safety_verifier import build_topology
@@ -53,7 +54,7 @@ def api_simulate():
         intent = {"action": "no_action", "reason": "Default check"}
 
     if graph is not None:
-        verif_res = server_module.apply_intent_to_graph(graph, intent)
+        verif_res = sys.modules["netops_guardrail.observability.server"].apply_intent_to_graph(graph, intent)
     else:
         verif_res = {"safe": False, "reason": "No active topology"}
 
@@ -190,6 +191,8 @@ def api_execute_human_approved(proposal_id):
         return jsonify({"error": "Proposal not found"}), 404
     if proposal.get("status") != "approved":
         return jsonify({"error": "Only an approved, unconsumed proposal can execute"}), 409
+    if proposal.get("execution_allowed", True) is False or proposal.get("requested_by") == "presentation-demo":
+        return jsonify({"error": "This proposal is review-only; network execution is disabled."}), 409
     chain_ok, chain_message = audit.verify_chain(audit.chain)
     if not chain_ok:
         return jsonify({"error": f"Audit chain verification failed; execution blocked: {chain_message}"}), 503
@@ -213,13 +216,13 @@ def api_execute_human_approved(proposal_id):
         }), 503
     module_name, function_name = checker_spec.split(":", 1)
     try:
-        checker = getattr(server_module.importlib.import_module(module_name), function_name)
+        checker = getattr(importlib.import_module(module_name), function_name)
         if not callable(checker):
             raise ValueError("checker is not callable")
     except Exception as exc:
         return jsonify({"error": f"Connectivity checker could not be loaded: {exc}"}), 503
 
-    result = server_module.decide(
+    result = sys.modules["netops_guardrail.observability.server"].decide(
         telemetry_path=collector.telemetry_path,
         execute_approved=True,
         connectivity_checker=checker,

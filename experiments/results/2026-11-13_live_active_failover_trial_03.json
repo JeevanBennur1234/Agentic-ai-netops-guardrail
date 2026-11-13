@@ -1,0 +1,251 @@
+{
+  "metadata": {
+    "date": "2026-11-13T14:00:42+05:30",
+    "commit_hash": "c6831e2a86da7fccb81b9c03c9ffed3ad7144135",
+    "model_name": "none (live OVS/Mininet experiment)",
+    "command": "/home/bennurjeevan/netops_guardrail/src/netops_guardrail/testbed/validate_active_failover.py",
+    "observation_window_seconds": 90.0,
+    "testbed": "LIVE Mininet + OVS + Ryu"
+  },
+  "events": [
+    {
+      "event": "link_down_command_started",
+      "timestamp_utc": "2026-11-13T08:30:51.423+00:00",
+      "elapsed_seconds": 0.0,
+      "interfaces": [
+        "s1-eth2",
+        "s2-eth1"
+      ],
+      "injection_method": "OpenFlow 1.3 mod-port down (administrative port failure)"
+    },
+    {
+      "event": "link_down",
+      "timestamp_utc": "2026-11-13T08:30:51.435+00:00",
+      "elapsed_seconds": 0.012,
+      "interfaces": [
+        "s1-eth2",
+        "s2-eth1"
+      ],
+      "injection_method": "OpenFlow 1.3 mod-port down (administrative port failure)"
+    },
+    {
+      "event": "first_ping_failure",
+      "timestamp_utc": "2026-11-13T08:30:56.977+00:00",
+      "elapsed_seconds": 2.019,
+      "ping_loss_percent": 100.0,
+      "since_link_down_seconds": 2.019
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:57.478+00:00",
+      "elapsed_seconds": 2.52,
+      "switch": "1",
+      "port": "1",
+      "previous_state": "FORWARD",
+      "new_state": "LISTEN",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:51.514488+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:57.478+00:00",
+      "elapsed_seconds": 2.52,
+      "switch": "1",
+      "port": "2",
+      "previous_state": "FORWARD",
+      "new_state": "DISABLE",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:51.514488+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:57.478+00:00",
+      "elapsed_seconds": 2.52,
+      "switch": "1",
+      "port": "3",
+      "previous_state": "FORWARD",
+      "new_state": "LISTEN",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:51.514488+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:57.478+00:00",
+      "elapsed_seconds": 2.52,
+      "switch": "2",
+      "port": "1",
+      "previous_state": "FORWARD",
+      "new_state": "DISABLE",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:51.514488+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:57.478+00:00",
+      "elapsed_seconds": 2.52,
+      "switch": "2",
+      "port": "2",
+      "previous_state": "BLOCK",
+      "new_state": "LISTEN",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:51.514488+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:57.478+00:00",
+      "elapsed_seconds": 2.52,
+      "switch": "2",
+      "port": "3",
+      "previous_state": "FORWARD",
+      "new_state": "LISTEN",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:51.514488+00:00"
+    },
+    {
+      "event": "of_port_down_event_observed",
+      "timestamp_utc": "2026-11-13T08:30:57.478+00:00",
+      "elapsed_seconds": 2.52,
+      "switch": "1",
+      "port": "2",
+      "port_status": {
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      "telemetry_updated_at_utc": "2026-11-13T08:30:51.514488+00:00"
+    },
+    {
+      "event": "of_port_down_event_observed",
+      "timestamp_utc": "2026-11-13T08:30:57.478+00:00",
+      "elapsed_seconds": 2.52,
+      "switch": "2",
+      "port": "1",
+      "port_status": {
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      "telemetry_updated_at_utc": "2026-11-13T08:30:51.514488+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:59.984+00:00",
+      "elapsed_seconds": 5.027,
+      "switch": "1",
+      "port": "1",
+      "previous_state": "LISTEN",
+      "new_state": "LEARN",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:59.675435+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:59.984+00:00",
+      "elapsed_seconds": 5.027,
+      "switch": "1",
+      "port": "3",
+      "previous_state": "LISTEN",
+      "new_state": "LEARN",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:59.675435+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:59.984+00:00",
+      "elapsed_seconds": 5.027,
+      "switch": "2",
+      "port": "2",
+      "previous_state": "LISTEN",
+      "new_state": "LEARN",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:59.675435+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:30:59.984+00:00",
+      "elapsed_seconds": 5.027,
+      "switch": "2",
+      "port": "3",
+      "previous_state": "LISTEN",
+      "new_state": "LEARN",
+      "telemetry_updated_at_utc": "2026-11-13T08:30:59.675435+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:31:04.005+00:00",
+      "elapsed_seconds": 9.048,
+      "switch": "1",
+      "port": "1",
+      "previous_state": "LEARN",
+      "new_state": "FORWARD",
+      "telemetry_updated_at_utc": "2026-11-13T08:31:03.057129+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:31:04.005+00:00",
+      "elapsed_seconds": 9.048,
+      "switch": "1",
+      "port": "3",
+      "previous_state": "LEARN",
+      "new_state": "FORWARD",
+      "telemetry_updated_at_utc": "2026-11-13T08:31:03.057129+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:31:04.005+00:00",
+      "elapsed_seconds": 9.048,
+      "switch": "2",
+      "port": "2",
+      "previous_state": "LEARN",
+      "new_state": "FORWARD",
+      "telemetry_updated_at_utc": "2026-11-13T08:31:03.057129+00:00"
+    },
+    {
+      "event": "stp_port_state_change",
+      "timestamp_utc": "2026-11-13T08:31:04.005+00:00",
+      "elapsed_seconds": 9.048,
+      "switch": "2",
+      "port": "3",
+      "previous_state": "LEARN",
+      "new_state": "FORWARD",
+      "telemetry_updated_at_utc": "2026-11-13T08:31:03.057129+00:00"
+    },
+    {
+      "event": "first_ping_success_after_failure",
+      "timestamp_utc": "2026-11-13T08:31:04.015+00:00",
+      "elapsed_seconds": 9.058,
+      "ping_loss_percent": 0.0,
+      "after_observed_failure": true,
+      "since_link_down_seconds": 9.057
+    },
+    {
+      "event": "validated_recovery",
+      "timestamp_utc": "2026-11-13T08:31:04.015+00:00",
+      "elapsed_seconds": 9.058,
+      "since_link_down_seconds": 9.058
+    }
+  ],
+  "started_at_utc": "2026-11-13T08:30:42.505979+00:00",
+  "test": "Mininet-emulated active-trunk link failure and STP failover",
+  "active_trunk_interfaces": [
+    "s1-eth2",
+    "s2-eth1"
+  ],
+  "result": "PASS",
+  "initial_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "FORWARD",
+    "s1-p3": "FORWARD",
+    "s2-p1": "FORWARD",
+    "s2-p2": "BLOCK",
+    "s2-p3": "FORWARD"
+  },
+  "baseline_ping_loss_percent": 0.0,
+  "failover_recovered": true,
+  "failover_recovery_time_seconds": 9.058,
+  "post_failure_ping_loss_percent": 0.0,
+  "observation_window_ping_samples": 164,
+  "post_recovery_nonzero_loss_samples": 0,
+  "post_failure_stp_states": {
+    "s1-p1": "FORWARD",
+    "s1-p2": "DISABLE",
+    "s1-p3": "FORWARD",
+    "s2-p1": "DISABLE",
+    "s2-p2": "FORWARD",
+    "s2-p3": "FORWARD"
+  },
+  "finished_at_utc": "2026-11-13T08:32:32.633026+00:00"
+}

@@ -1,5 +1,8 @@
 # Agentic AI-NetOps Guardrail - Implementation Status
 
+> **Current status update — 2026-11-13:** This section supersedes older failover/test counts below. The local branch is `p2/experimental-evidence`; the five successful active-trunk failover artifacts are trials 02, 03, 06, 07 and 08 in `experiments/results/2026-11-13_live_active_failover_trial_*.json`. Each completed a 90-second Mininet + OVS + Ryu observation window with 0% baseline loss, alternate-path recovery in 9.042–10.131 seconds, and zero post-recovery loss samples. Fault injection was OpenFlow 1.3 administrative port-down, not physical cable unplug and not AI-driven remediation. Trials 04 and 05 are INCONCLUSIVE because baseline connectivity was not ready. Latest local regression: **176 passed**. The failover harness/controller changes and evidence are currently local and uncommitted; HEAD is five commits ahead of `origin/master`. See `docs/CLAIMS_EVIDENCE.md` for the current claim boundaries.
+
+
 > Before running these examples, set NETOPS_HOME to the repository root and activate the Python environment: export NETOPS_HOME="$(pwd)" followed by source "$NETOPS_HOME/.venv/bin/activate".
 
 Date: 2026-10-27
@@ -9,7 +12,7 @@ Branch: master
 
 The repository contains a functional prototype pipeline made from an Ollama-backed intent proposer, a NetworkX topology safety checker, a decision gate, a constrained Open vSwitch executor, tamper-evident auditing, observability, and test/benchmark utilities.
 
-This is a research prototype, not a production-ready autonomous network controller. The strongest remaining limitation is live failover after a forwarding trunk fails. Current live lab experiments showed 0% baseline ping loss, 100% loss after the active trunk was disabled, and successful restoration of connectivity after the original trunk was re-enabled. This is a failover failure with a successful rollback, not a successful failover.
+This is a research prototype, not a production-ready autonomous network controller. The latest P2 evidence includes five successful 90-second active-trunk failover trials in the Mininet + OVS + Ryu testbed. Each recovered through the alternate STP path in 9.042–10.131 seconds and recorded zero post-recovery packet-loss samples. Fault injection used OpenFlow 1.3 administrative port-down; physical cable-unplug and AI-driven failover are not established.
 
 ## Mapping to the five presentation objectives
 

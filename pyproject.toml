@@ -19,7 +19,7 @@ dependencies = [
     "jsonschema",
     "prometheus_client",
     "requests",
-    "ryu",
+    "ryu==4.34",
     "eventlet<0.34.0",
 ]
 

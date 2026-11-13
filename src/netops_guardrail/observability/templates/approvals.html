@@ -92,8 +92,14 @@ function issuePresentation(p){
     ];
   }
 
+  const reviewOnly=p.execution_allowed===false||p.requested_by==='presentation-demo';
+  if(reviewOnly){
+    title='Review-only approval demonstration';
+    summary='This proposal exists only to demonstrate human review and audit logging. Approval records the reviewer decision; execution is disabled and no network change can be triggered from this proposal.';
+  }
   let stage='Proposed only — not applied to the network yet.';
-  if(status==='approved') stage='Approved by a human reviewer; execution is a separate step and is not confirmed yet.';
+  if(reviewOnly) stage='Review-only — execution is disabled for this proposal.';
+  else if(status==='approved') stage='Approved by a human reviewer; execution is a separate step and is not confirmed yet.';
   else if(status==='rejected') stage='Rejected by the human reviewer. This proposal is not authorized for execution.';
   else if(status==='changes_requested') stage='Changes requested. A revised proposal is needed; this proposal is not authorized for execution.';
   else if(status==='consumed') stage='Execution was attempted using this approval. Check the executor result and connectivity test to determine whether it succeeded.';
@@ -168,6 +174,7 @@ for(const p of data.proposals||[]){
   metadata.append(node('p','meta','Created: '+formatDate(p.created_at)));
   metadata.append(node('p','meta','Expires: '+formatDate(p.expires_at)));
   metadata.append(node('p','meta','Target switch: s'+String((p.intent||{}).target_switch||'?')+' · Port: '+String((p.intent||{}).from_port||'?')));
+  metadata.append(node('p','meta','Requested by: '+String(p.requested_by||'unknown')+' · Execution allowed: '+(p.execution_allowed===false?'No':'Yes')));
   const raw=node('pre','',JSON.stringify({topology_fingerprint:p.topology_fingerprint,proposal_fingerprint:p.proposal_fingerprint,original_reason:(p.intent||{}).reason,decision:p.decision,consumed_at:p.consumed_at},null,2));
   metadata.append(raw);details.append(metadata);card.append(details);
 
@@ -197,6 +204,9 @@ for(const p of data.proposals||[]){
     decisionSection.append(node('p','explainer','Decision: Approved by '+(decided.approver_id||'authorized reviewer')+' on '+formatDate(decided.decided_at)+'.'));
     if(decided.reason)decisionSection.append(node('p','meta','Recorded reason: '+decided.reason));
     decisionSection.append(node('p','explainer','The proposal is approved, but the change is not confirmed as applied until execution succeeds and connectivity is checked.'));
+    if(p.execution_allowed===false||p.requested_by==='presentation-demo'){
+      decisionSection.append(node('p','explainer','Review-only proposal: execution is deliberately disabled. This approval is for demonstrating review and audit logging only.'));
+    }else{
     const b=node('button','approve','Execute approved action');
     b.onclick=async()=>{
       if(!confirm('Run this exact approved action? It will be revalidated. Execution changes the lab network and requires a live connectivity check.'))return;
@@ -209,6 +219,7 @@ for(const p of data.proposals||[]){
       }catch(e){alert(e.message);b.disabled=false;}
     };
     decisionSection.append(b);
+    }
   }else{
     const decided=p.decision||{};
     decisionSection.append(node('p','explainer',state.summary));

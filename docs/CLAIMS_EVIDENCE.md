@@ -1,50 +1,74 @@
 # Claims-to-Evidence Matrix
 
-Date: 2026-10-30  
-Repository commit used for this review: 2541695baa2d1790c144736a4495bc6d4f59ec78
+Date: 2026-11-13
+Branch at review: `p2/experimental-evidence`
+HEAD recorded in the five failover artifacts: `c6831e2a86da7fccb81b9c03c9ffed3ad7144135`
+Important: the tested controller and failover-harness changes were present in the local working tree but were **uncommitted**. The artifact commit hash identifies HEAD, not a clean snapshot of every tested file. Preserve the JSON artifacts and corresponding local diff together.
 
 ## Evidence labels
 
-- **LIVE** — recorded execution against the Mininet/Open vSwitch testbed. A historical LIVE artifact is not proof the same result reproduces today.
+- **LIVE** — execution against the Mininet/Open vSwitch/Ryu testbed. It is still emulated lab evidence, not production hardware evidence.
 - **SIMULATED** — controlled simulation or in-memory/fake OVS runner.
 - **SYNTHETIC** — unit/API tests, manually authored cases, or deterministic fixtures.
-- **UNSUPPORTED** — no evidence supports the claim at the stated strength. This is a disposition, not an evidence type.
+- **UNSUPPORTED** — no evidence supports the claim at the stated strength.
 
-## Section 18: claims safe to make (with qualifications)
+## Current project status
 
-| Claim | Exact supporting evidence | Evidence label | Disposition |
+The project is a research prototype for AI-assisted NetOps with a separated intent proposer, deterministic topology safety gate, human approval workflow, constrained executor, post-check/rollback path, audit trail, and observability. The current full test suite passes **176 tests**. The strongest recent P2 result is five successful 90-second active-trunk failover trials in Mininet + OVS + Ryu.
+
+## Claims supported by current evidence
+
+| Claim | Supporting evidence | Evidence label | Qualification |
 |---|---|---|---|
-| A local AI intent proposer is integrated with a separate topology-aware safety gate. | `src/netops_guardrail/agent/remediation_agent.py`; `src/netops_guardrail/controller/decision_gate.py`; `tests/test_agent_incident_context.py::test_incident_context_produces_structured_ai_proposal`; `tests/test_observability.py::test_fault_injection_runs_ai_gate_and_returns_human_proposal` | SYNTHETIC | Claim the integration path exists. Do not infer model accuracy from these tests. The P2 30-case Qwen run completed, but 0/30 raw responses were strict JSON; all 30 fell back to no_action, so usable model-proposal quality metrics are unavailable. |
-| The graph verifier checks a limited set of topology and reachability invariants with STP-aware forwarding. | `tests/test_guardrail.py::test_gate_uses_stp_forwarding_state_for_block_decisions`; `tests/test_guardrail.py::test_stp_blocked_redundant_trunk_is_not_counted_as_live_path`; `tests/test_guardrail.py::test_incomplete_stp_state_fails_closed_for_alternate_path`; `tests/test_guardrail.py::test_redundant_topology_loop_detected_as_unsafe` | SYNTHETIC | Supported as a limited graph/topology check, not a formal proof of arbitrary packet behavior. |
-| Human approval is authenticated, reasoned, expiring, fingerprint-bound, and single-use. | `tests/test_human_verifier.py::test_human_approval_is_bound_and_single_use`; `tests/test_human_verifier.py::test_expired_approval_is_rejected`; `tests/test_human_verifier.py::test_human_approval_requires_fingerprint_and_reasoned_decision`; `tests/test_observability.py::test_human_approval_api_requires_authenticated_operator` | SYNTHETIC | Supported for tested software paths; production identity/access-control assurance is not established. |
-| Executor actions are constrained, cookie-tagged, checked after mutation, and include rollback attempts. | `tests/test_remediation_executor.py::test_successful_execution_is_recorded`; `tests/test_remediation_executor.py::test_post_execution_verification_detects_unsuccessful_change`; `tests/test_remediation_executor.py::test_post_safety_failure_rolls_back_verified_flow`; `tests/test_remediation_executor.py::test_live_connectivity_failure_rolls_back_both_trunk_ends`; `experiments/results/live_integration_summary_20261027.json` → `paired_trunk_remediation_and_access_rejection` | SYNTHETIC + LIVE (historical) | The 2026-10-27 artifact records a live standby-trunk test and safe refusal of an active-trunk block. The first 2026-10-30 baseline diagnostic failed at 50% ping loss while Ryu wrote telemetry to a package-local path; after correcting the telemetry destination, the second baseline diagnostic passed at 0% loss. The old live pass remains historical, not a replacement for new P2 evidence. |
-| Audit records are signed/hash-linked and tamper tests exist. | `tests/test_audit_trail.py::TestValidAuditChains`; `tests/test_audit_trail.py::TestAuditTamperDetection`; `tests/test_audit_trail.py::test_corrupt_existing_signing_key_fails_closed`; `tests/test_audit_trail.py::test_generated_signing_key_is_owner_only` | SYNTHETIC | Supports tested audit-chain integrity behavior, not a claim that every deployment is tamper-proof. |
-| Human Verifier has readable summaries and technical details. | `tests/test_observability.py::test_human_verifier_has_compact_issue_and_decision_sections`; `tests/test_demo_approval.py::test_demo_approval_is_written_to_dashboard_trace` | SYNTHETIC | UI/API regression tests support the implemented view; usability has not been independently evaluated. |
-| Issue 2 has a detector and an explicitly labelled controlled-simulation path. | `tests/test_standby_anomaly.py::test_both_standby_endpoints_forward_is_detected_from_live_snapshot`; `tests/test_standby_anomaly.py::test_normal_standby_block_is_not_reported_as_anomaly`; `tests/test_observability.py::test_issue2_standby_forwarding_simulation_creates_review_only_proposal`; `tests/test_observability.py::test_issue2_detector_only_reports_no_live_anomaly_without_simulation` | SYNTHETIC + SIMULATED | Downgraded: detector and controlled-simulation workflow exist. This P2 run did not observe a new real-world Issue 2 anomaly. Do not describe the controlled-simulation alert as live evidence. |
-| The latest full regression suite passed 169 tests. | `experiments/results/2026-10-30_2541695_p1-pytest.txt` | SYNTHETIC | **Superseded.** Current recorded suite result is 175 passed, 1 skipped, 0 failed. The skipped test is `tests/test_human_verifier.py::test_controller_records_openflow_port_down_event`. |
-| Standby-trunk integration passed in a recorded live test. | `experiments/results/live_integration_summary_20261027.json` → `paired_trunk_remediation_and_access_rejection` | LIVE (historical) | The 2026-10-27 artifact records PASS, 0% baseline/post-change loss, paired rule verification, and active-trunk refusal. The first 2026-10-30 baseline attempt saw 50% loss while reading stale telemetry; after the telemetry path fix, the second baseline-only run passed with 0% loss. Qualify the 2026-10-27 integration as historical evidence. |
-| Active-link failover did not pass in the recorded failure test, while restoring the original path recovered connectivity. | `experiments/results/live_active_failover_latest.json`; `experiments/results/live_triangle_failover_latest.json`; `experiments/results/live_integration_summary_20261027.json` → both active-route tests; `experiments/results/2026-10-30_2541695_failover_trial_01.json` | LIVE (historical) + INCONCLUSIVE (current setup) | Keep the negative historical result. The pre-fix 2026-10-30 trial did not inject a fault because baseline ping loss was 100%; it is not a valid failover measurement. After correcting the controller telemetry output path, five post-fix 90-second trials all started at 0% baseline loss but returned FAILOVER_FAILED_ROLLBACK_PASS. The alternate endpoint s2-p2 remained BLOCK in all five; no validated failover recovery time exists. One of five trials logged an OpenFlow port-down event, and rollback restored connectivity in all five. See experiments/results/2026-10-30_4e6bc80_failover_summary.json. |
+| A local AI intent proposer is integrated with a separate topology-aware safety gate. | `src/netops_guardrail/agent/remediation_agent.py`; `src/netops_guardrail/controller/decision_gate.py`; agent/observability tests | SYNTHETIC | Claim the integration path exists. Do not infer model accuracy. |
+| The graph verifier checks a limited set of topology and reachability invariants with STP-aware forwarding. | `src/netops_guardrail/verifier/safety_verifier.py`; `tests/test_guardrail.py` | SYNTHETIC | This is graph/topology checking, not formal proof of arbitrary packet behavior. |
+| Human approval is authenticated, reasoned, expiring, fingerprint-bound, and single-use in tested software paths. | `tests/test_human_verifier.py`; `tests/test_observability.py` | SYNTHETIC | Production identity/access-control assurance is not established. |
+| Executor actions are constrained, cookie-tagged, post-checked, and have scoped rollback attempts. | `src/netops_guardrail/executor/remediation_executor.py`; `tests/test_remediation_executor.py`; `experiments/results/live_integration_summary_20261027.json` | SYNTHETIC + LIVE (historical) | The live integration evidence is a standby-trunk rule test, not active-link failover. |
+| Audit records are signed/hash-linked and tamper tests exist. | `src/netops_guardrail/audit/audit_trail.py`; `tests/test_audit_trail.py` | SYNTHETIC | Does not establish that every deployment is tamper-proof. |
+| Five 90-second active-trunk failover trials passed in the Mininet + OVS + Ryu testbed. | `experiments/results/2026-11-13_live_active_failover_trial_02.json`, `_03.json`, `_06.json`, `_07.json`, `_08.json` | LIVE (emulated lab) | All five began at 0% baseline loss, recovered over the alternate STP path, completed 90 seconds of observation, and recorded zero post-recovery packet-loss samples. Fault injection was OpenFlow 1.3 administrative port-down, not physical cable unplug. |
+| The five successful failover trials recovered in 9.042–10.131 seconds. | The five JSON artifacts listed above and `experiments/results/2026-11-13_live_active_failover_summary.json` | LIVE (emulated lab) | Median 9.048 seconds; n=5. This is a small lab sample, not a production SLA or general performance guarantee. |
+| Qwen structured-output evaluation returned valid JSON and passed the intent schema for all 30 defined synthetic scenarios. | `experiments/results/2026-11-10_qwen_structured_full.json` | SYNTHETIC | 30/30 valid JSON, 30/30 schema pass, 0 fallbacks. The run had 3 mutating proposals; 2 unsafe mutating proposals were blocked by the independent guardrail and 0 passed. This is a result on a deterministic synthetic topology profile, not a general model-accuracy claim or live OVS evaluation. |
+| The latest full regression suite passed 176 tests. | Latest local run: `.venv/bin/pytest -q` → `176 passed` | SYNTHETIC | Tests passed after the controller/harness changes; this is a local run, not a CI run on a pushed commit. |
+| Live OVS executor latency was measured in five successful transactions. | `experiments/results/2026-10-30_952e9e7_real_ovs_latency_summary.json` and samples | LIVE (emulated lab) | Median 86.863 ms; n=5. p95/p99 estimates are weak at this sample size and exclude human approval latency and topology startup. |
 
-## Section 18: claims explicitly not to make
+## Claims to avoid
 
-| Claim to avoid | Exact evidence check | Evidence label | Disposition |
-|---|---|---|---|
-| Production readiness. | No production deployment, operational acceptance, or production threat-model validation result exists in the reviewed evidence. | UNSUPPORTED | Do not claim production readiness. |
-| Formal proof of the whole network. | `docs/PROJECT_COMPLETE_IMPLEMENTATION_INVENTORY.md` §2 and §18; verifier tests cover finite graph/topology invariants only. | SYNTHETIC | Do not call the verifier a formal proof. |
-| General 100% AI accuracy from 12 synthetic cases. | `experiments/results/recommended_evaluation_20261027.json`; `src/netops_guardrail/experiments/evaluate_guardrail_cases.py::evaluate_cases` | SYNTHETIC | The old 12-case fixture is small and synthetic; it cannot support general AI accuracy. The 30-case Qwen run completed but had 0 valid JSON responses and 100% fallback, so it cannot support an accuracy claim. |
-| Real OVS/data-plane latency from the fake-runner benchmark. | `tests/test_recommended_evaluation.py::test_simulated_executor_benchmark_runs_full_transaction_without_real_ovs`; `src/netops_guardrail/experiments/evaluate_guardrail_cases.py::benchmark_executor_transaction`; `experiments/results/recommended_evaluation_20261027.json` | SIMULATED | Label every prior fake-runner timing as **SIMULATED**. Separate live executor measurements are recorded in `experiments/results/2026-10-30_952e9e7_real_ovs_latency_summary.json` and `.csv` (n=5, median 86.863 ms, p95 98.416 ms, p99 100.611 ms). They exclude human approval latency and topology startup; do not conflate them with fake-runner results. |
-| A verifier result equals human approval or successful execution. | `tests/test_human_verifier.py::test_decision_gate_creates_pending_human_approval_instead_of_executing`; `tests/test_remediation_executor.py::test_executor_cannot_bypass_decision_gate` | SYNTHETIC | Keep verification, human authorization, execution, and post-check as separate states. |
-| A real Issue 2 anomaly when mode is controlled_simulation. | `tests/test_observability.py::test_issue2_standby_forwarding_simulation_creates_review_only_proposal`; `tests/test_observability.py::test_issue2_detector_only_reports_no_live_anomaly_without_simulation` | SIMULATED + SYNTHETIC | State explicitly that the alert is simulated. |
-| Successful automatic active-link failover. | `experiments/results/live_active_failover_latest.json`; `experiments/results/live_triangle_failover_latest.json`; `experiments/results/2026-10-30_4e6bc80_failover_summary.json` | LIVE (historical and current negative results) | Do not claim it works. Five post-fix 90-second trials did not validate alternate-path forwarding; rollback restored connectivity in all five. |
-| Physical cable-unplug coverage from the recorded emulated/admin-down test. | `experiments/results/live_integration_summary_20261027.json` → active-route entries; `experiments/results/link_down_diagnostic_20261027.md` | LIVE (emulated administrative-down only) | The tests used Linux interface-down or OpenFlow administrative-down, not a verified physical cable unplug. |
-| That no other network verifiers exist. | No exhaustive comparison or literature review can prove this negative. See `docs/literature_and_research_gap.md`. | UNSUPPORTED | Do not make this claim. |
+| Claim | Why it is unsupported |
+|---|---|
+| Production readiness or production SLA. | No production deployment, operational acceptance, or physical-network validation exists. |
+| Formal proof of the whole network. | The verifier covers finite graph/topology invariants, not arbitrary packet/header-level behavior. |
+| General 100% AI accuracy. | The Qwen run achieved 30/30 valid JSON and schema passes on the defined synthetic set, but that measures structured-output compliance on this dataset, not general decision accuracy or live network performance. |
+| AI autonomously performed the successful failover. | The successful experiment demonstrates STP reconvergence after an OpenFlow administrative port-down event. It does not demonstrate an LLM proposing or executing a remediation. |
+| Physical cable-unplug failover. | The recorded failure injection used OpenFlow 1.3 administrative port-down, not a verified physical cable unplug. |
+| A formal guarantee that failover always completes within 10 seconds. | Only five trials were recorded in one emulated topology/environment. |
+| A verifier result equals human approval or successful execution. | Verification, authorization, execution, and post-check remain separate lifecycle states. |
+| A real Issue 2 anomaly when mode is `controlled_simulation`. | The controlled-simulation path is explicitly simulated. |
+| That no other network verifiers exist. | No exhaustive literature review can establish this negative claim. |
 
-## Current P2 blockers and limitations
+## Failover experiment details
 
-- Active failover trial 1 is **INCONCLUSIVE**: baseline pingall was 100% loss, so no failure was injected. Raw output: `experiments/results/2026-10-30_2541695_failover_trial_01.txt` and `.json`.
-- The first baseline-only run failed its connectivity assertion at 50% packet loss: `experiments/results/2026-10-30_2541695_baseline_diagnostic.txt`. Inspection found Ryu was writing to `src/netops_guardrail/telemetry/data/latest.json` while the test read the repository-root telemetry file. The controller output path was corrected; the follow-up baseline run passed with 0.0% loss: `experiments/results/2026-10-30_2541695_baseline_diagnostic_02.txt`.
-- The original pre-fix failover trial remains **INCONCLUSIVE** (100% baseline ping loss, no fault injected). Five post-fix 90-second trials completed with 0% baseline loss but no validated failover; all five returned FAILOVER_FAILED_ROLLBACK_PASS. Recovery min/median/max are unavailable because the alternate path never reached FORWARD. See `experiments/results/2026-10-30_4e6bc80_failover_summary.json`.
-- Qwen 30-scenario evaluation completed: strict valid JSON 0/30 (0%), schema pass 0/30 (0%), fallback 30/30 (100%). All responses were wrapped in Markdown JSON fences, so the strict raw-response parser rejected them. No mutating proposals reached the guardrail; unsafe proposals blocked = 0 and unsafe proposals passed = 0 are therefore not evidence of guardrail effectiveness. Full output: `experiments/results/2026-10-30_2541695_llm_qwen2.5-coder-1.5b.json` and CSV.
-- Mistral Nemo was not run because host RAM is only 7.8 GB total and the 12.2B Q4_0 model file is about 7.07 GB before runtime overhead; record: `experiments/results/2026-10-30_2541695_llm_mistral-nemo_not-run.json`.
-- Real-OVS executor latency is measured in five successful live Mininet/OVS transactions: min 82.210 ms, median 86.863 ms, p95 98.416 ms, p99 100.611 ms, max 101.160 ms. Raw samples and aggregate are `experiments/results/2026-10-30_952e9e7_real_ovs_latency_sample_01.json` through `_05.json` and `experiments/results/2026-10-30_952e9e7_real_ovs_latency_summary.json`. This excludes topology startup and synthetic approval preparation; p95/p99 are weak estimates at n=5. Old fake-runner timings remain **SIMULATED** only.
-- Ryu required a temporary compatibility shim because the installed Ryu/eventlet versions fail to import `ALREADY_HANDLED` normally. The shim is outside the repository and does not change project safety logic.
+- Trials counted as PASS: **02, 03, 06, 07, 08**.
+- Trial 01: do not count; it is not part of the five validated 90-second results.
+- Trials 04 and 05: **INCONCLUSIVE** because baseline connectivity was 100% packet loss before fault injection. They are not failover failures and are not counted as passes.
+- Each successful trial had 0.0% baseline ping loss, observed the primary trunk administrative-down event, saw the alternate trunk transition to FORWARD, recovered host connectivity, and completed the 90-second window.
+- Successful trial metrics:
+
+| Trial | Recovery (seconds) | Ping samples | Post-recovery loss samples |
+|---|---:|---:|---:|
+| 02 | 9.048 | 165 | 0 |
+| 03 | 9.058 | 164 | 0 |
+| 06 | 10.131 | 162 | 0 |
+| 07 | 9.042 | 165 | 0 |
+| 08 | 9.042 | 165 | 0 |
+
+- Baseline harness fix: controller clears stale per-switch STP states on datapath reconnect; validator waits for fresh telemetry, expected initial STP state, and three consecutive 0%-loss baseline probes before injecting the fault.
+- The tested controller and harness edits are currently local/uncommitted. Do not cite the HEAD hash alone as an immutable reproduction snapshot; retain the source diff with these artifacts.
+
+## Remaining limitations / final-day priorities
+
+1. Keep claims scoped to the Mininet + OVS + Ryu emulation. Do not imply physical or production validation.
+2. Preserve the current local source changes and all five PASS JSON artifacts together.
+3. Before submission, review the report and slides for stale statements that active failover is unresolved or failed; update them to the five-trial result with the administrative-down qualification.
+4. Keep the Qwen model-output limitation explicit: 0/30 strict JSON, 30/30 fallback.
+5. Do not claim production readiness, formal verification, or autonomous AI failover.
+6. The working tree is not clean and the latest changes have not been committed or pushed. If source delivery through GitHub is required, review the diff, commit only after approval, and push the intended branch separately.

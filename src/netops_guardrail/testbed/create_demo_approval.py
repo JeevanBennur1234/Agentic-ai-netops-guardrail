@@ -42,6 +42,7 @@ def append_pipeline_trace(intent, verification, proposal, audit_record, trace_pa
         "human_approval": {
             "proposal_id": proposal["proposal_id"],
             "status": proposal["status"],
+            "execution_allowed": bool(proposal.get("execution_allowed", False)),
             "proposal_fingerprint": proposal["proposal_fingerprint"],
             "expires_at": proposal["expires_at"],
         },
@@ -93,14 +94,16 @@ def main():
             "action": "block",
             "target_switch": "1",
             "from_port": selected_port,
-            "reason": "Presentation demo: review the already STP-blocked redundant trunk; this helper never executes it.",
+            "reason": "Review-only presentation demo: inspect the redundant trunk with an STP-blocked endpoint. This proposal cannot be executed and does not change OVS.",
         }
         verification = apply_intent_to_graph(build_topology(telemetry), intent)
         if verification.get("safe") is not True:
             raise ApprovalError("Automated verifier did not approve this proposal: " + str(verification.get("reason", verification)))
         proposal = HumanApprovalStore().create_proposal(
             intent=intent, verifier_result=verification,
-            telemetry_path=str(TELEMETRY_PATH), requested_by="presentation-demo",
+            telemetry_path=str(TELEMETRY_PATH),
+            requested_by="presentation-demo",
+            execution_allowed=False,
         )
         audit_record = AuditTrail().record_decision(
             decision="PENDING_HUMAN_APPROVAL",
@@ -111,7 +114,7 @@ def main():
                 "status": proposal["status"],
                 "proposal_fingerprint": proposal["proposal_fingerprint"],
                 "expires_at": proposal["expires_at"],
-            }, "demo_only": True, "network_mutation_attempted": False},
+            }, "demo_only": True, "execution_allowed": False, "network_mutation_attempted": False},
         )
         try:
             append_pipeline_trace(intent, verification, proposal, audit_record)
@@ -124,7 +127,8 @@ def main():
             "intent": intent,
             "automated_verification": verification,
             "network_mutation_attempted": False,
-            "next_step": "Open http://127.0.0.1:8000/approvals and review this proposal.",
+            "execution_allowed": bool(proposal.get("execution_allowed", False)),
+            "next_step": "Open http://127.0.0.1:8000/approvals and review this review-only proposal; execution is disabled.",
         }, indent=2, default=str))
         return 0
     except (OSError, json.JSONDecodeError, ApprovalError, ValueError) as exc:

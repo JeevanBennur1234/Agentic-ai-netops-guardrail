@@ -1,5 +1,8 @@
 # Agentic AI-NetOps Guardrail — Complete Project Implementation Inventory
 
+> **Current status update — 2026-11-13:** Supersedes the older snapshot below. Latest local pytest: 176 passed. Five 90-second Mininet + OVS + Ryu active-trunk failover trials passed (02, 03, 06, 07, 08), with 9.042–10.131 second recovery and zero post-recovery loss samples. Failure injection was OpenFlow 1.3 administrative port-down, not physical cable unplug or AI-driven remediation. Trials 04/05 were inconclusive at baseline. The local branch is five commits ahead of origin/master and has uncommitted changes; see `docs/CLAIMS_EVIDENCE.md`.
+
+
 > Before running these examples, set NETOPS_HOME to the repository root and activate the Python environment: export NETOPS_HOME="$(pwd)" followed by source "$NETOPS_HOME/.venv/bin/activate".
 
 
