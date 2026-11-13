@@ -118,7 +118,7 @@ This evaluation proves the actual safety, operational performance, and cryptogra
 - **Unsafe Actions Prevented**: 100% of reachability-violating and adversarial intents were blocked before network modification.
 - **Safe Remediation Verified**: Redundant trunk isolation executed safely and verified inside active OVS flow tables.
 - **Cryptographic Tamper Detection**: 100% of tamper attempts (decision, intent, verifier result, execution result, hash chaining, and ECDSA signature) were caught.
-- **Guardrail Runtime Overhead**: The entire formal guardrail safety verification and cryptographic audit layer executes in **{b['guardrail_pipeline_latency']['mean']} ms**.
+- **Guardrail Runtime Overhead**: The invariant-based guardrail safety checks and cryptographic audit layer execute in **{b['guardrail_pipeline_latency']['mean']} ms**.
 
 ---
 

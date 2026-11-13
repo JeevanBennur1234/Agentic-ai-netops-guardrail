@@ -5,7 +5,7 @@ help:
 	@echo "Agentic AI-NetOps Guardrail - Developer Commands"
 	@echo ""
 	@echo "Targets:"
-	@echo "  install        Install package in editable mode with development dependencies"
+	@echo "  install        Install Python dependencies using the pinned Ryu-compatible sequence"
 	@echo "  test           Run test suite with pytest"
 	@echo "  lint           Run Ruff linter on codebase"
 	@echo "  run-dashboard  Start observability metrics server and web dashboard"
@@ -18,7 +18,9 @@ help:
 	@echo "  NETOPS_CHAOS_API_TOKEN Bearer token required for fault-injection chaos endpoints"
 
 install:
-	pip install -e ".[dev]"
+	python -m pip install --upgrade pip
+	python -m pip install "setuptools==58.0.4" wheel pbr
+	python -m pip install --no-build-isolation -r requirements.txt
 
 test:
 	pytest -v

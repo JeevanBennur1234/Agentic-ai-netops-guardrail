@@ -8,7 +8,7 @@ This directory contains the architecture, security specifications, operational r
 
 ### Architecture & Security Design
 - **[Architecture Overview](architecture_overview.md)**
-  Comprehensive explanation of the guardrail pipeline, telemetry collector, formal safety verifier, controlled executor, and tamper-evident cryptographic audit trail.
+  Comprehensive explanation of the guardrail pipeline, telemetry collector, invariant-based safety verifier, controlled executor, and tamper-evident cryptographic audit trail.
 - **[System Design & Threat Model](system_design_and_threat_model.md)**
   Threat analysis against untrusted AI models, prompt injection, parameter tampering, and network topology isolation, establishing fail-closed mathematical safety guarantees.
 

@@ -1,11 +1,13 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel", "pbr"]
+# PEP 621 metadata needs setuptools >=61 in isolated builds. The Makefile uses
+# setuptools 58.0.4 without build isolation specifically for legacy Ryu 4.34.
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "netops_guardrail"
 version = "0.1.0"
-description = "Agentic AI-NetOps Guardrail: Formal graph verification, cryptographic audit, and human-in-the-loop control for automated network remediation."
+description = "Agentic AI-NetOps Guardrail: Invariant-based runtime verification, cryptographic audit, and human-in-the-loop control for automated network remediation."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

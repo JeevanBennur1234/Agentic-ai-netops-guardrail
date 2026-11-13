@@ -166,7 +166,7 @@
             </span>
             <div class="d-flex align-items-center gap-3">
                 <span class="badge badge-verified rounded-pill">
-                    <i class="fa-solid fa-circle-check me-1"></i> Formally Verified Guardrail: ACTIVE
+                    <i class="fa-solid fa-circle-check me-1"></i> Invariant-based runtime verification: ACTIVE
                 </span>
                 <span class="badge badge-approved rounded-pill">
                     <i class="fa-solid fa-lock me-1"></i> SHA3-256 + ECDSA Audit: SECURED
@@ -290,7 +290,7 @@
             <div class="col-lg-6">
                 <div class="card card-custom p-3 h-100">
                     <h5 class="fw-bold mb-3"><i class="fa-solid fa-gamepad text-warning me-2"></i>Live Incident Simulation & Guardrail Verification</h5>
-                    <p class="text-secondary small mb-3">Click any button below to trigger a live AI remediation proposal and watch the formal verification layer evaluate it in real time:</p>
+                    <p class="text-secondary small mb-3">Click any button below to trigger a live AI remediation proposal and watch the invariant checks evaluate it in real time:</p>
                     
                     <div class="d-flex flex-wrap gap-2 mb-3">
                         <button class="btn btn-sm btn-success btn-scenario" onclick="runSimulation('normal')">
@@ -317,7 +317,7 @@
                                 <pre id="sim-intent-box" class="json-box mt-1" style="height: 120px;">{ "status": "Ready for test" }</pre>
                             </div>
                             <div class="col-6">
-                                <span class="text-secondary small">Formal Verifier Safety Proof:</span>
+                                <span class="text-secondary small">Invariant Check Result:</span>
                                 <pre id="sim-verifier-box" class="json-box mt-1" style="height: 120px;">[ "Click any scenario above to test" ]</pre>
                             </div>
                         </div>
@@ -733,7 +733,7 @@
         async function runSimulation(scenario) {
             const verdictBadge = document.getElementById('sim-verdict-badge');
             verdictBadge.className = 'badge bg-warning';
-            verdictBadge.innerText = 'Evaluating Formal Proof...';
+            verdictBadge.innerText = 'Checking Network Invariants...';
 
             try {
                 const res = await fetch(`/api/simulate?scenario=${scenario}`);
