@@ -1122,9 +1122,6 @@ class RemediationExecutor:
                 if prio_match and int(prio_match.group(1)) == priority:
                     target_flow_line = line_str
                     break
-                elif not prio_match:
-                    target_flow_line = line_str
-                    break
 
         if not target_flow_line:
             return {
@@ -1413,6 +1410,45 @@ class RemediationExecutor:
         ]
         inverse_commands = [del_flow_cmd, del_meter_cmd]
 
+        def resources_absent():
+            """Require authoritative OVS dumps to prove this transaction left no resources."""
+            rc_flows, flows_text, err_flows = self._dump_flows(bridge)
+            if rc_flows != 0:
+                return False, f"Unable to verify flow cleanup: {err_flows or flows_text or 'no details'}"
+            residual_flows = [
+                line.strip() for line in (flows_text or "").splitlines()
+                if self._flow_cookie(line) == cookie
+            ]
+            if residual_flows:
+                return False, f"Remediation flow remains after rollback: {residual_flows[0]}"
+
+            rc_meters, meters_text, err_meters = self.cmd_runner([
+                "sudo", "ovs-ofctl", "-O", "OpenFlow13", "dump-meters", bridge
+            ])
+            if rc_meters != 0:
+                return False, f"Unable to verify meter cleanup: {err_meters or meters_text or 'no details'}"
+            meter_pattern = re.compile(rf"\bmeter={re.escape(str(from_port))}\b", re.IGNORECASE)
+            if meter_pattern.search(meters_text or ""):
+                return False, f"Meter {from_port} remains on {bridge} after rollback"
+            return True, "OVS dumps confirm the transaction flow and meter are absent"
+
+        def release_cookie_after_verification():
+            absent, message = resources_absent()
+            if not absent:
+                return False, message + "; retaining the active ledger reservation"
+            try:
+                remove_guardrail_cookie(cookie, ledger_path=self.ledger_path)
+                return True, message + "; ledger reservation released"
+            except Exception as exc:
+                return False, message + f"; ledger reservation retained because cleanup failed: {exc}"
+
+        def rollback_rate_limit_resources():
+            # Cookie-scoped deletion cannot affect unrelated flows. The meter ID
+            # belongs to this transaction after add-meter succeeded.
+            self.cmd_runner(del_flow_cmd)
+            self.cmd_runner(del_meter_cmd)
+            return release_cookie_after_verification()
+
         if self.require_human_approval:
             try:
                 self.approval_store.consume_approval(
@@ -1450,11 +1486,10 @@ class RemediationExecutor:
         # Step 1: Add meter
         rc1, out1, err1 = self.cmd_runner(meter_cmd)
         if rc1 != 0:
-            try:
-                remove_guardrail_cookie(cookie, ledger_path=self.ledger_path)
-                ledger_cleanup_ok = True
-            except Exception:
-                ledger_cleanup_ok = False
+            # A non-zero command result does not prove that OVS made no change.
+            # Do not delete a possibly pre-existing meter here; release the cookie
+            # only if read-back proves both this flow and the meter are absent.
+            ledger_cleanup_ok, cleanup_message = release_cookie_after_verification()
             return {
                 "success": False,
                 "action": "rate_limit_port",
@@ -1469,23 +1504,17 @@ class RemediationExecutor:
                 "connectivity_verified": None,
                 "rollback_attempted": False,
                 "rollback_success": ledger_cleanup_ok,
-                "rollback_details": (
-                    "No meter was installed; ledger reservation released"
-                    if ledger_cleanup_ok else "No meter was installed; ledger reservation cleanup failed"
-                ),
+                "rollback_details": cleanup_message,
                 "details": err1 or out1 or "OVS add-meter failed",
             }
 
         # Step 2: Add flow
         rc2, out2, err2 = self.cmd_runner(flow_cmd)
         if rc2 != 0:
-            rb_rc, _, _ = self.cmd_runner(del_meter_cmd)
-            try:
-                remove_guardrail_cookie(cookie, ledger_path=self.ledger_path)
-                ledger_cleanup_ok = True
-            except Exception:
-                ledger_cleanup_ok = False
-            rb_ok = (rb_rc == 0 and ledger_cleanup_ok)
+            # The add-flow command may have partially applied despite its error.
+            # Remove only our random cookie and our newly-created meter, then
+            # release the ledger reservation only after read-back proves absence.
+            rb_ok, rb_message = rollback_rate_limit_resources()
             return {
                 "success": False,
                 "action": "rate_limit_port",
@@ -1493,26 +1522,24 @@ class RemediationExecutor:
                 "from_port": str(from_port),
                 "rate_kbps": rate_kbps,
                 "cookie": cookie,
-                "inverse_commands": [del_meter_cmd],
-                "error": f"OVS add-flow for meter failed on {bridge}: {err2 or out2 or 'no details'}",
+                "inverse_commands": inverse_commands,
+                "error": (
+                    f"OVS add-flow for meter failed on {bridge}: "
+                    f"{err2 or out2 or 'no details'}. "
+                    f"Rollback {'succeeded' if rb_ok else 'FAILED'}: {rb_message}"
+                ),
                 "change_verified": False,
                 "safety_verified": False,
                 "connectivity_verified": None,
                 "rollback_attempted": True,
                 "rollback_success": rb_ok,
-                "rollback_details": f"Rolled back meter (rc={rb_rc})",
+                "rollback_details": rb_message,
                 "details": err2 or out2 or "OVS add-flow failed",
             }
 
         def run_full_rollback():
-            rc_f, _, _ = self.cmd_runner(del_flow_cmd)
-            rc_m, _, _ = self.cmd_runner(del_meter_cmd)
-            try:
-                remove_guardrail_cookie(cookie, ledger_path=self.ledger_path)
-                ledger_ok = True
-            except Exception:
-                ledger_ok = False
-            return (rc_f == 0 and rc_m == 0 and ledger_ok)
+            rollback_ok, _rollback_message = rollback_rate_limit_resources()
+            return rollback_ok
 
         # Post-check 1: OVS verification
         verified, verify_msg = self._verify_ovs_change(

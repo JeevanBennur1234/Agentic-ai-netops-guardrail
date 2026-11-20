@@ -951,9 +951,67 @@ class TestRateLimitPortAction:
         assert res["rollback_attempted"] is True
         del_meter_calls = [c for c in history if "del-meter" in c]
         assert len(del_meter_calls) == 1
-        # del-flows was NOT needed since flow failed to add
+        # add-flow may have partially applied despite its non-zero exit code.
+        # Cleanup is cookie-scoped and read back before releasing the ledger.
         del_flow_calls = [c for c in history if "del-flows" in c]
-        assert len(del_flow_calls) == 0
+        assert len(del_flow_calls) == 1
+
+    def test_rate_limit_partial_flow_rollback_failure_keeps_ledger_cookie(
+        self, phase_b_redundant_telemetry, tmp_path
+    ):
+        from netops_guardrail.verifier.safety_verifier import load_guardrail_cookies
+
+        ledger = tmp_path / "rate_limit_rollback_ledger.json"
+        flows = []
+        meters = {}
+
+        def runner(args):
+            subcmd = next(
+                (arg for arg in args if arg in {
+                    "dump-meters", "add-meter", "add-flow", "del-meter", "del-flows", "dump-flows"
+                }),
+                None,
+            )
+            idx = args.index(subcmd) if subcmd else -1
+            if subcmd == "dump-meters":
+                lines = [f"meter={key},kbps,band=type=drop,rate=1000" for key in meters]
+                return 0, "\n".join(lines), ""
+            if subcmd == "add-meter":
+                spec = args[idx + 2]
+                meter_id = re.search(r"\bmeter=(\d+)\b", spec).group(1)
+                meters[meter_id] = spec
+                return 0, "", ""
+            if subcmd == "add-flow":
+                flows.append(args[idx + 2])  # Simulate partial application before error.
+                return 1, "", "injected add-flow failure"
+            if subcmd == "del-flows":
+                return 1, "", "injected delete failure; flow remains"
+            if subcmd == "del-meter":
+                spec = args[idx + 2]
+                meter_id = re.search(r"\bmeter=(\d+)\b", spec).group(1)
+                meters.pop(meter_id, None)
+                return 0, "", ""
+            if subcmd == "dump-flows":
+                return 0, "\n".join(flows), ""
+            return 0, "", ""
+
+        executor = RemediationExecutor(
+            telemetry_path=phase_b_redundant_telemetry,
+            cmd_runner=runner,
+            require_human_approval=False,
+            require_connectivity_check=False,
+            ledger_path=ledger,
+        )
+        result = executor.execute(
+            {"action": "rate_limit_port", "target_switch": "1", "from_port": "1", "rate_kbps": 4000},
+            "APPROVED",
+            {"safe": True},
+        )
+
+        assert result["success"] is False
+        assert result["rollback_success"] is False
+        assert result["cookie"] in load_guardrail_cookies(ledger)
+        assert flows, "the test must leave the simulated partial flow installed"
 
     def test_rate_limit_rejected_on_trunk_port(self, phase_b_redundant_telemetry, mock_ovs_runner):
         executor = RemediationExecutor(
