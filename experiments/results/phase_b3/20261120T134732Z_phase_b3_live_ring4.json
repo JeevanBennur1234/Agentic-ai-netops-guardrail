@@ -1,0 +1,5624 @@
+{
+  "approval_lifecycle": {
+    "approval_store": "/home/bennurjeevan/netops_guardrail/audit/live_approvals_b3.json",
+    "consumed_proposals": [
+      {
+        "action": "disable_port",
+        "approver_id": "live-network-admin",
+        "consumed_at": "2026-11-20T13:47:46.928118+00:00",
+        "proposal_id": "9e3bd9585b1d45a2b1f9747819ef14b8"
+      },
+      {
+        "action": "restore_port",
+        "approver_id": "live-network-admin",
+        "consumed_at": "2026-11-20T13:48:13.636513+00:00",
+        "proposal_id": "a1f426e1321b438aaf438f86dc56025c"
+      },
+      {
+        "action": "rate_limit_port",
+        "approver_id": "live-network-admin",
+        "consumed_at": "2026-11-20T13:48:27.890884+00:00",
+        "proposal_id": "2e7ba2d6d62b4e0a99c97b6e37aadc00"
+      }
+    ],
+    "require_human_approval": true
+  },
+  "baseline_snapshots": [
+    {
+      "blocked_port": "s4-p4",
+      "captured_at_utc": "2026-11-20T13:47:45.913268+00:00",
+      "flows": {
+        "s1": {
+          "guardrail_or_meter_flows": []
+        },
+        "s2": {
+          "guardrail_or_meter_flows": []
+        },
+        "s3": {
+          "guardrail_or_meter_flows": []
+        },
+        "s4": {
+          "guardrail_or_meter_flows": []
+        }
+      },
+      "label": "before_7a_active_trunk",
+      "pingall_loss_percent": 0.0,
+      "ports": {
+        "s1": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s1-eth1): addr:4e:24:d9:17:e2:51\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s1-eth2): addr:2a:26:2b:a7:5b:12\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s1-eth3): addr:ba:d3:48:7a:79:4e\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 4(s1-eth4): addr:9e:aa:cc:dc:ad:be\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s1): addr:62:6f:1b:7d:9e:4f\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s2": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s2-eth1): addr:92:e1:57:2c:1e:07\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s2-eth2): addr:6e:18:f8:10:fb:ea\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s2): addr:8e:8f:cf:51:65:4b\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s3": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s3-eth1): addr:ea:bb:d8:6f:97:03\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s3-eth2): addr:c6:92:3e:cb:3c:93\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s3): addr:ea:e7:68:ca:b8:4d\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s4": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s4-eth1): addr:32:c2:70:af:c2:aa\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s4-eth2): addr:52:e0:ba:42:41:09\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s4-eth3): addr:8a:f1:f3:1f:5b:e8\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 4(s4-eth4): addr:fa:67:f2:7d:45:bb\n     config:     NO_FWD NO_PACKET_IN\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s4): addr:7a:51:08:fa:f1:46\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        }
+      },
+      "stp_convergence_seconds": 0.0,
+      "telemetry": {
+        "hosts": [
+          {
+            "id": "host-000000000004",
+            "label": "Host 00:04",
+            "last_seen_utc": "2026-11-20T13:47:33.849271+00:00",
+            "mac": "00:00:00:00:00:04",
+            "port_id": "2",
+            "switch_id": "4"
+          }
+        ],
+        "link_events": [
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:33.775500+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:33.780412+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:33.792440+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.797619+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:33.803263+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.807654+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.817621+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.823623+00:00"
+          }
+        ],
+        "links": [
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "role": "primary",
+            "src_port": "3",
+            "src_switch": "1"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "3",
+            "role": "primary",
+            "src_port": "4",
+            "src_switch": "1"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "role": "primary",
+            "src_port": "1",
+            "src_switch": "2"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "1",
+            "role": "primary",
+            "src_port": "1",
+            "src_switch": "3"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "role": "primary",
+            "src_port": "2",
+            "src_switch": "2"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "role": "standby",
+            "src_port": "2",
+            "src_switch": "3"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "role": "primary",
+            "src_port": "3",
+            "src_switch": "4"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "role": "standby",
+            "src_port": "4",
+            "src_switch": "4"
+          }
+        ],
+        "mac_learning_events": [
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.849271+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.956564+00:00"
+          }
+        ],
+        "port_status_events": [],
+        "provenance": {
+          "producer": "ryu_telemetry_controller",
+          "source": "live_telemetry"
+        },
+        "switches": {
+          "1": {
+            "flows": [
+              {
+                "byte_count": 600,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 10,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 120,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 2,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 512,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 4
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 6,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 446,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 1
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 5,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 446,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 2
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 5,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 250,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 3
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 3,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 0,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 0,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "port_status": {},
+            "ports": {
+              "1": {
+                "rx_bytes": 646,
+                "rx_packets": 7,
+                "tx_bytes": 1146,
+                "tx_packets": 16
+              },
+              "2": {
+                "rx_bytes": 646,
+                "rx_packets": 7,
+                "tx_bytes": 1146,
+                "tx_packets": 16
+              },
+              "3": {
+                "rx_bytes": 876,
+                "rx_packets": 12,
+                "tx_bytes": 1056,
+                "tx_packets": 15
+              },
+              "4": {
+                "rx_bytes": 962,
+                "rx_packets": 13,
+                "tx_bytes": 996,
+                "tx_packets": 14
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD",
+              "3": "FORWARD",
+              "4": "FORWARD"
+            }
+          },
+          "2": {
+            "flows": [
+              {
+                "byte_count": 480,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 8,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 240,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 4,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 426,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 1
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 5,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 512,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 2
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 6,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 180,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 3,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "port_status": {},
+            "ports": {
+              "1": {
+                "rx_bytes": 1056,
+                "rx_packets": 15,
+                "tx_bytes": 876,
+                "tx_packets": 12
+              },
+              "2": {
+                "rx_bytes": 1022,
+                "rx_packets": 14,
+                "tx_bytes": 1056,
+                "tx_packets": 15
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD"
+            }
+          },
+          "3": {
+            "flows": [
+              {
+                "byte_count": 480,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 8,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 300,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 5,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 426,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 1
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 5,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 426,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 2
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 5,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 266,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 4,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {},
+            "ports": {
+              "1": {
+                "rx_bytes": 996,
+                "rx_packets": 14,
+                "tx_bytes": 962,
+                "tx_packets": 13
+              },
+              "2": {
+                "rx_bytes": 1082,
+                "rx_packets": 15,
+                "tx_bytes": 1056,
+                "tx_packets": 15
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD"
+            }
+          },
+          "4": {
+            "flows": [
+              {
+                "byte_count": 480,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 8,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 600,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 10,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 336,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 3
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 4,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 446,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 1
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 5,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 360,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 2
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 4,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 336,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 4
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 4,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 86,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 1,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {},
+            "ports": {
+              "1": {
+                "rx_bytes": 646,
+                "rx_packets": 7,
+                "tx_bytes": 1292,
+                "tx_packets": 18
+              },
+              "2": {
+                "rx_bytes": 646,
+                "rx_packets": 7,
+                "tx_bytes": 1206,
+                "tx_packets": 17
+              },
+              "3": {
+                "rx_bytes": 1056,
+                "rx_packets": 15,
+                "tx_bytes": 1022,
+                "tx_packets": 14
+              },
+              "4": {
+                "rx_bytes": 1056,
+                "rx_packets": 15,
+                "tx_bytes": 1082,
+                "tx_packets": 15
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD",
+              "3": "FORWARD",
+              "4": "BLOCK"
+            }
+          }
+        },
+        "trunk_roles": {
+          "blocked_ports": [
+            "s4-p4"
+          ],
+          "links": [
+            {
+              "dst": "s2-p1",
+              "role": "primary",
+              "src": "s1-p3",
+              "stp_states": {
+                "s1-p3": "FORWARD",
+                "s2-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s3-p1",
+              "role": "primary",
+              "src": "s1-p4",
+              "stp_states": {
+                "s1-p4": "FORWARD",
+                "s3-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s1-p3",
+              "role": "primary",
+              "src": "s2-p1",
+              "stp_states": {
+                "s1-p3": "FORWARD",
+                "s2-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s1-p4",
+              "role": "primary",
+              "src": "s3-p1",
+              "stp_states": {
+                "s1-p4": "FORWARD",
+                "s3-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s4-p3",
+              "role": "primary",
+              "src": "s2-p2",
+              "stp_states": {
+                "s2-p2": "FORWARD",
+                "s4-p3": "FORWARD"
+              }
+            },
+            {
+              "dst": "s4-p4",
+              "role": "standby",
+              "src": "s3-p2",
+              "stp_states": {
+                "s3-p2": "FORWARD",
+                "s4-p4": "BLOCK"
+              }
+            },
+            {
+              "dst": "s2-p2",
+              "role": "primary",
+              "src": "s4-p3",
+              "stp_states": {
+                "s2-p2": "FORWARD",
+                "s4-p3": "FORWARD"
+              }
+            },
+            {
+              "dst": "s3-p2",
+              "role": "standby",
+              "src": "s4-p4",
+              "stp_states": {
+                "s3-p2": "FORWARD",
+                "s4-p4": "BLOCK"
+              }
+            }
+          ],
+          "primary_trunks": [
+            [
+              "s1-p3",
+              "s2-p1"
+            ],
+            [
+              "s1-p4",
+              "s3-p1"
+            ],
+            [
+              "s2-p2",
+              "s4-p3"
+            ]
+          ],
+          "standby_trunks": [
+            [
+              "s3-p2",
+              "s4-p4"
+            ]
+          ]
+        },
+        "updated_at_utc": "2026-11-20T13:47:45.683688+00:00"
+      }
+    },
+    {
+      "blocked_port": "s4-p4",
+      "captured_at_utc": "2026-11-20T13:48:11.602445+00:00",
+      "flows": {
+        "s1": {
+          "guardrail_or_meter_flows": []
+        },
+        "s2": {
+          "guardrail_or_meter_flows": []
+        },
+        "s3": {
+          "guardrail_or_meter_flows": []
+        },
+        "s4": {
+          "guardrail_or_meter_flows": []
+        }
+      },
+      "label": "after_7a_before_7b",
+      "pingall_loss_percent": 0.0,
+      "ports": {
+        "s1": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s1-eth1): addr:4e:24:d9:17:e2:51\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s1-eth2): addr:2a:26:2b:a7:5b:12\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s1-eth3): addr:ba:d3:48:7a:79:4e\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 4(s1-eth4): addr:9e:aa:cc:dc:ad:be\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s1): addr:62:6f:1b:7d:9e:4f\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s2": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s2-eth1): addr:92:e1:57:2c:1e:07\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s2-eth2): addr:6e:18:f8:10:fb:ea\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s2): addr:8e:8f:cf:51:65:4b\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s3": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s3-eth1): addr:ea:bb:d8:6f:97:03\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s3-eth2): addr:c6:92:3e:cb:3c:93\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s3): addr:ea:e7:68:ca:b8:4d\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s4": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s4-eth1): addr:32:c2:70:af:c2:aa\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s4-eth2): addr:52:e0:ba:42:41:09\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s4-eth3): addr:8a:f1:f3:1f:5b:e8\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 4(s4-eth4): addr:fa:67:f2:7d:45:bb\n     config:     NO_FWD NO_PACKET_IN\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s4): addr:7a:51:08:fa:f1:46\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        }
+      },
+      "stp_convergence_seconds": 0.0,
+      "telemetry": {
+        "hosts": [
+          {
+            "id": "host-000000000001",
+            "label": "Host 00:01",
+            "last_seen_utc": "2026-11-20T13:47:59.767797+00:00",
+            "mac": "00:00:00:00:00:01",
+            "port_id": "1",
+            "switch_id": "1"
+          },
+          {
+            "id": "host-000000000002",
+            "label": "Host 00:02",
+            "last_seen_utc": "2026-11-20T13:47:45.815794+00:00",
+            "mac": "00:00:00:00:00:02",
+            "port_id": "2",
+            "switch_id": "1"
+          },
+          {
+            "id": "host-000000000003",
+            "label": "Host 00:03",
+            "last_seen_utc": "2026-11-20T13:47:49.492078+00:00",
+            "mac": "00:00:00:00:00:03",
+            "port_id": "1",
+            "switch_id": "4"
+          },
+          {
+            "id": "host-000000000004",
+            "label": "Host 00:04",
+            "last_seen_utc": "2026-11-20T13:47:59.770310+00:00",
+            "mac": "00:00:00:00:00:04",
+            "port_id": "2",
+            "switch_id": "4"
+          }
+        ],
+        "link_events": [
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:33.775500+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:33.780412+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:33.792440+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.797619+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:33.803263+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.807654+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.817621+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.823623+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "DELETE",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.950537+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "DELETE",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.957485+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.048585+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.053629+00:00"
+          }
+        ],
+        "links": [
+          {
+            "dst_port": "1",
+            "dst_switch": "3",
+            "role": "primary",
+            "src_port": "4",
+            "src_switch": "1"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "1",
+            "role": "primary",
+            "src_port": "1",
+            "src_switch": "3"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "role": "primary",
+            "src_port": "2",
+            "src_switch": "2"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "role": "standby",
+            "src_port": "2",
+            "src_switch": "3"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "role": "primary",
+            "src_port": "3",
+            "src_switch": "4"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "role": "standby",
+            "src_port": "4",
+            "src_switch": "4"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "role": "primary",
+            "src_port": "1",
+            "src_switch": "2"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "role": "primary",
+            "src_port": "3",
+            "src_switch": "1"
+          }
+        ],
+        "mac_learning_events": [
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.849271+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.956564+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.814379+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.815392+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.815794+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.815962+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.817211+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.822772+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.823526+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.824351+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.831231+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.840590+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.840878+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.841457+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.860175+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:49.492078+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "9e:aa:cc:dc:ad:be",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:50.515785+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:51.539797+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:55.076090+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:55.077031+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:59.767797+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:59.768729+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:59.769393+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:59.770310+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:59.770538+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:59.771382+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:59.771437+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:59.772131+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.080410+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.080555+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:02.140592+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:02.140702+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:02.180848+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:02.180949+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "9e:aa:cc:dc:ad:be",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:06.141233+00:00"
+          }
+        ],
+        "port_status_events": [
+          {
+            "admin_down": true,
+            "link_down": false,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.943337+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.962833+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.967850+00:00"
+          },
+          {
+            "admin_down": true,
+            "link_down": true,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.973155+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.013709+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.023774+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.028266+00:00"
+          }
+        ],
+        "provenance": {
+          "producer": "ryu_telemetry_controller",
+          "source": "live_telemetry"
+        },
+        "switches": {
+          "1": {
+            "flows": [
+              {
+                "byte_count": 3240,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 54,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 420,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 7,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 4570,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 53,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {
+              "3": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 10138,
+                "rx_packets": 107,
+                "tx_bytes": 8050,
+                "tx_packets": 110
+              },
+              "2": {
+                "rx_bytes": 2284,
+                "rx_packets": 28,
+                "tx_bytes": 9128,
+                "tx_packets": 121
+              },
+              "3": {
+                "rx_bytes": 4522,
+                "rx_packets": 59,
+                "tx_bytes": 5518,
+                "tx_packets": 74
+              },
+              "4": {
+                "rx_bytes": 4748,
+                "rx_packets": 67,
+                "tx_bytes": 9670,
+                "tx_packets": 128
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD",
+              "3": "FORWARD",
+              "4": "FORWARD"
+            }
+          },
+          "2": {
+            "flows": [
+              {
+                "byte_count": 3180,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 53,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 1620,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 27,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 2216,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 29,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {
+              "1": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 5518,
+                "rx_packets": 74,
+                "tx_bytes": 4522,
+                "tx_packets": 59
+              },
+              "2": {
+                "rx_bytes": 6598,
+                "rx_packets": 93,
+                "tx_bytes": 6482,
+                "tx_packets": 92
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD"
+            }
+          },
+          "3": {
+            "flows": [
+              {
+                "byte_count": 3960,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 66,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 1860,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 31,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 4814,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 56,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 3,
+            "port_status": {},
+            "ports": {
+              "1": {
+                "rx_bytes": 9670,
+                "rx_packets": 128,
+                "tx_bytes": 4748,
+                "tx_packets": 67
+              },
+              "2": {
+                "rx_bytes": 4488,
+                "rx_packets": 63,
+                "tx_bytes": 9560,
+                "tx_packets": 126
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD"
+            }
+          },
+          "4": {
+            "flows": [
+              {
+                "byte_count": 4200,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 70,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 2580,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 43,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 70,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 4
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 1,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 1568,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 24,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 2,
+            "port_status": {},
+            "ports": {
+              "1": {
+                "rx_bytes": 2410,
+                "rx_packets": 31,
+                "tx_bytes": 6060,
+                "tx_packets": 90
+              },
+              "2": {
+                "rx_bytes": 4440,
+                "rx_packets": 54,
+                "tx_bytes": 7808,
+                "tx_packets": 108
+              },
+              "3": {
+                "rx_bytes": 6482,
+                "rx_packets": 92,
+                "tx_bytes": 6598,
+                "tx_packets": 93
+              },
+              "4": {
+                "rx_bytes": 9560,
+                "rx_packets": 126,
+                "tx_bytes": 4488,
+                "tx_packets": 63
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD",
+              "3": "FORWARD",
+              "4": "BLOCK"
+            }
+          }
+        },
+        "trunk_roles": {
+          "blocked_ports": [
+            "s4-p4"
+          ],
+          "links": [
+            {
+              "dst": "s3-p1",
+              "role": "primary",
+              "src": "s1-p4",
+              "stp_states": {
+                "s1-p4": "FORWARD",
+                "s3-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s1-p4",
+              "role": "primary",
+              "src": "s3-p1",
+              "stp_states": {
+                "s1-p4": "FORWARD",
+                "s3-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s4-p3",
+              "role": "primary",
+              "src": "s2-p2",
+              "stp_states": {
+                "s2-p2": "FORWARD",
+                "s4-p3": "FORWARD"
+              }
+            },
+            {
+              "dst": "s4-p4",
+              "role": "standby",
+              "src": "s3-p2",
+              "stp_states": {
+                "s3-p2": "FORWARD",
+                "s4-p4": "BLOCK"
+              }
+            },
+            {
+              "dst": "s2-p2",
+              "role": "primary",
+              "src": "s4-p3",
+              "stp_states": {
+                "s2-p2": "FORWARD",
+                "s4-p3": "FORWARD"
+              }
+            },
+            {
+              "dst": "s3-p2",
+              "role": "standby",
+              "src": "s4-p4",
+              "stp_states": {
+                "s3-p2": "FORWARD",
+                "s4-p4": "BLOCK"
+              }
+            },
+            {
+              "dst": "s1-p3",
+              "role": "primary",
+              "src": "s2-p1",
+              "stp_states": {
+                "s1-p3": "FORWARD",
+                "s2-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s2-p1",
+              "role": "primary",
+              "src": "s1-p3",
+              "stp_states": {
+                "s1-p3": "FORWARD",
+                "s2-p1": "FORWARD"
+              }
+            }
+          ],
+          "primary_trunks": [
+            [
+              "s1-p3",
+              "s2-p1"
+            ],
+            [
+              "s1-p4",
+              "s3-p1"
+            ],
+            [
+              "s2-p2",
+              "s4-p3"
+            ]
+          ],
+          "standby_trunks": [
+            [
+              "s3-p2",
+              "s4-p4"
+            ]
+          ]
+        },
+        "updated_at_utc": "2026-11-20T13:48:11.174962+00:00"
+      }
+    },
+    {
+      "blocked_port": "s4-p4",
+      "captured_at_utc": "2026-11-20T13:48:27.865498+00:00",
+      "flows": {
+        "s1": {
+          "guardrail_or_meter_flows": []
+        },
+        "s2": {
+          "guardrail_or_meter_flows": []
+        },
+        "s3": {
+          "guardrail_or_meter_flows": []
+        },
+        "s4": {
+          "guardrail_or_meter_flows": []
+        }
+      },
+      "label": "after_7b_before_7c",
+      "pingall_loss_percent": 0.0,
+      "ports": {
+        "s1": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s1-eth1): addr:4e:24:d9:17:e2:51\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s1-eth2): addr:2a:26:2b:a7:5b:12\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s1-eth3): addr:ba:d3:48:7a:79:4e\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 4(s1-eth4): addr:9e:aa:cc:dc:ad:be\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s1): addr:62:6f:1b:7d:9e:4f\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s2": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s2-eth1): addr:92:e1:57:2c:1e:07\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s2-eth2): addr:6e:18:f8:10:fb:ea\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s2): addr:8e:8f:cf:51:65:4b\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s3": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s3-eth1): addr:ea:bb:d8:6f:97:03\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s3-eth2): addr:c6:92:3e:cb:3c:93\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s3): addr:ea:e7:68:ca:b8:4d\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        },
+        "s4": {
+          "administratively_down": [],
+          "raw": "OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\n 1(s4-eth1): addr:32:c2:70:af:c2:aa\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 2(s4-eth2): addr:52:e0:ba:42:41:09\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 3(s4-eth3): addr:8a:f1:f3:1f:5b:e8\n     config:     0\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n 4(s4-eth4): addr:fa:67:f2:7d:45:bb\n     config:     NO_FWD NO_PACKET_IN\n     state:      LIVE\n     current:    10GB-FD COPPER\n     speed: 10000 Mbps now, 0 Mbps max\n LOCAL(s4): addr:7a:51:08:fa:f1:46\n     config:     PORT_DOWN\n     state:      LINK_DOWN\n     speed: 0 Mbps now, 0 Mbps max\n"
+        }
+      },
+      "stp_convergence_seconds": 0.0,
+      "telemetry": {
+        "hosts": [
+          {
+            "id": "host-000000000001",
+            "label": "Host 00:01",
+            "last_seen_utc": "2026-11-20T13:48:12.626148+00:00",
+            "mac": "00:00:00:00:00:01",
+            "port_id": "1",
+            "switch_id": "1"
+          },
+          {
+            "id": "host-000000000002",
+            "label": "Host 00:02",
+            "last_seen_utc": "2026-11-20T13:48:11.530776+00:00",
+            "mac": "00:00:00:00:00:02",
+            "port_id": "2",
+            "switch_id": "1"
+          },
+          {
+            "id": "host-000000000003",
+            "label": "Host 00:03",
+            "last_seen_utc": "2026-11-20T13:48:11.539054+00:00",
+            "mac": "00:00:00:00:00:03",
+            "port_id": "1",
+            "switch_id": "4"
+          },
+          {
+            "id": "host-000000000004",
+            "label": "Host 00:04",
+            "last_seen_utc": "2026-11-20T13:48:11.551949+00:00",
+            "mac": "00:00:00:00:00:04",
+            "port_id": "2",
+            "switch_id": "4"
+          }
+        ],
+        "link_events": [
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:33.775500+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:33.780412+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:33.792440+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.797619+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:33.803263+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.807654+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.817621+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.823623+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "DELETE",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.950537+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "DELETE",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.957485+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.048585+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.053629+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "event": "DELETE",
+            "src_port": "3",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.623639+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "event": "DELETE",
+            "src_port": "2",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:48:11.628252+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "event": "DELETE",
+            "src_port": "4",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.656562+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "event": "DELETE",
+            "src_port": "2",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.660690+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.716471+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.724176+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:48:13.680826+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:48:13.685330+00:00"
+          }
+        ],
+        "links": [
+          {
+            "dst_port": "1",
+            "dst_switch": "3",
+            "role": "primary",
+            "src_port": "4",
+            "src_switch": "1"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "1",
+            "role": "primary",
+            "src_port": "1",
+            "src_switch": "3"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "role": "primary",
+            "src_port": "1",
+            "src_switch": "2"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "role": "primary",
+            "src_port": "3",
+            "src_switch": "1"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "role": "standby",
+            "src_port": "2",
+            "src_switch": "3"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "role": "standby",
+            "src_port": "4",
+            "src_switch": "4"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "role": "primary",
+            "src_port": "2",
+            "src_switch": "2"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "role": "primary",
+            "src_port": "3",
+            "src_switch": "4"
+          }
+        ],
+        "mac_learning_events": [
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.849271+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.956564+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.814379+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.815392+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.815794+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.815962+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.817211+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.822772+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.823526+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.824351+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.831231+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.840590+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.840878+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.841457+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.860175+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:49.492078+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "9e:aa:cc:dc:ad:be",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:50.515785+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:51.539797+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:55.076090+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:55.077031+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:59.767797+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:59.768729+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:59.769393+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:59.770310+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:59.770538+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:59.771382+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:59.771437+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:59.772131+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.080410+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.080555+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:02.140592+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:02.140702+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:02.180848+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:02.180949+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "9e:aa:cc:dc:ad:be",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:06.141233+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.252782+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:11.253680+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:11.254500+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.255172+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:11.529226+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.530647+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:11.530776+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:11.530845+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:11.532088+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.532145+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.532333+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.533686+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.539054+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:11.539745+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:11.540326+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.540907+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.551949+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.818334+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:11.863470+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:12.626148+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "8a:f1:f3:1f:5b:e8",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:13.710424+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "6e:18:f8:10:fb:ea",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:13.710581+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "8a:f1:f3:1f:5b:e8",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:13.766269+00:00"
+          }
+        ],
+        "port_status_events": [
+          {
+            "admin_down": true,
+            "link_down": false,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.943337+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.962833+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.967850+00:00"
+          },
+          {
+            "admin_down": true,
+            "link_down": true,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.973155+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.013709+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.023774+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.028266+00:00"
+          },
+          {
+            "admin_down": true,
+            "link_down": false,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.616831+00:00"
+          },
+          {
+            "admin_down": true,
+            "link_down": true,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.632775+00:00"
+          },
+          {
+            "admin_down": true,
+            "link_down": false,
+            "port_id": "4",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.636277+00:00"
+          },
+          {
+            "admin_down": true,
+            "link_down": true,
+            "port_id": "4",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.639443+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "2",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.642620+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "2",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.646541+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "2",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:11.650454+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "2",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:11.653411+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "2",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:11.676732+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "4",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:11.685838+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:13.646410+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "2",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:13.659459+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:13.663400+00:00"
+          }
+        ],
+        "provenance": {
+          "producer": "ryu_telemetry_controller",
+          "source": "live_telemetry"
+        },
+        "switches": {
+          "1": {
+            "flows": [
+              {
+                "byte_count": 4080,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 68,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 420,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 7,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 6066,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 71,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {
+              "3": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 10908,
+                "rx_packets": 116,
+                "tx_bytes": 9828,
+                "tx_packets": 134
+              },
+              "2": {
+                "rx_bytes": 2914,
+                "rx_packets": 35,
+                "tx_bytes": 11102,
+                "tx_packets": 147
+              },
+              "3": {
+                "rx_bytes": 5798,
+                "rx_packets": 75,
+                "tx_bytes": 7472,
+                "tx_packets": 100
+              },
+              "4": {
+                "rx_bytes": 5268,
+                "rx_packets": 75,
+                "tx_bytes": 11190,
+                "tx_packets": 149
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD",
+              "3": "FORWARD",
+              "4": "FORWARD"
+            }
+          },
+          "2": {
+            "flows": [
+              {
+                "byte_count": 3960,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 66,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 1980,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 33,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 258,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 1
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 3,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 496,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 2
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 6,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 3286,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 42,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {
+              "1": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              },
+              "2": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 7472,
+                "rx_packets": 100,
+                "tx_bytes": 5798,
+                "tx_packets": 75
+              },
+              "2": {
+                "rx_bytes": 8370,
+                "rx_packets": 115,
+                "tx_bytes": 8298,
+                "tx_packets": 116
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD"
+            }
+          },
+          "3": {
+            "flows": [
+              {
+                "byte_count": 4680,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 78,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 2220,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 37,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 5646,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 66,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {
+              "2": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 11190,
+                "rx_packets": 149,
+                "tx_bytes": 5268,
+                "tx_packets": 75
+              },
+              "2": {
+                "rx_bytes": 5654,
+                "rx_packets": 79,
+                "tx_bytes": 11322,
+                "tx_packets": 151
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD"
+            }
+          },
+          "4": {
+            "flows": [
+              {
+                "byte_count": 4920,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 82,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 3300,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 55,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 90,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 3
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 1,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 126,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 1
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 3,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 252,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 2
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 6,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 992,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 4
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 12,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 2736,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 38,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {
+              "3": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              },
+              "4": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 3166,
+                "rx_packets": 41,
+                "tx_bytes": 8118,
+                "tx_packets": 119
+              },
+              "2": {
+                "rx_bytes": 5280,
+                "rx_packets": 66,
+                "tx_bytes": 9866,
+                "tx_packets": 137
+              },
+              "3": {
+                "rx_bytes": 8298,
+                "rx_packets": 116,
+                "tx_bytes": 8370,
+                "tx_packets": 115
+              },
+              "4": {
+                "rx_bytes": 11322,
+                "rx_packets": 151,
+                "tx_bytes": 5654,
+                "tx_packets": 79
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD",
+              "3": "FORWARD",
+              "4": "BLOCK"
+            }
+          }
+        },
+        "trunk_roles": {
+          "blocked_ports": [
+            "s4-p4"
+          ],
+          "links": [
+            {
+              "dst": "s3-p1",
+              "role": "primary",
+              "src": "s1-p4",
+              "stp_states": {
+                "s1-p4": "FORWARD",
+                "s3-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s1-p4",
+              "role": "primary",
+              "src": "s3-p1",
+              "stp_states": {
+                "s1-p4": "FORWARD",
+                "s3-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s1-p3",
+              "role": "primary",
+              "src": "s2-p1",
+              "stp_states": {
+                "s1-p3": "FORWARD",
+                "s2-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s2-p1",
+              "role": "primary",
+              "src": "s1-p3",
+              "stp_states": {
+                "s1-p3": "FORWARD",
+                "s2-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s4-p4",
+              "role": "standby",
+              "src": "s3-p2",
+              "stp_states": {
+                "s3-p2": "FORWARD",
+                "s4-p4": "BLOCK"
+              }
+            },
+            {
+              "dst": "s3-p2",
+              "role": "standby",
+              "src": "s4-p4",
+              "stp_states": {
+                "s3-p2": "FORWARD",
+                "s4-p4": "BLOCK"
+              }
+            },
+            {
+              "dst": "s4-p3",
+              "role": "primary",
+              "src": "s2-p2",
+              "stp_states": {
+                "s2-p2": "FORWARD",
+                "s4-p3": "FORWARD"
+              }
+            },
+            {
+              "dst": "s2-p2",
+              "role": "primary",
+              "src": "s4-p3",
+              "stp_states": {
+                "s2-p2": "FORWARD",
+                "s4-p3": "FORWARD"
+              }
+            }
+          ],
+          "primary_trunks": [
+            [
+              "s1-p3",
+              "s2-p1"
+            ],
+            [
+              "s1-p4",
+              "s3-p1"
+            ],
+            [
+              "s2-p2",
+              "s4-p3"
+            ]
+          ],
+          "standby_trunks": [
+            [
+              "s3-p2",
+              "s4-p4"
+            ]
+          ]
+        },
+        "updated_at_utc": "2026-11-20T13:48:25.351798+00:00"
+      }
+    }
+  ],
+  "cleanup": {
+    "lab_bridges_remaining": [],
+    "retired_guardrail_cookies": 1
+  },
+  "command": "scripts/run_phase_b3_live_ring4.py",
+  "commit": "f18845f0544423d657740c49e663ac1357c96d66",
+  "model": null,
+  "phase": "B3",
+  "provenance": "live_mininet_ovs",
+  "result_file": "/home/bennurjeevan/netops_guardrail/experiments/results/phase_b3/20261120T134732Z_phase_b3_live_ring4.json",
+  "scenarios": {
+    "7a_active_trunk_disable": {
+      "active_port": "s1-p3",
+      "baseline_median_reply_interval_seconds": 0.20381450653076172,
+      "execution": {
+        "action": "disable_port",
+        "change_verified": true,
+        "connectivity_verified": true,
+        "convergence_time_seconds": 13.045,
+        "cookie": 1481747354133679443,
+        "details": "Port s1-p3 admin-down verified. Converged in 13.045s.",
+        "from_port": "3",
+        "human_approval_id": "9e3bd9585b1d45a2b1f9747819ef14b8",
+        "inverse_command": [
+          "sudo",
+          "ovs-ofctl",
+          "-O",
+          "OpenFlow13",
+          "mod-port",
+          "s1",
+          "3",
+          "up"
+        ],
+        "rollback_attempted": false,
+        "rollback_details": "No rollback required",
+        "rollback_success": null,
+        "safety_verified": true,
+        "success": true,
+        "target_switch": "1"
+      },
+      "executor_stp_convergence_seconds": 13.045,
+      "interval_estimated_loss_seconds": 12.636,
+      "lost_sequence_count": 62,
+      "measured_reply_gap_seconds": 12.86,
+      "ping_reply_count": 18,
+      "standby_port": "s4-p4",
+      "unexplained_gap_residual_seconds": 0.224
+    },
+    "7b_edge_partition": {
+      "disabled_uplinks": [
+        "s4-p3",
+        "s4-p4"
+      ],
+      "h1_to_h4_reachable_before_restore": false,
+      "removed_telemetry_links": [
+        "s4-p3",
+        "s4-p4"
+      ],
+      "telemetry_snapshot": {
+        "hosts": [
+          {
+            "id": "host-000000000001",
+            "label": "Host 00:01",
+            "last_seen_utc": "2026-11-20T13:47:59.767797+00:00",
+            "mac": "00:00:00:00:00:01",
+            "port_id": "1",
+            "switch_id": "1"
+          },
+          {
+            "id": "host-000000000002",
+            "label": "Host 00:02",
+            "last_seen_utc": "2026-11-20T13:47:45.815794+00:00",
+            "mac": "00:00:00:00:00:02",
+            "port_id": "2",
+            "switch_id": "1"
+          },
+          {
+            "id": "host-000000000003",
+            "label": "Host 00:03",
+            "last_seen_utc": "2026-11-20T13:47:49.492078+00:00",
+            "mac": "00:00:00:00:00:03",
+            "port_id": "1",
+            "switch_id": "4"
+          },
+          {
+            "id": "host-000000000004",
+            "label": "Host 00:04",
+            "last_seen_utc": "2026-11-20T13:47:59.770310+00:00",
+            "mac": "00:00:00:00:00:04",
+            "port_id": "2",
+            "switch_id": "4"
+          }
+        ],
+        "link_events": [
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:33.775500+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:33.780412+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:33.792440+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.797619+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:33.803263+00:00"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "4",
+            "event": "ADD",
+            "src_port": "2",
+            "src_switch": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.807654+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.817621+00:00"
+          },
+          {
+            "dst_port": "2",
+            "dst_switch": "3",
+            "event": "ADD",
+            "src_port": "4",
+            "src_switch": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.823623+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "DELETE",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.950537+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "DELETE",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.957485+00:00"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "event": "ADD",
+            "src_port": "1",
+            "src_switch": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.048585+00:00"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "event": "ADD",
+            "src_port": "3",
+            "src_switch": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.053629+00:00"
+          }
+        ],
+        "links": [
+          {
+            "dst_port": "1",
+            "dst_switch": "3",
+            "role": "primary",
+            "src_port": "4",
+            "src_switch": "1"
+          },
+          {
+            "dst_port": "4",
+            "dst_switch": "1",
+            "role": "primary",
+            "src_port": "1",
+            "src_switch": "3"
+          },
+          {
+            "dst_port": "3",
+            "dst_switch": "1",
+            "role": "primary",
+            "src_port": "1",
+            "src_switch": "2"
+          },
+          {
+            "dst_port": "1",
+            "dst_switch": "2",
+            "role": "primary",
+            "src_port": "3",
+            "src_switch": "1"
+          }
+        ],
+        "mac_learning_events": [
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:33.849271+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:33.956564+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.814379+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.815392+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.815794+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.815962+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.817211+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.822772+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.823526+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:45.824351+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.831231+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.840590+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:45.840878+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "00:00:00:00:00:02",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:45.841457+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:45.860175+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:03",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:49.492078+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "9e:aa:cc:dc:ad:be",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:50.515785+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "fa:67:f2:7d:45:bb",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:51.539797+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:55.076090+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:55.077031+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:59.767797+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:59.768729+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:59.769393+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:47:59.770310+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:01",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:59.770538+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:59.771382+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:47:59.771437+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "00:00:00:00:00:04",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:59.772131+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.080410+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.080555+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:02.140592+00:00"
+          },
+          {
+            "port_id": "3",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:02.140702+00:00"
+          },
+          {
+            "port_id": "4",
+            "source_mac": "92:e1:57:2c:1e:07",
+            "switch_id": "4",
+            "timestamp_utc": "2026-11-20T13:48:02.180848+00:00"
+          },
+          {
+            "port_id": "2",
+            "source_mac": "ba:d3:48:7a:79:4e",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:02.180949+00:00"
+          },
+          {
+            "port_id": "1",
+            "source_mac": "9e:aa:cc:dc:ad:be",
+            "switch_id": "3",
+            "timestamp_utc": "2026-11-20T13:48:06.141233+00:00"
+          }
+        ],
+        "port_status_events": [
+          {
+            "admin_down": true,
+            "link_down": false,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.943337+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.962833+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:47:46.967850+00:00"
+          },
+          {
+            "admin_down": true,
+            "link_down": true,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:47:46.973155+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": true,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "DOWN",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.013709+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "3",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "1",
+            "timestamp_utc": "2026-11-20T13:48:02.023774+00:00"
+          },
+          {
+            "admin_down": false,
+            "link_down": false,
+            "port_id": "1",
+            "reason": "MODIFY",
+            "state": "UP",
+            "switch_id": "2",
+            "timestamp_utc": "2026-11-20T13:48:02.028266+00:00"
+          }
+        ],
+        "provenance": {
+          "producer": "ryu_telemetry_controller",
+          "source": "live_telemetry"
+        },
+        "switches": {
+          "1": {
+            "flows": [
+              {
+                "byte_count": 3240,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 54,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 420,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 7,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 4570,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 53,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {
+              "3": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 10138,
+                "rx_packets": 107,
+                "tx_bytes": 8050,
+                "tx_packets": 110
+              },
+              "2": {
+                "rx_bytes": 2284,
+                "rx_packets": 28,
+                "tx_bytes": 9128,
+                "tx_packets": 121
+              },
+              "3": {
+                "rx_bytes": 4522,
+                "rx_packets": 59,
+                "tx_bytes": 5518,
+                "tx_packets": 74
+              },
+              "4": {
+                "rx_bytes": 4748,
+                "rx_packets": 67,
+                "tx_bytes": 9670,
+                "tx_packets": 128
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD",
+              "3": "FORWARD",
+              "4": "FORWARD"
+            }
+          },
+          "2": {
+            "flows": [
+              {
+                "byte_count": 3180,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 53,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 1620,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 27,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 2216,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 29,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 1,
+            "port_status": {
+              "1": {
+                "admin_down": false,
+                "link_down": false,
+                "reason": "MODIFY",
+                "state": "UP"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 5518,
+                "rx_packets": 74,
+                "tx_bytes": 4522,
+                "tx_packets": 59
+              },
+              "2": {
+                "rx_bytes": 6598,
+                "rx_packets": 93,
+                "tx_bytes": 6482,
+                "tx_packets": 92
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD"
+            }
+          },
+          "3": {
+            "flows": [
+              {
+                "byte_count": 3960,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 66,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 1860,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 31,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 4814,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 56,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 3,
+            "port_status": {},
+            "ports": {
+              "1": {
+                "rx_bytes": 9670,
+                "rx_packets": 128,
+                "tx_bytes": 4748,
+                "tx_packets": 67
+              },
+              "2": {
+                "rx_bytes": 4488,
+                "rx_packets": 63,
+                "tx_bytes": 9560,
+                "tx_packets": 126
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD"
+            }
+          },
+          "4": {
+            "flows": [
+              {
+                "byte_count": 4200,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 20,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:0e"
+                        }
+                      },
+                      {
+                        "OXMTlv": {
+                          "field": "eth_type",
+                          "mask": null,
+                          "value": 35020
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 70,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 2580,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 14,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "eth_dst",
+                          "mask": null,
+                          "value": "01:80:c2:00:00:00"
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 43,
+                "priority": 65535,
+                "table_id": 0
+              },
+              {
+                "byte_count": 70,
+                "cookie": 0,
+                "instructions": [],
+                "match": {
+                  "OFPMatch": {
+                    "length": 12,
+                    "oxm_fields": [
+                      {
+                        "OXMTlv": {
+                          "field": "in_port",
+                          "mask": null,
+                          "value": 4
+                        }
+                      }
+                    ],
+                    "type": 1
+                  }
+                },
+                "packet_count": 1,
+                "priority": 65534,
+                "table_id": 0
+              },
+              {
+                "byte_count": 1568,
+                "cookie": 0,
+                "instructions": [
+                  {
+                    "OFPInstructionActions": {
+                      "actions": [
+                        {
+                          "OFPActionOutput": {
+                            "len": 16,
+                            "max_len": 65535,
+                            "port": 4294967293,
+                            "type": 0
+                          }
+                        }
+                      ],
+                      "len": 24,
+                      "type": 4
+                    }
+                  }
+                ],
+                "match": {
+                  "OFPMatch": {
+                    "length": 4,
+                    "oxm_fields": [],
+                    "type": 1
+                  }
+                },
+                "packet_count": 24,
+                "priority": 0,
+                "table_id": 0
+              }
+            ],
+            "learned_mac_count": 2,
+            "port_status": {
+              "3": {
+                "admin_down": true,
+                "link_down": true,
+                "state": "DOWN"
+              },
+              "4": {
+                "admin_down": true,
+                "link_down": true,
+                "state": "DOWN"
+              }
+            },
+            "ports": {
+              "1": {
+                "rx_bytes": 2410,
+                "rx_packets": 31,
+                "tx_bytes": 6060,
+                "tx_packets": 90
+              },
+              "2": {
+                "rx_bytes": 4440,
+                "rx_packets": 54,
+                "tx_bytes": 7808,
+                "tx_packets": 108
+              },
+              "3": {
+                "rx_bytes": 6482,
+                "rx_packets": 92,
+                "tx_bytes": 6598,
+                "tx_packets": 93
+              },
+              "4": {
+                "rx_bytes": 9560,
+                "rx_packets": 126,
+                "tx_bytes": 4488,
+                "tx_packets": 63
+              },
+              "4294967294": {
+                "rx_bytes": 0,
+                "rx_packets": 0,
+                "tx_bytes": 0,
+                "tx_packets": 0
+              }
+            },
+            "stp_port_states": {
+              "1": "FORWARD",
+              "2": "FORWARD",
+              "3": "FORWARD",
+              "4": "BLOCK"
+            }
+          }
+        },
+        "trunk_roles": {
+          "blocked_ports": [
+            "s4-p4"
+          ],
+          "links": [
+            {
+              "dst": "s3-p1",
+              "role": "primary",
+              "src": "s1-p4",
+              "stp_states": {
+                "s1-p4": "FORWARD",
+                "s3-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s1-p4",
+              "role": "primary",
+              "src": "s3-p1",
+              "stp_states": {
+                "s1-p4": "FORWARD",
+                "s3-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s4-p3",
+              "role": "primary",
+              "src": "s2-p2",
+              "stp_states": {
+                "s2-p2": "FORWARD",
+                "s4-p3": "FORWARD"
+              }
+            },
+            {
+              "dst": "s4-p4",
+              "role": "standby",
+              "src": "s3-p2",
+              "stp_states": {
+                "s3-p2": "FORWARD",
+                "s4-p4": "BLOCK"
+              }
+            },
+            {
+              "dst": "s2-p2",
+              "role": "primary",
+              "src": "s4-p3",
+              "stp_states": {
+                "s2-p2": "FORWARD",
+                "s4-p3": "FORWARD"
+              }
+            },
+            {
+              "dst": "s3-p2",
+              "role": "standby",
+              "src": "s4-p4",
+              "stp_states": {
+                "s3-p2": "FORWARD",
+                "s4-p4": "BLOCK"
+              }
+            },
+            {
+              "dst": "s1-p3",
+              "role": "primary",
+              "src": "s2-p1",
+              "stp_states": {
+                "s1-p3": "FORWARD",
+                "s2-p1": "FORWARD"
+              }
+            },
+            {
+              "dst": "s2-p1",
+              "role": "primary",
+              "src": "s1-p3",
+              "stp_states": {
+                "s1-p3": "FORWARD",
+                "s2-p1": "FORWARD"
+              }
+            }
+          ],
+          "primary_trunks": [
+            [
+              "s1-p3",
+              "s2-p1"
+            ],
+            [
+              "s1-p4",
+              "s3-p1"
+            ],
+            [
+              "s2-p2",
+              "s4-p3"
+            ]
+          ],
+          "standby_trunks": [
+            [
+              "s3-p2",
+              "s4-p4"
+            ]
+          ]
+        },
+        "updated_at_utc": "2026-11-20T13:48:11.174962+00:00"
+      }
+    },
+    "7b_restore_port": {
+      "execution": {
+        "action": "restore_port",
+        "change_verified": true,
+        "connectivity_verified": true,
+        "convergence_time_seconds": 8.529,
+        "cookie": 2150736923776886822,
+        "details": "Port s4-p3 admin-up verified. Converged in 8.529s.",
+        "from_port": "3",
+        "human_approval_id": "a1f426e1321b438aaf438f86dc56025c",
+        "inverse_command": [
+          "sudo",
+          "ovs-ofctl",
+          "-O",
+          "OpenFlow13",
+          "mod-port",
+          "s4",
+          "3",
+          "down"
+        ],
+        "rollback_attempted": false,
+        "rollback_details": "No rollback required",
+        "rollback_success": null,
+        "safety_verified": true,
+        "success": true,
+        "target_switch": "4"
+      },
+      "human_approval_id": "a1f426e1321b438aaf438f86dc56025c",
+      "intent": {
+        "action": "restore_port",
+        "from_port": "3",
+        "reason": "Restore trunk link s4-p3 absent from telemetry links to recover partition",
+        "target_switch": "4"
+      }
+    },
+    "7c_rate_limit_port": {
+      "blocked_port_counter_delta": {
+        "kernel_rx": 2784,
+        "kernel_tx": 1,
+        "openflow_rx": 2784,
+        "openflow_tx": 1
+      },
+      "broadcast": {
+        "configured_meter_rate_kbps": 2000,
+        "duration_seconds": 15.04,
+        "payload_bytes": 1400,
+        "requested_interval_seconds": 0.001
+      },
+      "execution": {
+        "action": "rate_limit_port",
+        "change_verified": true,
+        "connectivity_verified": true,
+        "cookie": 17762122131081134126,
+        "details": "Rate limit 2000 kbps installed on s1 port 1. Topology safety: Topology safety checks passed",
+        "from_port": "1",
+        "human_approval_id": "2e7ba2d6d62b4e0a99c97b6e37aadc00",
+        "inverse_commands": [
+          [
+            "sudo",
+            "ovs-ofctl",
+            "-O",
+            "OpenFlow13",
+            "del-flows",
+            "s1",
+            "cookie=0xf67fbbf87032002e/0xffffffffffffffff"
+          ],
+          [
+            "sudo",
+            "ovs-ofctl",
+            "-O",
+            "OpenFlow13",
+            "del-meter",
+            "s1",
+            "meter=1"
+          ]
+        ],
+        "rate_kbps": 2000,
+        "rollback_attempted": false,
+        "rollback_details": "No rollback required",
+        "rollback_success": null,
+        "safety_verified": true,
+        "success": true,
+        "target_switch": "1"
+      },
+      "h1_to_h4_rtt_summary": "rtt min/avg/max/mdev = 0.026/0.041/0.089/0.014 ms",
+      "h2_to_h4_ping": {
+        "packet_loss_percent": 0,
+        "received": 32,
+        "transmitted": 32
+      },
+      "intent": {
+        "action": "rate_limit_port",
+        "from_port": "1",
+        "rate_kbps": 2000,
+        "reason": "Broadcast rate limiting on access port s1-p1",
+        "target_switch": "1"
+      },
+      "meter_after": {
+        "drop_bytes": 15978802,
+        "drop_packets": 11081,
+        "raw": "OFPST_METER reply (OF1.3) (xid=0x2):\nmeter:1 flow_count:1 packet_in_count:13887 byte_in_count:19977902 duration:16.082s bands:\n0: packet_count:11081 byte_count:15978802\n"
+      },
+      "meter_before": {
+        "drop_bytes": 0,
+        "drop_packets": 0,
+        "raw": "OFPST_METER reply (OF1.3) (xid=0x2):\nmeter:1 flow_count:1 packet_in_count:1 byte_in_count:98 duration:0.031s bands:\n0: packet_count:0 byte_count:0\n"
+      },
+      "meter_drop_bytes": 15978802,
+      "meter_drop_packets": 11081
+    }
+  },
+  "started_at_utc": "2026-11-20T13:47:32.003334+00:00",
+  "status": "passed",
+  "updated_at_utc": "2026-11-20T13:48:45.829987+00:00"
+}
