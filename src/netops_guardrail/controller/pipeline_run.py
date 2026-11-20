@@ -28,6 +28,11 @@ from netops_guardrail.faults.registry import (
     PASSIVE_ONLY_FAULTS,
     get_fault,
 )
+from netops_guardrail.faults.targets import (
+    TargetResolutionError,
+    build_lab_restore_commands,
+    resolve_fault_target,
+)
 from netops_guardrail.netops_paths import NETOPS_HOME
 
 LOGGER = logging.getLogger(__name__)
@@ -590,12 +595,33 @@ def execute_guarded_injection(
     except KeyError:
         return {"error": f"Unknown fault identifier: {fault_id}"}, 400
 
-    # Generator requirement for mac_flooding
-    if fault_id == "mac_flooding" and not callable(context.get("mac_flood_generator")):
-        return {
-            "error": "mac_flooding requires a live mac_flood_generator callback. Injection refused.",
-            "fault_id": fault_id,
-        }, 400
+    # Generator requirement for MAC flooding is validated before telemetry resolution.
+    if fault_id == "mac_flooding":
+        if not callable(context.get("mac_flood_generator")):
+            return {
+                "error": "mac_flooding requires a live mac_flood_generator callback. Injection refused.",
+                "fault_id": fault_id,
+            }, 400
+        if not callable(context.get("mac_table_reset")):
+            return {
+                "error": "mac_flooding requires a mac_table_reset recovery callback. Injection refused.",
+                "fault_id": fault_id,
+            }, 400
+
+    # Every live injector must receive a target resolved from fresh controller telemetry.
+    telemetry = context.get("telemetry")
+    if not isinstance(telemetry, Mapping) and context.get("telemetry_path"):
+        try:
+            with open(context["telemetry_path"], "r", encoding="utf-8") as handle:
+                telemetry = json.load(handle)
+        except (OSError, json.JSONDecodeError) as exc:
+            return {"error": f"Unable to read live telemetry for target resolution: {exc}", "fault_id": fault_id}, 503
+    if not isinstance(telemetry, Mapping):
+        return {"error": "Live controller telemetry is required to resolve injection targets.", "fault_id": fault_id}, 503
+    try:
+        execution_target = resolve_fault_target(fault_id, telemetry)
+    except TargetResolutionError as exc:
+        return {"error": f"Live target resolution refused: {exc}", "fault_id": fault_id}, 409
 
     command_events: list[dict[str, Any]] = []
     original_run_command = context.get("run_command", subprocess.run)
@@ -635,6 +661,7 @@ def execute_guarded_injection(
             raise
 
     execution_context = dict(context)
+    execution_context["target"] = execution_target
     execution_context["run_command"] = recording_run_command
     injection_started_at = _now_utc()
     try:
@@ -684,6 +711,7 @@ def execute_guarded_injection(
         "fault_injected",
         evidence={
             "fault_id": fault_id,
+            "resolved_target": execution_target,
             "injection_started_at": injection_started_at,
             "injection_completed_at": injection_completed_at,
             "injection_result": inject_res,
@@ -703,45 +731,11 @@ def execute_guarded_injection(
     }, 201
 
 
-RESTORE_COMMANDS = (
-    ("sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "mod-port", "s1", "2", "up"),
-    ("sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "mod-port", "s2", "1", "up"),
-    ("sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "mod-port", "s1", "3", "up"),
-    ("sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "mod-port", "s2", "2", "up"),
-    ("sudo", "-n", "ip", "link", "set", "dev", "s1-eth3", "up"),
-    ("sudo", "-n", "ip", "link", "set", "dev", "s2-eth2", "up"),
-    (
-        "sudo",
-        "-n",
-        "ovs-ofctl",
-        "-O",
-        "OpenFlow13",
-        "--strict",
-        "del-flows",
-        "s1",
-        "cookie=0x4e45544f5053/-1,priority=65500,in_port=3",
-    ),
-    (
-        "sudo",
-        "-n",
-        "ovs-ofctl",
-        "-O",
-        "OpenFlow13",
-        "--strict",
-        "del-flows",
-        "s2",
-        "cookie=0x4e45544f5053/-1,priority=65500,in_port=2",
-    ),
-    ("sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "del-flows", "s1", "cookie=0x4e45544f5053/-1"),
-    ("sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "del-flows", "s2", "cookie=0x4e45544f5053/-1"),
-)
-
-
 def execute_guarded_restore(
     context: Mapping[str, Any] | None = None,
     manager: Optional[PipelineRunManager] = None,
 ) -> tuple[dict[str, Any], int]:
-    """Execute fixed command sequence with shell=False to restore the lab to baseline.
+    """Restore discovered physical ports and remove only tagged lab flows.
 
     Records each use in the run record with commands and timestamps.
     May restore network state even if a pipeline/proposal is stuck awaiting
@@ -753,6 +747,23 @@ def execute_guarded_restore(
     # It is intentionally allowed even if a proposal/run is stuck awaiting
     # approval: it restores network links and removes only tagged lab flows.
     # Approval/proposal records are NOT deleted or bypassed by this action.
+
+    telemetry = context.get("telemetry")
+    if not isinstance(telemetry, Mapping) and context.get("telemetry_path"):
+        try:
+            with open(context["telemetry_path"], "r", encoding="utf-8") as handle:
+                telemetry = json.load(handle)
+        except (OSError, json.JSONDecodeError) as exc:
+            return {"success": False, "error": f"Unable to read live telemetry for lab restore: {exc}",
+                    "network_mutation_attempted": False}, 503
+    if not isinstance(telemetry, Mapping):
+        return {"success": False, "error": "Fresh controller telemetry is required for lab restore.",
+                "network_mutation_attempted": False}, 503
+    try:
+        restore_commands = build_lab_restore_commands(telemetry)
+    except TargetResolutionError as exc:
+        return {"success": False, "error": f"Lab restore target resolution refused: {exc}",
+                "network_mutation_attempted": False}, 409
 
     original_run_command = context.get("run_command", subprocess.run)
     command_events: list[dict[str, Any]] = []
@@ -796,7 +807,7 @@ def execute_guarded_restore(
     failed = []
 
     restore_started_at = _now_utc()
-    for cmd in RESTORE_COMMANDS:
+    for cmd in restore_commands:
         cmd_list = list(cmd)
         try:
             res = run_command(
@@ -839,6 +850,7 @@ def execute_guarded_restore(
         restore_evidence = {
             "restore_executed": True,
             "restore_type": "manual_baseline_restore",
+            "resolved_switches": sorted(str(key) for key in telemetry.get("switches", {})),
             "restore_started_at": restore_started_at,
             "restore_completed_at": restore_completed_at,
             "commands": [event["command"] for event in command_events],
@@ -881,75 +893,38 @@ def execute_guarded_restore(
     return response_payload, 200 if all_ok else 500
 
 
-def get_live_faults_detail(mac_flood_generator: Any = None) -> list[dict[str, Any]]:
-    """Return live-injectable faults; MAC flooding requires a configured generator."""
+def get_live_faults_detail(
+    mac_flood_generator: Any = None,
+    mac_table_reset: Any = None,
+) -> list[dict[str, Any]]:
+    """Return live fault metadata; concrete targets are resolved at injection time."""
     faults = [
-        {
-            "id": "trunk_down",
-            "name": "trunk_down",
-            "display_name": "Issue 6 — Active trunk down",
-            "target": "s1 port 2, s2 port 1 (Trunk A - Primary)",
-            "description": "Administratively disables active trunk ports via OpenFlow 1.3 mod-port down.",
-            "commands": [
-                "sudo -n ovs-ofctl -O OpenFlow13 mod-port s1 2 down",
-                "sudo -n ovs-ofctl -O OpenFlow13 mod-port s2 1 down",
-            ],
-            "safe_expectation": "STP transitions the alternate trunk to FORWARD; no host-facing or alternate ports are disabled.",
-            "executable": False,
-        },
-        {
-            "id": "redundant_trunk_restored",
-            "name": "redundant_trunk_restored",
-            "display_name": "Issue 1 — Restored redundant trunk",
-            "target": "s1 port 3, s2 port 2 (Trunk B - Standby)",
-            "description": "Restores redundant trunk by enabling interfaces and removing drop flows.",
-            "commands": [
-                "sudo -n ovs-ofctl -O OpenFlow13 --strict del-flows s1 cookie=0x4e45544f5053/-1,priority=65500,in_port=3",
-                "sudo -n ovs-ofctl -O OpenFlow13 --strict del-flows s2 cookie=0x4e45544f5053/-1,priority=65500,in_port=2",
-                "sudo -n ip link set dev s1-eth3 up",
-                "sudo -n ip link set dev s2-eth2 up",
-            ],
-            "safe_expectation": "Re-isolate only the standby trunk through the existing guarded, human-approved remediation path while preserving the primary trunk and host reachability.",
-            "executable": True,
-        },
-        {
-            "id": "flow_drift",
-            "name": "flow_drift",
-            "display_name": "Issue 3 — Unauthorized OpenFlow rule drift",
-            "target": "s1 Flow Table 0",
-            "description": "Installs a uniquely tagged, high-priority drop rule for marker EtherType 0x88b5.",
-            "commands": [
-                "sudo -n ovs-ofctl -O OpenFlow13 add-flow s1 cookie=0x4e45544f5053,table=0,priority=65000,dl_type=0x88b5,actions=drop",
-            ],
-            "safe_expectation": "Remove only the identified unauthorized marker rule after policy verification.",
-            "executable": False,
-        },
-        {
-            "id": "link_flapping",
-            "name": "link_flapping",
-            "display_name": "Issue 4 — Link flapping",
-            "target": "s1 port 2 (Trunk A - Primary)",
-            "description": "Rapidly alternates primary trunk carrier state between down and up.",
-            "commands": [
-                "sudo -n ovs-ofctl -O OpenFlow13 mod-port s1 2 down",
-                "sudo -n ovs-ofctl -O OpenFlow13 mod-port s1 2 up",
-            ],
-            "safe_expectation": "Stabilize trunk or isolate unstable flapping port without disrupting alternative paths.",
-            "executable": False,
-        },
-        {
-            "id": "mac_flooding",
-            "name": "mac_flooding",
-            "display_name": "Issue 5 — MAC table flooding",
-            "target": "s1 MAC Address Table",
-            "description": "Floods switch MAC table with random source addresses.",
-            "commands": [
-                "Synthetic frame generation (generator callback)",
-            ],
-            "safe_expectation": "Limit MAC learning or isolate flooding source port.",
-            "executable": False,
-        },
+        {"id": "trunk_down", "name": "trunk_down", "display_name": "Active primary trunk down",
+         "target": "Resolved from fresh controller telemetry at injection time",
+         "description": "Disables both endpoints of the currently discovered primary inter-switch link.",
+         "commands": ["Generated from telemetry-derived bridge and port IDs"],
+         "safe_expectation": "STP transitions an alternate path to forwarding while host access remains available.", "executable": False},
+        {"id": "redundant_trunk_restored", "name": "redundant_trunk_restored", "display_name": "Restored redundant trunk",
+         "target": "Resolved from a currently STP-blocked standby inter-switch link",
+         "description": "Restores only the telemetry-proven failed redundant link.",
+         "commands": ["Generated from telemetry-derived bridge and interface IDs"],
+         "safe_expectation": "STP continues blocking at least one standby endpoint; guarded remediation decides whether isolation is needed.", "executable": True},
+        {"id": "flow_drift", "name": "flow_drift", "display_name": "Unauthorized OpenFlow rule drift",
+         "target": "A live switch flow table selected from current telemetry",
+         "description": "Installs a uniquely tagged drop rule for reserved demo EtherType 0x88b5.",
+         "commands": ["Generated from telemetry-derived bridge ID"],
+         "safe_expectation": "Remove only the identified marker-cookie rule.", "executable": False},
+        {"id": "link_flapping", "name": "link_flapping", "display_name": "Repeated standby link flapping",
+         "target": "A standby trunk endpoint identified by current STP telemetry",
+         "description": "Performs bounded down/up transitions on one proven standby endpoint.",
+         "commands": ["Generated from telemetry-derived interface ID"],
+         "safe_expectation": "Keep the primary path and host-facing links operational.", "executable": False},
+        {"id": "mac_flooding", "name": "mac_flooding", "display_name": "MAC address flooding",
+         "target": "A live host access attachment identified from MAC-learning telemetry",
+         "description": "Uses an explicitly configured bounded frame generator on the resolved access interface.",
+         "commands": ["Explicit configured traffic-generator callback"],
+         "safe_expectation": "Contain only the identified access source and preserve trusted host reachability.", "executable": False},
     ]
-    if not callable(mac_flood_generator):
+    if not callable(mac_flood_generator) or not callable(mac_table_reset):
         faults = [fault for fault in faults if fault["id"] != "mac_flooding"]
     return faults

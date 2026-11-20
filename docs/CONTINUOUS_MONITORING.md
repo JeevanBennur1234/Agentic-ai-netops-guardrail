@@ -33,7 +33,7 @@ On each polling cycle the monitor atomically writes `monitor_status.json` beside
 - Flow drift currently detects the project's known marker cookie/priority only. It is not a general desired-state flow policy engine. This path returns a deterministic `no_action` without invoking Ollama because no policy-safe flow-specific remediation is wired through the guarded executor path.
 - Link failures are detected from explicit DOWN/MISSING port state or DELETE link events. The model is restricted to `no_action` until an approved link-remediation intent is supported by the existing human-approval path; if telemetry already shows recovery, the agent short-circuits without invoking Ollama.
 - Standby-forwarding anomalies can produce a constrained AI recommendation using Ollama. The existing safety verifier and decision gate run, and a block recommendation requires human approval. The monitor never executes it.
-- The current continuous monitor does not yet invoke the registered `link_flapping` or `mac_flooding` detectors. Those fault classes exist in the registry and experiment framework, but are not yet part of the monitor's polling detector set.
+- The polling monitor invokes `standby_forwarding_anomaly`, `flow_rule_drift`, `link_flapping`, and `mac_flooding` detectors. MAC-flood detection is passive and reads recent controller MAC-learning events; its live injector is exposed only when both an explicit traffic-generator callback and a MAC-table recovery callback are configured.
 - Each agent result records whether the LLM was actually invoked and why it was skipped or failed. The incident pipeline stage uses this metadata rather than marking every deterministic no-action as an AI completion.
 
 ## Persistence and controls
@@ -46,4 +46,13 @@ On each polling cycle the monitor atomically writes `monitor_status.json` beside
 
 ## Validation boundaries
 
-Unit tests, mocked decision-pipeline integration tests, Flask dashboard/API tests, and a one-shot CLI replay test cover the local software path. A live Mininet/OVS fault-injection run is still required before production deployment. OVS database access is permission-gated on the current development machine, so no live OVS mutation or live remediation validation is claimed.
+Unit tests, mocked decision-pipeline integration tests, Flask dashboard/API tests, and a one-shot CLI replay test cover the continuous-monitor software path. Separately, the Phase B3 ring4 harness has recorded a live Mininet/OVS verification; that evidence validates the B3 executor scenarios, not the continuous monitor's end-to-end detector-to-approval path. Live monitor-driven incident validation and production deployment checks remain outstanding.
+
+
+## Phase C live-fault target policy
+
+All live injector targets are resolved from a controller-produced telemetry snapshot no older than 30 seconds. Injection fails closed when provenance, timestamp, physical ports, or the scenario-specific topology evidence is missing. The injector records the resolved target with the run evidence. The current target resolver supports primary-trunk shutdown, standby-trunk flapping, flow-table drift, restoration of a recently deleted/down inter-switch link, and MAC flooding on a discovered host access attachment. `standby_forwarding` remains passive-only.
+
+The monitor polls `trunk_down`, `redundant_trunk_restored`, `flow_rule_drift`, `link_flapping`, `mac_flooding`, and `standby_forwarding_anomaly`. These detectors are telemetry-driven; fixture provenance is not eligible for AI dispatch or live remediation. A passing unit test does not constitute a live lab run. Live execution still requires fresh ring4 telemetry, healthy baseline connectivity, monitor heartbeat, an operator token, and the existing approval/safety gates.
+
+The manual LAB RESET now follows the same target rule: it requires a controller-produced telemetry snapshot no older than 30 seconds, enumerates discovered physical switch ports, restores those ports, and deletes only the NetOps marker-cookie flows on discovered bridges. It does not flush unrelated flows, remove bridges, clear telemetry/approval/audit files, or run global Mininet cleanup. Stale or missing telemetry causes reset to fail closed; restart the controller/monitor and refresh telemetry before retrying.

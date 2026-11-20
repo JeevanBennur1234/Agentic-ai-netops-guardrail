@@ -36,7 +36,11 @@ class FlowRuleDriftFault(Fault):
     def injector(self, context: Optional[Mapping[str, Any]] = None) -> dict:
         context = context or {}
         run_command = context.get("run_command", subprocess.run)
-        bridge = str(context.get("bridge", "s1"))
+        target = context.get("target") or {}
+        if target.get("kind") != "flow_table" or not target.get("bridge"):
+            return {"success": False, "network_mutation_attempted": False,
+                    "error": "flow_rule_drift requires a telemetry-derived flow-table target."}
+        bridge = str(target["bridge"])
         flow = (
             f"cookie=0x{self.marker_cookie:x},table=0,"
             f"priority={self.marker_priority},dl_type={self.marker_eth_type},actions=drop"
@@ -70,7 +74,11 @@ class FlowRuleDriftFault(Fault):
     def restore(self, context: Optional[Mapping[str, Any]] = None) -> dict:
         context = context or {}
         run_command = context.get("run_command", subprocess.run)
-        bridge = str(context.get("bridge", "s1"))
+        target = context.get("target") or {}
+        if target.get("kind") != "flow_table" or not target.get("bridge"):
+            return {"success": False, "network_mutation_attempted": False,
+                    "error": "flow_rule_drift restore requires its telemetry-derived flow-table target."}
+        bridge = str(target["bridge"])
         command = [
             "sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13",
             "del-flows", bridge, f"cookie=0x{self.marker_cookie:x}/-1",

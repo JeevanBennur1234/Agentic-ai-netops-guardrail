@@ -175,3 +175,61 @@ def test_recent_delete_event_is_detected_as_link_failure():
 
     detections = detect_incidents(data, now=now)
     assert [item["type"] for item in detections] == ["link_failure"]
+
+
+def test_mac_flooding_detector_emits_live_evidence_for_ai_review():
+    now = datetime.now(timezone.utc)
+    data = {
+        "updated_at_utc": now.isoformat(),
+        "provenance": {"source": "live_telemetry"},
+        "switches": {"1": {"ports": {"1": {}}, "flows": [], "port_status": {}}},
+        "links": [],
+        "mac_learning_events": [
+            {
+                "timestamp_utc": (now - timedelta(seconds=index)).isoformat(),
+                "switch_id": "1",
+                "port_id": "1",
+                "source_mac": f"02:00:00:00:{index // 256:02x}:{index % 256:02x}",
+            }
+            for index in range(20)
+        ],
+    }
+
+    detections = detect_incidents(data, now=now)
+
+    assert [item["type"] for item in detections] == ["mac_flooding"]
+    assert detections[0]["evidence"]["result"]["unique_mac_count"] == 20
+    assert detections[0]["source"] == "live_telemetry"
+    assert detections[0]["remediation_allowed"] is True
+
+
+def test_mac_flooding_fixture_provenance_never_dispatches(tmp_path):
+    now = datetime.now(timezone.utc)
+    calls = []
+    monitor = IncidentMonitor(
+        tmp_path,
+        debounce_reads=1,
+        cooldown_seconds=0,
+        decision_pipeline=lambda **kwargs: calls.append(kwargs) or {},
+    )
+    data = {
+        "updated_at_utc": now.isoformat(),
+        "provenance": {"source": "test_fixture"},
+        "switches": {"1": {"ports": {"1": {}}, "flows": [], "port_status": {}}},
+        "links": [],
+        "mac_learning_events": [
+            {
+                "timestamp_utc": (now - timedelta(seconds=index)).isoformat(),
+                "switch_id": "1",
+                "port_id": "1",
+                "source_mac": f"02:00:00:01:{index // 256:02x}:{index % 256:02x}",
+            }
+            for index in range(20)
+        ],
+    }
+
+    emitted = monitor.process_snapshot(data, now=now)
+
+    assert [item["type"] for item in emitted] == ["mac_flooding"]
+    assert emitted[0]["remediation_allowed"] is False
+    assert calls == []

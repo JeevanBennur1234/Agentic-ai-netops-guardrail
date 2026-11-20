@@ -31,38 +31,27 @@ class RedundantTrunkRestoredFault(Fault):
         "host-to-host reachability before and after injection/remediation."
     )
 
-    _COMMANDS = (
-        (
-            "sudo",
-            "-n",
-            "ovs-ofctl",
-            "-O",
-            "OpenFlow13",
-            "--strict",
-            "del-flows",
-            "s1",
-            "cookie=0x4e45544f5053/-1,priority=65500,in_port=3",
-        ),
-        (
-            "sudo",
-            "-n",
-            "ovs-ofctl",
-            "-O",
-            "OpenFlow13",
-            "--strict",
-            "del-flows",
-            "s2",
-            "cookie=0x4e45544f5053/-1,priority=65500,in_port=2",
-        ),
-        ("sudo", "-n", "ip", "link", "set", "s1-eth3", "up"),
-        ("sudo", "-n", "ip", "link", "set", "s2-eth2", "up"),
-    )
+    @staticmethod
+    def _commands(context: Mapping[str, Any]) -> list[tuple[str, ...]]:
+        target = context.get("target") or {}
+        endpoints = target.get("endpoints") or []
+        if target.get("kind") != "restorable_link" or len(endpoints) != 2:
+            raise ValueError("redundant_trunk_restored requires a telemetry-proven deleted/down link.")
+        commands = []
+        for endpoint in endpoints:
+            commands.append(("sudo", "-n", "ovs-ofctl", "-O", "OpenFlow13", "--strict", "del-flows", endpoint["bridge"], f"cookie=0x4e45544f5053/-1,priority=65500,in_port={endpoint['port_id']}"))
+            commands.append(("sudo", "-n", "ip", "link", "set", "dev", endpoint["interface"], "up"))
+        return commands
 
     def injector(self, context: Optional[Mapping[str, Any]] = None) -> dict:
         context = context or {}
         run_command = context.get("run_command", subprocess.run)
         completed = []
-        for command in self._COMMANDS:
+        try:
+            commands = self._commands(context)
+        except (KeyError, TypeError, ValueError) as exc:
+            return {"success": False, "network_mutation_attempted": False, "error": str(exc)}
+        for command in commands:
             try:
                 result = run_command(
                     list(command),

@@ -116,13 +116,19 @@ def test_issue1_injector_runs_only_the_existing_reset_commands():
         calls.append(command)
         return SimpleNamespace(returncode=0, stdout="", stderr="")
 
-    result = fault.injector({"run_command": fake_run})
+    result = fault.injector({"run_command": fake_run, "target": {
+        "kind": "restorable_link", "endpoints": [
+            {"bridge": "s3", "port_id": "4", "interface": "s3-eth4"},
+            {"bridge": "s4", "port_id": "2", "interface": "s4-eth2"},
+        ]
+    }})
     assert result["success"] is True
     assert result["network_mutation_attempted"] is True
     assert len(calls) == 4
-    assert calls[0][-2:] == ["s1", "cookie=0x4e45544f5053/-1,priority=65500,in_port=3"]
-    assert calls[1][-2:] == ["s2", "cookie=0x4e45544f5053/-1,priority=65500,in_port=2"]
-    assert all("--strict" in command for command in calls[:2])
+    assert calls[0][-2:] == ["s3", "cookie=0x4e45544f5053/-1,priority=65500,in_port=4"]
+    assert calls[2][-2:] == ["s4", "cookie=0x4e45544f5053/-1,priority=65500,in_port=2"]
+    assert calls[1][-1] == "up" and calls[3][-1] == "up"
+    assert all("--strict" in command for command in (calls[0], calls[2]))
 
 
 def test_issue1_restore_never_bypasses_guarded_remediation():

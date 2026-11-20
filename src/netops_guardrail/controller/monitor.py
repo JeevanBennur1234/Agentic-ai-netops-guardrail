@@ -19,7 +19,10 @@ from typing import Any, Callable, Mapping
 
 from netops_guardrail.faults.flow_rule_drift import FlowRuleDriftFault
 from netops_guardrail.faults.link_flapping import LinkFlappingFault
+from netops_guardrail.faults.mac_flooding import MacFloodingFault
+from netops_guardrail.faults.redundant_trunk import RedundantTrunkRestoredFault
 from netops_guardrail.faults.standby_forwarding import StandbyForwardingFault
+from netops_guardrail.faults.trunk_down import TrunkDownFault
 from netops_guardrail.netops_paths import NETOPS_HOME
 
 LOGGER = logging.getLogger(__name__)
@@ -167,6 +170,9 @@ def detect_incidents(
         ("standby_forwarding_anomaly", StandbyForwardingFault().detector),
         ("flow_rule_drift", FlowRuleDriftFault().detector),
         ("link_flapping", LinkFlappingFault().detector),
+        ("mac_flooding", MacFloodingFault().detector),
+        ("trunk_down", TrunkDownFault().detector),
+        ("redundant_trunk_restored", RedundantTrunkRestoredFault().detector),
     )
     for name, detector in detectors:
         result = detector(snapshot)

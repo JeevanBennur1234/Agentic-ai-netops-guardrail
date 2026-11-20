@@ -10,6 +10,7 @@ from flask import Blueprint, current_app, jsonify, request
 
 from netops_guardrail.controller.trunk_roles import derive_discovered_hosts, derive_trunk_roles
 from netops_guardrail.faults.registry import get_fault
+from netops_guardrail.faults.targets import TargetResolutionError, resolve_fault_target
 from netops_guardrail.verifier.safety_verifier import build_topology
 
 topology_bp = Blueprint("topology", __name__)
@@ -58,21 +59,21 @@ def api_chaos_inject_loop():
             {"error": "Confirmation required. Call with ?confirm=true to continue."}
         ), 400
 
-    for bridge in ("s1", "s2"):
+    try:
+        with open(collector.telemetry_path, "r", encoding="utf-8") as handle:
+            telemetry = json.load(handle)
+        target = resolve_fault_target("redundant_trunk_restored", telemetry)
+    except (OSError, json.JSONDecodeError, TargetResolutionError) as exc:
+        return jsonify({"error": f"Live standby target resolution failed closed: {exc}",
+                        "execution_started": False, "network_mutation_attempted": False}), 409
+
+    for bridge in sorted({endpoint["bridge"] for endpoint in target["endpoints"]}):
         check = subprocess.run(
             ["sudo", "-n", "ovs-vsctl", "br-exists", bridge],
-            shell=False,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=3,
+            shell=False, capture_output=True, text=True, check=False, timeout=3,
         )
         if check.returncode != 0:
-            return jsonify(
-                {
-                    "error": f"Controlled fault injection requires live Mininet bridge {bridge}; no command was run."
-                }
-            ), 409
+            return jsonify({"error": f"Controlled fault injection requires live Mininet bridge {bridge}; no command was run."}), 409
 
     checker_spec = os.environ.get("NETOPS_CONNECTIVITY_CHECKER", "")
     module_name, separator, function_name = checker_spec.partition(":")
@@ -103,7 +104,7 @@ def api_chaos_inject_loop():
             {"error": f"Baseline connectivity checker failed closed: {type(exc).__name__}: {exc}"}
         ), 503
 
-    injection = fault.injector({"run_command": subprocess.run})
+    injection = fault.injector({"run_command": subprocess.run, "target": target})
     if not injection.get("success"):
         command = injection.get("failed_command") or ["", "", "unknown"]
         return jsonify(

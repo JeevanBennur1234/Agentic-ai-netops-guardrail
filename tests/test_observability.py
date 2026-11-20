@@ -536,13 +536,15 @@ def test_human_verifier_request_changes_is_audited(
 
 def test_fault_injection_runs_ai_gate_and_returns_human_proposal(monkeypatch, tmp_path):
     import json
+    from datetime import datetime, timezone
     from types import SimpleNamespace
 
     import netops_guardrail.observability.server as server_module
 
     telemetry_path = tmp_path / "latest.json"
     telemetry = {
-        "updated_at_utc": "2026-10-28T06:30:00+00:00",
+        "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "provenance": {"source": "live_telemetry", "producer": "test-controller"},
         "links": [
             {"src_switch": "1", "src_port": "2", "dst_switch": "2", "dst_port": "1"},
             {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},

@@ -56,10 +56,19 @@ class MacFloodingFault(Fault):
                     "Injection is disabled rather than fabricating telemetry."
                 ),
             }
+        target = context.get("target") or {}
+        endpoint = target.get("endpoint") or {}
+        if target.get("kind") != "access_port" or not endpoint.get("interface"):
+            return {"success": False, "network_mutation_attempted": False,
+                    "error": "mac_flooding requires a telemetry-derived host access port."}
         try:
             result = generator(
                 count=self.injection_count,
                 interval_seconds=0.05,
+                interface=endpoint["interface"],
+                switch_id=endpoint["switch_id"],
+                port_id=endpoint["port_id"],
+                host_mac=target.get("host_mac"),
             )
         except Exception as exc:
             return {

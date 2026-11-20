@@ -50,8 +50,9 @@ def test_flow_rule_drift_injector_and_restore_are_scoped_to_marker_cookie():
         calls.append(command)
         return SimpleNamespace(returncode=0, stdout="", stderr="")
 
-    injected = fault.injector({"run_command": fake_run})
-    restored = fault.restore({"run_command": fake_run})
+    target = {"kind": "flow_table", "bridge": "s3", "switch_id": "3"}
+    injected = fault.injector({"run_command": fake_run, "target": target})
+    restored = fault.restore({"run_command": fake_run, "target": target})
     assert injected["success"] is True
     assert restored["success"] is True
     assert "add-flow" in calls[0]
@@ -60,9 +61,18 @@ def test_flow_rule_drift_injector_and_restore_are_scoped_to_marker_cookie():
 
 
 def test_link_flapping_detector_counts_only_recent_target_link_events():
-    result = get_fault("link_flapping").detector(fixture("phase2_link_flapping.json"))
+    telemetry = fixture("phase2_link_flapping.json")
+    telemetry["switches"] = {
+        "1": {"stp_port_states": {"2": "FORWARD", "3": "BLOCK"}},
+        "2": {"stp_port_states": {"1": "FORWARD", "2": "FORWARD"}},
+    }
+    telemetry["links"] = [
+        {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"}
+    ]
+    result = get_fault("link_flapping").detector(telemetry)
     assert result["detected"] is True
     assert result["event_count"] == 4
+    assert result["standby_endpoints"] == ["s1-p3", "s2-p2"]
 
 
 def test_link_flapping_detector_ignores_old_or_unrelated_events():
@@ -84,8 +94,10 @@ def test_link_flapping_injector_is_bounded_and_restore_sets_interface_up():
     injected = fault.injector({
         "run_command": fake_run, "sleep": lambda _: None,
         "cycles": 2, "interval_seconds": 0,
+        "target": {"kind": "trunk", "role": "standby", "endpoint": {"interface": "s4-eth4"}},
     })
-    restored = fault.restore({"run_command": fake_run})
+    restored = fault.restore({"run_command": fake_run,
+        "target": {"kind": "trunk", "role": "standby", "endpoint": {"interface": "s4-eth4"}}})
     assert injected["success"] is True
     assert injected["cycles"] == 2
     assert len(calls) == 5
@@ -120,7 +132,8 @@ def test_mac_flooding_injector_requires_explicit_generator():
     assert fault.injector()["network_mutation_attempted"] is False
     generated = []
     result = fault.injector({
-        "mac_flood_generator": lambda **kwargs: generated.append(kwargs) or True
+        "mac_flood_generator": lambda **kwargs: generated.append(kwargs) or True,
+        "target": {"kind": "access_port", "endpoint": {"interface": "s4-eth1", "switch_id": "4", "port_id": "1"}, "host_mac": "02:00:00:00:00:01"}
     })
     assert result["success"] is True
     assert generated[0]["count"] == fault.injection_count

@@ -8,9 +8,9 @@ from types import SimpleNamespace
 import pytest
 
 from netops_guardrail.controller.pipeline_run import (
-    RESTORE_COMMANDS,
     PipelineRun,
     PipelineRunManager,
+    build_lab_restore_commands,
     check_injection_preconditions,
     execute_guarded_injection,
     get_live_faults_detail,
@@ -77,6 +77,28 @@ def test_failed_outcome_is_terminal_even_if_status_is_stale_approved(tmp_path):
     assert manager.is_run_active() is False
 
 
+
+def _live_injection_telemetry():
+    now = datetime.now(timezone.utc).isoformat()
+    return {
+        "updated_at_utc": now,
+        "provenance": {"source": "live_telemetry"},
+        "switches": {
+            "1": {"ports": {"1": {}, "2": {}, "3": {}}, "flows": [],
+                  "port_status": {"1": {"state": "UP"}, "2": {"state": "UP"}, "3": {"state": "DOWN"}},
+                  "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "BLOCK"}},
+            "2": {"ports": {"1": {}, "2": {}, "3": {}}, "flows": [],
+                  "port_status": {"1": {"state": "UP"}, "2": {"state": "DOWN"}, "3": {"state": "UP"}},
+                  "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"}},
+        },
+        "links": [
+            {"src_switch": "1", "src_port": "2", "dst_switch": "2", "dst_port": "1"},
+            {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+        ],
+        "link_events": [{"timestamp_utc": now, "event": "DELETE", "src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"}],
+        "hosts": [{"switch_id": "1", "port_id": "1", "mac": "02:00:00:00:00:01"}],
+    }
+
 def test_execute_guarded_injection_records_commands_and_creates_run(tmp_path):
     manager = PipelineRunManager(tmp_path / "runs")
     calls = []
@@ -87,7 +109,7 @@ def test_execute_guarded_injection_records_commands_and_creates_run(tmp_path):
 
     result, code = execute_guarded_injection(
         fault_id="redundant_trunk_restored",
-        context={"run_command": mock_run},
+        context={"run_command": mock_run, "telemetry": _live_injection_telemetry()},
         manager=manager,
     )
     assert code == 201
@@ -123,6 +145,19 @@ def test_mac_flooding_requires_generator_callback(tmp_path):
     assert "mac_flood_generator callback" in result["error"]
 
 
+def test_mac_flooding_requires_recovery_callback_before_injection(tmp_path):
+    manager = PipelineRunManager(tmp_path / "runs")
+    context = {
+        "telemetry": _live_injection_telemetry(),
+        "mac_flood_generator": lambda **kwargs: True,
+    }
+    result, code = execute_guarded_injection(
+        fault_id="mac_flooding", context=context, manager=manager
+    )
+    assert code == 400
+    assert "mac_table_reset recovery callback" in result["error"]
+
+
 def test_trunk_down_injector_and_restore():
     fault = get_fault("trunk_down")
     calls = []
@@ -131,14 +166,18 @@ def test_trunk_down_injector_and_restore():
         calls.append(list(cmd))
         return SimpleNamespace(returncode=0, stdout="", stderr="")
 
-    res = fault.injector({"run_command": mock_run})
+    from netops_guardrail.faults.targets import resolve_fault_target
+    telemetry = _live_injection_telemetry()
+    target = resolve_fault_target("trunk_down", telemetry)
+    context = {"run_command": mock_run, "target": target}
+    res = fault.injector(context)
     assert res["success"] is True
     assert len(calls) == 2
     assert "down" in calls[0]
     assert "down" in calls[1]
 
     calls.clear()
-    restore_res = fault.restore({"run_command": mock_run})
+    restore_res = fault.restore(context)
     assert restore_res["success"] is True
     assert len(calls) == 2
     assert "up" in calls[0]
@@ -151,10 +190,22 @@ def test_pipeline_api_endpoints_auth_and_guards(monkeypatch, tmp_path):
         json.dumps(
             {
                 "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+                "provenance": {"source": "live_telemetry", "producer": "test-controller"},
                 "switches": {
-                    "1": {"ports": {}, "flows": [], "stp_port_states": {}, "port_status": {}}
+                    "1": {"ports": {"1": {}, "2": {}, "3": {}}, "flows": [],
+                          "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "BLOCK"},
+                          "port_status": {"1": {"state": "UP"}, "2": {"state": "UP"}, "3": {"state": "DOWN"}}},
+                    "2": {"ports": {"1": {}, "2": {}, "3": {}}, "flows": [],
+                          "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"},
+                          "port_status": {"1": {"state": "UP"}, "2": {"state": "DOWN"}, "3": {"state": "UP"}}},
                 },
-                "links": [],
+                "links": [
+                {"src_switch": "1", "src_port": "2", "dst_switch": "2", "dst_port": "1"},
+                {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+            ],
+                "link_events": [{"timestamp_utc": datetime.now(timezone.utc).isoformat(), "event": "DELETE",
+                                  "src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"}],
+                "hosts": [{"switch_id": "1", "port_id": "1", "mac": "02:00:00:00:00:01"}],
             }
         ),
         encoding="utf-8",
@@ -277,7 +328,10 @@ def test_pipeline_faults_endpoint(tmp_path):
     assert len(faults) == 4
     ids = {f["id"] for f in faults}
     assert "mac_flooding" not in ids
-    assert len(get_live_faults_detail(mac_flood_generator=lambda *_: None)) == 5
+    assert len(get_live_faults_detail(mac_flood_generator=lambda *_: None)) == 4
+    assert len(get_live_faults_detail(
+        mac_flood_generator=lambda *_: None, mac_table_reset=lambda: True
+    )) == 5
     assert "trunk_down" in ids
     assert "redundant_trunk_restored" in ids
     assert "flow_drift" in ids
@@ -291,7 +345,9 @@ def test_pipeline_faults_endpoint(tmp_path):
 def test_pipeline_restore_endpoint_guarded(monkeypatch, tmp_path):
     monkeypatch.setenv("NETOPS_CHAOS_API_TOKEN", "restore-token-secret")
 
-    app = create_metrics_app(telemetry_path=str(tmp_path / "telemetry.json"))
+    telemetry_path = tmp_path / "telemetry.json"
+    telemetry_path.write_text(json.dumps(_live_injection_telemetry()), encoding="utf-8")
+    app = create_metrics_app(telemetry_path=str(telemetry_path))
     runs_dir = tmp_path / "runs"
     app.config["NETOPS_PIPELINE_RUNS_DIR"] = str(runs_dir)
 
@@ -329,8 +385,9 @@ def test_pipeline_restore_endpoint_guarded(monkeypatch, tmp_path):
     assert res_ok.status_code == 200
     data = res_ok.get_json()
     assert data["success"] is True
-    assert len(data["completed_commands"]) == 10
-    assert len(executed_cmds) == 10
+    expected_count = len(build_lab_restore_commands(_live_injection_telemetry()))
+    assert len(data["completed_commands"]) == expected_count
+    assert len(executed_cmds) == expected_count
 
     # Verify pipeline run was finalized as rolled_back
     assert manager.is_run_active() is False
@@ -343,7 +400,9 @@ def test_lab_reset_recovers_network_even_when_pipeline_stuck_in_approval(monkeyp
     """Emergency baseline restore is independent of pending approval state."""
     monkeypatch.setenv("NETOPS_CHAOS_API_TOKEN", "reset-token-secret")
 
-    app = create_metrics_app(telemetry_path=str(tmp_path / "telemetry.json"))
+    telemetry_path = tmp_path / "telemetry.json"
+    telemetry_path.write_text(json.dumps(_live_injection_telemetry()), encoding="utf-8")
+    app = create_metrics_app(telemetry_path=str(telemetry_path))
     runs_dir = tmp_path / "runs"
     app.config["NETOPS_PIPELINE_RUNS_DIR"] = str(runs_dir)
 
@@ -362,7 +421,8 @@ def test_lab_reset_recovers_network_even_when_pipeline_stuck_in_approval(monkeyp
     )
     assert res_awaiting.status_code == 200
     assert res_awaiting.get_json()["success"] is True
-    assert len(res_awaiting.get_json()["completed_commands"]) == 10
+    expected_count = len(build_lab_restore_commands(_live_injection_telemetry()))
+    assert len(res_awaiting.get_json()["completed_commands"]) == expected_count
     assert manager.is_run_active() is False
     assert manager.get_current_run().outcome == "rolled_back"
 
@@ -376,14 +436,16 @@ def test_lab_reset_recovers_network_even_when_pipeline_stuck_in_approval(monkeyp
     )
     assert res_approved.status_code == 200
     assert res_approved.get_json()["success"] is True
-    assert len(executed_cmds) == 20
+    assert len(executed_cmds) == expected_count * 2
 
 
 def test_lab_reset_records_commands_and_timestamps_in_run_record(monkeypatch, tmp_path):
     """Each use of lab reset must be recorded in the run record with commands and timestamps."""
     monkeypatch.setenv("NETOPS_CHAOS_API_TOKEN", "reset-token-secret")
 
-    app = create_metrics_app(telemetry_path=str(tmp_path / "telemetry.json"))
+    telemetry_path = tmp_path / "telemetry.json"
+    telemetry_path.write_text(json.dumps(_live_injection_telemetry()), encoding="utf-8")
+    app = create_metrics_app(telemetry_path=str(telemetry_path))
     runs_dir = tmp_path / "runs"
     app.config["NETOPS_PIPELINE_RUNS_DIR"] = str(runs_dir)
 
@@ -409,7 +471,7 @@ def test_lab_reset_records_commands_and_timestamps_in_run_record(monkeypatch, tm
     conn_stage = current.get_stage("connectivity_verified")
     assert conn_stage.evidence["restore_executed"] is True
     assert "commands" in conn_stage.evidence
-    assert len(conn_stage.evidence["commands"]) == 10
+    assert len(conn_stage.evidence["commands"]) == len(build_lab_restore_commands(_live_injection_telemetry()))
     assert "restore_started_at" in conn_stage.evidence
     assert "restore_completed_at" in conn_stage.evidence
 
@@ -454,60 +516,66 @@ def test_missing_connectivity_checker_fails_closed(tmp_path, monkeypatch):
 
 
 def test_restore_flow_deletes_are_cookie_scoped_only():
-    delete_commands = [cmd for cmd in RESTORE_COMMANDS if "del-flows" in cmd]
-    assert delete_commands
+    commands = build_lab_restore_commands(_live_injection_telemetry())
+    delete_commands = [cmd for cmd in commands if "del-flows" in cmd]
+    assert len(delete_commands) == 2
     for command in delete_commands:
         assert any(arg.startswith("cookie=") for arg in command), command
-    assert not any(
-        arg in {"in_port=3", "in_port=2"} for command in delete_commands for arg in command
-    )
+    assert not any("--all" in arg for command in delete_commands for arg in command)
 
 
-def test_restore_command_events_include_exact_command_and_timestamps(monkeypatch, tmp_path):
+def test_restore_command_events_are_derived_from_live_telemetry(monkeypatch, tmp_path):
     from netops_guardrail.controller.pipeline_run import execute_guarded_restore
 
     calls = []
+    telemetry = _live_injection_telemetry()
+    expected_commands = build_lab_restore_commands(telemetry)
 
     def fake_run(command, **kwargs):
         calls.append(list(command))
         return SimpleNamespace(returncode=0, stdout="ok", stderr="")
 
     result, status = execute_guarded_restore(
-        context={"run_command": fake_run},
+        context={"run_command": fake_run, "telemetry": telemetry},
         manager=PipelineRunManager(tmp_path / "runs"),
     )
     assert status == 200
-    assert len(result["command_events"]) == len(RESTORE_COMMANDS)
-    for event, command in zip(result["command_events"], RESTORE_COMMANDS):
+    assert len(result["command_events"]) == len(expected_commands)
+    for event, command in zip(result["command_events"], expected_commands):
         assert event["command"] == list(command)
         assert event["started_at_utc"]
         assert event["completed_at_utc"]
         assert event["returncode"] == 0
-    assert calls == [list(command) for command in RESTORE_COMMANDS]
+    assert calls == [list(command) for command in expected_commands]
 
 
 def _pipeline_test_app(monkeypatch, tmp_path):
     telemetry = tmp_path / "telemetry.json"
+    now = datetime.now(timezone.utc).isoformat()
     telemetry.write_text(
-        json.dumps(
-            {
-                "updated_at_utc": datetime.now(timezone.utc).isoformat(),
-                "switches": {
-                    "1": {"ports": {}, "flows": [], "stp_port_states": {}, "port_status": {}}
-                },
-                "links": [],
-            }
-        ),
+        json.dumps({
+            "updated_at_utc": now,
+            "provenance": {"source": "live_telemetry", "producer": "test-controller"},
+            "switches": {
+                "1": {"ports": {"1": {}, "2": {}, "3": {}}, "flows": [],
+                      "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "BLOCK"},
+                      "port_status": {"1": {"state": "UP"}, "2": {"state": "UP"}, "3": {"state": "DOWN"}}},
+                "2": {"ports": {"1": {}, "2": {}, "3": {}}, "flows": [],
+                      "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"},
+                      "port_status": {"1": {"state": "UP"}, "2": {"state": "DOWN"}, "3": {"state": "UP"}}},
+            },
+            "links": [
+                {"src_switch": "1", "src_port": "2", "dst_switch": "2", "dst_port": "1"},
+                {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+            ],
+            "link_events": [{"timestamp_utc": now, "event": "DELETE", "src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"}],
+            "hosts": [{"switch_id": "1", "port_id": "1", "mac": "02:00:00:00:00:01"}],
+        }),
         encoding="utf-8",
     )
     monitor = tmp_path / "monitor_status.json"
     monitor.write_text(
-        json.dumps(
-            {
-                "status": "running",
-                "last_heartbeat_utc": datetime.now(timezone.utc).isoformat(),
-            }
-        ),
+        json.dumps({"status": "running", "last_heartbeat_utc": now}),
         encoding="utf-8",
     )
     monkeypatch.setenv("NETOPS_CHAOS_API_TOKEN", "pipeline-token")
@@ -703,10 +771,12 @@ def test_lab_restore_recovers_network_if_approval_store_is_unavailable(tmp_path)
         context={
             "approval_store": BrokenApprovalStore(),
             "run_command": fake_run,
+            "telemetry": _live_injection_telemetry(),
         },
         manager=PipelineRunManager(tmp_path / "runs"),
     )
     assert status == 200
     assert result["success"] is True
-    assert len(result["completed_commands"]) == 10
-    assert len(commands) == 10
+    expected_count = len(build_lab_restore_commands(_live_injection_telemetry()))
+    assert len(result["completed_commands"]) == expected_count
+    assert len(commands) == expected_count

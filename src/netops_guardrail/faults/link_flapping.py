@@ -7,6 +7,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Any, Mapping, Optional
 
+from netops_guardrail.controller.trunk_roles import derive_trunk_roles
 from netops_guardrail.faults.base import Fault, check_callback
 
 
@@ -26,8 +27,8 @@ class LinkFlappingFault(Fault):
     name = "link_flapping"
     display_name = "Issue 4 — Repeated link flapping"
     description = (
-        "Performs controlled down/up transitions on the redundant standby "
-        "trunk (s1-eth3) and detects repeated link events in a rolling window."
+        "Performs controlled down/up transitions on a telemetry-derived standby "
+        "trunk endpoint and detects repeated link events in a rolling window."
     )
     safe_expectation = (
         "Keep the stable primary path and host-facing links operational; "
@@ -42,7 +43,6 @@ class LinkFlappingFault(Fault):
         "remains UP without further transitions for its observation window."
     )
 
-    default_interface = "s1-eth3"
     window_seconds = 30
     flap_event_threshold = 4
 
@@ -50,7 +50,12 @@ class LinkFlappingFault(Fault):
         context = context or {}
         run_command = context.get("run_command", subprocess.run)
         sleep = context.get("sleep", time.sleep)
-        interface = str(context.get("interface", self.default_interface))
+        target = context.get("target") or {}
+        endpoint = target.get("endpoint") or {}
+        if target.get("kind") != "trunk" or target.get("role") != "standby" or not endpoint.get("interface"):
+            return {"success": False, "network_mutation_attempted": False,
+                    "error": "link_flapping requires a telemetry-derived standby trunk endpoint."}
+        interface = str(endpoint["interface"])
         cycles = int(context.get("cycles", 3))
         interval = float(context.get("interval_seconds", 0.2))
         if not 1 <= cycles <= 5 or not 0 <= interval <= 2:
@@ -109,7 +114,12 @@ class LinkFlappingFault(Fault):
     def restore(self, context: Optional[Mapping[str, Any]] = None) -> dict:
         context = context or {}
         run_command = context.get("run_command", subprocess.run)
-        interface = str(context.get("interface", self.default_interface))
+        target = context.get("target") or {}
+        endpoint = target.get("endpoint") or {}
+        if target.get("kind") != "trunk" or target.get("role") != "standby" or not endpoint.get("interface"):
+            return {"success": False, "network_mutation_attempted": False,
+                    "error": "link_flapping restore requires a telemetry-derived standby endpoint."}
+        interface = str(endpoint["interface"])
         command = [
             "sudo", "-n", "ip", "link", "set", "dev", interface, "up",
         ]
@@ -133,14 +143,13 @@ class LinkFlappingFault(Fault):
     def detector(self, telemetry: Mapping[str, Any]) -> dict:
         reference = _parse_time(telemetry.get("updated_at_utc") or telemetry.get("timestamp"))
         if reference is None:
-            return {
-                "detected": False, "telemetry_available": False,
-                "reason": "Telemetry timestamp is missing; link stability cannot be evaluated.",
-                "event_count": 0, "window_seconds": self.window_seconds,
-            }
+            return {"detected": False, "telemetry_available": False,
+                    "reason": "Telemetry timestamp is missing; link stability cannot be evaluated.",
+                    "event_count": 0, "window_seconds": self.window_seconds}
         cutoff = reference - timedelta(seconds=self.window_seconds)
+        roles = derive_trunk_roles(telemetry)
+        standby_nodes = {node for pair in roles.get("standby_trunks", []) for node in pair}
         events = []
-
         for event in telemetry.get("link_events") or []:
             if not isinstance(event, Mapping):
                 continue
@@ -149,44 +158,28 @@ class LinkFlappingFault(Fault):
                 continue
             if str(event.get("event", "")).upper() not in {"ADD", "DELETE"}:
                 continue
-            if (
-                str(event.get("src_switch")) == "1"
-                and str(event.get("src_port")) == "3"
-            ) or (
-                str(event.get("dst_switch")) == "1"
-                and str(event.get("dst_port")) == "3"
-            ):
+            left = f"s{str(event.get('src_switch', '')).strip()}-p{str(event.get('src_port', '')).strip()}"
+            right = f"s{str(event.get('dst_switch', '')).strip()}-p{str(event.get('dst_port', '')).strip()}"
+            if left in standby_nodes or right in standby_nodes:
                 events.append(dict(event))
-
         for event in telemetry.get("port_status_events") or []:
             if not isinstance(event, Mapping):
                 continue
             event_time = _parse_time(event.get("timestamp_utc"))
             if event_time is None or not cutoff <= event_time <= reference:
                 continue
-            if (
-                str(event.get("switch_id")) == "1"
-                and str(event.get("port_id")) == "3"
-                and str(event.get("state", "")).upper() in {"UP", "DOWN", "MISSING"}
-            ):
+            node = f"s{str(event.get('switch_id', '')).strip()}-p{str(event.get('port_id', '')).strip()}"
+            if node in standby_nodes and str(event.get("state", "")).upper() in {"UP", "DOWN", "MISSING"}:
                 events.append(dict(event))
-
         event_count = len(events)
-        detected = event_count >= self.flap_event_threshold
+        detected = bool(standby_nodes) and event_count >= self.flap_event_threshold
         return {
-            "detected": detected,
-            "telemetry_available": True,
-            "reason": (
-                f"Standby-link instability detected: {event_count} transitions "
-                f"within {self.window_seconds} seconds."
-                if detected else
-                f"No flap threshold reached: {event_count} relevant transitions "
-                f"within {self.window_seconds} seconds."
-            ),
-            "event_count": event_count,
-            "threshold": self.flap_event_threshold,
-            "window_seconds": self.window_seconds,
-            "events": events,
+            "detected": detected, "telemetry_available": True,
+            "reason": (f"Standby-link instability detected: {event_count} transitions within {self.window_seconds} seconds."
+                       if detected else f"No standby-link flap threshold reached: {event_count} transitions within {self.window_seconds} seconds."),
+            "event_count": event_count, "threshold": self.flap_event_threshold,
+            "window_seconds": self.window_seconds, "events": events,
+            "standby_endpoints": sorted(standby_nodes),
         }
 
     def ground_truth_check(self, context: Optional[Mapping[str, Any]] = None) -> dict:

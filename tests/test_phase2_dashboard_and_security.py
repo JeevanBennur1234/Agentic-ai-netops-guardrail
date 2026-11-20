@@ -164,6 +164,24 @@ def test_api_pipeline_preflight_and_restore_workflow(monkeypatch, tmp_path):
     assert res_pf_stale.get_json()["ready"] is False
     assert res_pf_stale.get_json()["telemetry"]["status"] == "stale"
 
+    # Stale telemetry cannot be used to choose reset targets.
+    stale_restore = client.post(
+        "/api/pipeline/restore",
+        headers={"Authorization": "Bearer operator-secret-999"},
+    )
+    assert stale_restore.status_code == 409
+    assert executed == []
+
+    # Refresh controller telemetry before asking the reset to resolve targets.
+    telemetry_path.write_text(json.dumps({
+        "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "provenance": {"source": "live_telemetry", "producer": "test-controller"},
+        "switches": {
+            "1": {"ports": {"1": {}, "2": {}}},
+            "2": {"ports": {"1": {}, "2": {}}},
+        },
+    }), encoding="utf-8")
+
     # Restore endpoint requires token
     res_unauth = client.post("/api/pipeline/restore")
     assert res_unauth.status_code == 401

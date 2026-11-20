@@ -95,6 +95,24 @@ def read_telemetry() -> dict:
         return {}
 
 
+def wait_for_new_telemetry(previous_updated_at: str | None, timeout: float = 15.0) -> bool:
+    """Wait until the controller replaces the prior snapshot with a fresh one."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        current = read_telemetry().get("updated_at_utc")
+        if current and current != previous_updated_at:
+            try:
+                updated = datetime.fromisoformat(str(current).replace("Z", "+00:00"))
+                if updated.tzinfo is None:
+                    updated = updated.replace(tzinfo=timezone.utc)
+                if (datetime.now(timezone.utc) - updated).total_seconds() <= 10:
+                    return True
+            except ValueError:
+                pass
+        time.sleep(0.25)
+    return False
+
+
 def wait_for_stp_convergence(timeout: float = 30.0) -> tuple[bool, float, str]:
     t_start = time.monotonic()
     deadline = t_start + timeout
@@ -323,18 +341,23 @@ def run_live_experiment():
     print("  PHASE B3 LIVE RING4 DEMONSTRATION & VERIFICATION")
     print("=" * 75)
 
-    # Clean previous state
-    subprocess.run(["ovs-vsctl", "--if-exists", "del-br", "s1",
-                    "--", "--if-exists", "del-br", "s2",
-                    "--", "--if-exists", "del-br", "s3",
-                    "--", "--if-exists", "del-br", "s4"],
-                   check=False, capture_output=True)
-    if TELEMETRY_PATH.exists():
-        TELEMETRY_PATH.unlink()
-    if APPROVALS_PATH.exists():
-        APPROVALS_PATH.unlink()
-    if LEDGER_PATH.exists():
-        LEDGER_PATH.unlink()
+    # Fail closed instead of deleting bridges or clearing shared runtime state.
+    existing_bridges = set(subprocess.check_output(["ovs-vsctl", "list-br"], text=True).split())
+    conflicting_bridges = sorted(existing_bridges.intersection({"s1", "s2", "s3", "s4"}))
+    if conflicting_bridges:
+        raise RuntimeError(
+            f"Refusing to start: OVS bridges already exist: {conflicting_bridges}. "
+            "Stop only the lab instance you own, then retry."
+        )
+    if wait_for_port(port=6653, timeout=0.5):
+        raise RuntimeError("Refusing to start: TCP port 6653 is already occupied.")
+
+    # Keep every run's approval and cookie ledger for auditability.
+    global LEDGER_PATH, APPROVALS_PATH
+    run_stamp = started.strftime("%Y%m%dT%H%M%SZ")
+    LEDGER_PATH = PROJECT_ROOT / "audit" / f"phase_b3_live_cookie_ledger_{run_stamp}.json"
+    APPROVALS_PATH = PROJECT_ROOT / "audit" / f"live_approvals_b3_{run_stamp}.json"
+    previous_telemetry_updated_at = read_telemetry().get("updated_at_utc")
 
     # 1. Start Ryu
     print("\n[1] Starting Ryu Controller with telemetry_controller (OF 1.3, port 6653)...")
@@ -357,7 +380,6 @@ def run_live_experiment():
             return
 
         print("Ryu controller active and listening on port 6653.")
-
         # 2. Start Mininet Ring4
         print("\n[2] Initializing Mininet Ring4 Topology (s1..s4, h1..h4)...")
         setLogLevel("warning")
@@ -373,6 +395,8 @@ def run_live_experiment():
         )
         net.addController("c0", controller=RemoteController, ip="127.0.0.1", port=6653)
         net.start()
+        if not wait_for_new_telemetry(previous_telemetry_updated_at, timeout=15.0):
+            raise RuntimeError("Controller did not publish a fresh telemetry snapshot after switch connection; refusing stale baseline.")
 
         print("Waiting for STP convergence across s1..s4...")
         converged, conv_time, blocked_port = wait_for_stp_convergence(timeout=30.0)
@@ -892,7 +916,8 @@ def run_live_experiment():
                 os.killpg(os.getpgid(ryu_proc.pid), signal.SIGKILL)
             except Exception:
                 pass
-        subprocess.run(["mn", "-c"], check=False, capture_output=True)
+        # Do not run global `mn -c`: it can tear down unrelated Mininet labs.
+        # Mininet.net.stop() above owns teardown for this process only.
 
         # Once Mininet has removed the ring4 bridges, its guardrail cookies no
         # longer refer to installed OVS rules. Retire them under the real ledger

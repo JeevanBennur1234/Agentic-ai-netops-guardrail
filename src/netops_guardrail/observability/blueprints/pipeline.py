@@ -323,11 +323,14 @@ def api_pipeline_preflight():
 
 @pipeline_bp.route("/api/pipeline/faults", methods=["GET"])
 def api_pipeline_faults():
-    """Return live-injectable faults with target, description, and exact commands."""
+    """Return live-injectable fault metadata and telemetry-derived target policies."""
     generator = current_app.config.get("NETOPS_MAC_FLOOD_GENERATOR")
+    mac_table_reset = current_app.config.get("NETOPS_MAC_TABLE_RESET")
     return jsonify(
         {
-            "faults": get_live_faults_detail(mac_flood_generator=generator),
+            "faults": get_live_faults_detail(
+                mac_flood_generator=generator, mac_table_reset=mac_table_reset
+            ),
         }
     ), 200
 
@@ -351,11 +354,16 @@ def api_pipeline_restore():
         return jsonify({"error": "Unauthorized"}), 401
 
     manager = _get_manager()
-    context = {}
+    collector = current_app.config.get("NETOPS_COLLECTOR")
+    if collector is None or not getattr(collector, "telemetry_path", None):
+        return jsonify({"success": False, "error": "Controller telemetry source is unavailable; lab restore refused."}), 503
+    context = {"telemetry_path": collector.telemetry_path}
     if request.is_json:
         payload = request.get_json(silent=True) or {}
         if isinstance(payload.get("context"), dict):
-            context = payload["context"]
+            context = {key: value for key, value in payload["context"].items()
+                       if key not in {"telemetry", "telemetry_path", "target", "run_command"}}
+    context["telemetry_path"] = collector.telemetry_path
     if "NETOPS_RUN_COMMAND_OVERRIDE" in current_app.config:
         context["run_command"] = current_app.config["NETOPS_RUN_COMMAND_OVERRIDE"]
     if "NETOPS_APPROVAL_STORE" in current_app.config:
@@ -424,11 +432,13 @@ def api_pipeline_inject():
                 return jsonify({"error": error_msg, "fault_id": fault_id}), status_code
 
             # 3. Execute guarded injection
-            context = {}
+            context = {"telemetry_path": telemetry_path}
             if "NETOPS_RUN_COMMAND_OVERRIDE" in current_app.config:
                 context["run_command"] = current_app.config["NETOPS_RUN_COMMAND_OVERRIDE"]
             if "NETOPS_MAC_FLOOD_GENERATOR" in current_app.config:
                 context["mac_flood_generator"] = current_app.config["NETOPS_MAC_FLOOD_GENERATOR"]
+            if "NETOPS_MAC_TABLE_RESET" in current_app.config:
+                context["mac_table_reset"] = current_app.config["NETOPS_MAC_TABLE_RESET"]
 
             result, code = execute_guarded_injection(
                 fault_id=fault_id,
