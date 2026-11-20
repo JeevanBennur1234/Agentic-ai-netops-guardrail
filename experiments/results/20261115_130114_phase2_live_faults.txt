@@ -1,0 +1,84 @@
+run_id: 20261115_130114
+evidence_type: LIVE_MININET_OVS
+passed: False
+raw_json: /home/bennurjeevan/netops_guardrail/experiments/results/20261115_130114_phase2_live_faults.json
+
+{
+  "initial_baseline": {
+    "loss_percent": 0.0,
+    "passed": true
+  },
+  "experiments": {
+    "flow_rule_drift": {
+      "baseline": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "injection": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "bridge": "s1",
+        "marker_cookie": 86059674194003,
+        "marker_priority": 65000
+      },
+      "detection": {
+        "detected": true,
+        "telemetry_available": true,
+        "reason": "Unauthorized marker flow detected in OpenFlow telemetry.",
+        "matched_flows": [
+          {
+            "switch_id": "1",
+            "cookie": 86059674194003,
+            "priority": 65000,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_type",
+                      "value": 34997,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 10,
+                "type": 1
+              }
+            },
+            "instructions": []
+          }
+        ],
+        "marker_cookie": 86059674194003
+      },
+      "restoration": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "error": "",
+        "command": [
+          "sudo",
+          "-n",
+          "ovs-ofctl",
+          "-O",
+          "OpenFlow13",
+          "del-flows",
+          "s1",
+          "cookie=0x4e45544f5053/-1"
+        ]
+      },
+      "independent_policy_check": true,
+      "ground_truth": {
+        "available": true,
+        "passed": true,
+        "result": true,
+        "error": null
+      },
+      "connectivity": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "passed": true
+    }
+  },
+  "error": "RuntimeError: Timed out waiting for flap trial 1 event detection: None",
+  "cleanup_error": null
+}

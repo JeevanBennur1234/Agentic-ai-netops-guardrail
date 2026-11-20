@@ -1,0 +1,22 @@
+{
+  "ring4": {
+    "links": [
+      {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "1"},
+      {"src_switch": "2", "src_port": "1", "dst_switch": "1", "dst_port": "3"},
+      {"src_switch": "1", "src_port": "4", "dst_switch": "3", "dst_port": "1"},
+      {"src_switch": "3", "src_port": "1", "dst_switch": "1", "dst_port": "4"},
+      {"src_switch": "2", "src_port": "2", "dst_switch": "4", "dst_port": "3"},
+      {"src_switch": "4", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+      {"src_switch": "3", "src_port": "2", "dst_switch": "4", "dst_port": "4"},
+      {"src_switch": "4", "src_port": "4", "dst_switch": "3", "dst_port": "2"}
+    ]
+  },
+  "redundant2": {
+    "links": [
+      {"src_switch": "1", "src_port": "2", "dst_switch": "2", "dst_port": "1"},
+      {"src_switch": "2", "src_port": "1", "dst_switch": "1", "dst_port": "2"},
+      {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+      {"src_switch": "2", "src_port": "2", "dst_switch": "1", "dst_port": "3"}
+    ]
+  }
+}

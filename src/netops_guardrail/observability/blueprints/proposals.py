@@ -2,78 +2,32 @@
 import importlib
 import json
 import os
-import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 from netops_guardrail.controller.human_verifier import ApprovalError
+from netops_guardrail.controller.pipeline_run import PipelineRunManager
 from netops_guardrail.observability.blueprints.auth import authenticated_approver
-from netops_guardrail.verifier.safety_verifier import build_topology
 
 proposals_bp = Blueprint("proposals", __name__)
+
+
+def _get_pipeline_manager() -> PipelineRunManager:
+    runs_dir = current_app.config.get("NETOPS_PIPELINE_RUNS_DIR")
+    if runs_dir:
+        return PipelineRunManager(runs_dir)
+    collector = current_app.config.get("NETOPS_COLLECTOR")
+    if collector and hasattr(collector, "telemetry_path"):
+        base_dir = Path(collector.telemetry_path).resolve().parents[2]
+        return PipelineRunManager(base_dir / "observability" / "data" / "pipeline_runs")
+    return PipelineRunManager()
 
 
 @proposals_bp.route("/approvals", methods=["GET"])
 def human_approval_page():
     return render_template("approvals.html")
-
-
-@proposals_bp.route("/api/simulate", methods=["GET"])
-def api_simulate():
-    collector = current_app.config["NETOPS_COLLECTOR"]
-    audit = current_app.config["NETOPS_AUDIT"]
-    scenario = request.args.get("scenario", "normal")
-    telem = {}
-    if os.path.exists(collector.telemetry_path):
-        with open(collector.telemetry_path, "r", encoding="utf-8") as f:
-            telem = json.load(f)
-
-    graph = build_topology(telem) if telem else None
-
-    if scenario == "normal":
-        intent = {
-            "action": "no_action",
-            "reason": "Nominal traffic across all ports, zero congestion"
-        }
-    elif scenario == "unsafe_block":
-        intent = {
-            "action": "block",
-            "target_switch": "1",
-            "from_port": "1",
-            "reason": "Adversarial or erroneous intent to isolate access port"
-        }
-    elif scenario == "injection":
-        intent = {
-            "action": "block",
-            "target_switch": "1",
-            "from_port": "1; rm -rf /",
-            "reason": "Shell command injection payload attempt"
-        }
-    else:
-        intent = {"action": "no_action", "reason": "Default check"}
-
-    if graph is not None:
-        verif_res = sys.modules["netops_guardrail.observability.server"].apply_intent_to_graph(graph, intent)
-    else:
-        verif_res = {"safe": False, "reason": "No active topology"}
-
-    decision = "APPROVED" if verif_res.get("safe") else "REJECTED"
-
-    record = audit.record_decision(
-        decision=decision,
-        intent=intent,
-        verifier_result=verif_res,
-        execution_result={"success": True if decision == "APPROVED" else False}
-    )
-
-    return jsonify({
-        "scenario": scenario,
-        "intent": intent,
-        "verification": verif_res,
-        "decision": decision,
-        "audit_record": record
-    }), 200
 
 
 @proposals_bp.route("/api/approvals", methods=["GET"])
@@ -170,6 +124,40 @@ def api_human_approval_decision(proposal_id):
     except OSError:
         current_app.logger.exception("Failed to append human approval decision to pipeline trace")
 
+    # Update pipeline run if active and linked
+    pipeline_mgr = _get_pipeline_manager()
+    run = pipeline_mgr.get_current_run()
+    if run and (run.proposal_id == proposal_id or not run.proposal_id):
+        run.proposal_id = proposal_id
+        if updated["status"] == "approved":
+            intent = current.get("intent") or {}
+            # Scope of execution: only block is executable
+            if intent.get("action") != "block" or not run.executable:
+                run.complete_stage("awaiting_approval")
+                run.complete_stage("approved")
+                run.skip_stage(
+                    "executed",
+                    reason="Scope of execution: only 'block' is executable; recommendation only.",
+                )
+                run.skip_stage(
+                    "connectivity_verified",
+                    reason="Recommendation only; no network mutation executed.",
+                )
+                run.status = "RECOMMENDATION_ONLY"
+                pipeline_mgr.finalize_run(run, outcome="recommendation_only")
+            else:
+                run.complete_stage("awaiting_approval")
+                run.complete_stage("approved")
+                run.status = "APPROVED"
+                pipeline_mgr.save_run(run)
+        else:
+            run.fail_stage(
+                "awaiting_approval",
+                error=f"Human decision: {updated['status']}",
+                outcome="failed",
+            )
+            pipeline_mgr.finalize_run(run, outcome="failed")
+
     return jsonify({
         "proposal": updated,
         "audit_status": "recorded",
@@ -178,6 +166,7 @@ def api_human_approval_decision(proposal_id):
 
 
 @proposals_bp.route("/api/approvals/<proposal_id>/execute", methods=["POST"])
+@proposals_bp.route("/api/proposals/<proposal_id>/execute", methods=["POST"])
 def api_execute_human_approved(proposal_id):
     approver, error = authenticated_approver()
     if error:
@@ -193,6 +182,17 @@ def api_execute_human_approved(proposal_id):
         return jsonify({"error": "Only an approved, unconsumed proposal can execute"}), 409
     if proposal.get("execution_allowed", True) is False or proposal.get("requested_by") == "presentation-demo":
         return jsonify({"error": "This proposal is review-only; network execution is disabled."}), 409
+
+    # Scope of execution: only 'block' is executable
+    intent = proposal.get("intent") or {}
+    if intent.get("action") != "block":
+        return jsonify({
+            "error": (
+                f"Scope of execution: only 'block' is executable. "
+                f"Action '{intent.get('action')}' is recommendation-only; executor cannot be called."
+            )
+        }), 409
+
     chain_ok, chain_message = audit.verify_chain(audit.chain)
     if not chain_ok:
         return jsonify({"error": f"Audit chain verification failed; execution blocked: {chain_message}"}), 503
@@ -222,7 +222,14 @@ def api_execute_human_approved(proposal_id):
     except Exception as exc:
         return jsonify({"error": f"Connectivity checker could not be loaded: {exc}"}), 503
 
-    result = sys.modules["netops_guardrail.observability.server"].decide(
+    pipeline_mgr = _get_pipeline_manager()
+    run = pipeline_mgr.get_current_run()
+    if run and (run.proposal_id == proposal_id or not run.proposal_id):
+        run.proposal_id = proposal_id
+        run.start_stage("executed")
+        pipeline_mgr.save_run(run)
+
+    result = current_app.config["NETOPS_DECIDE"](
         telemetry_path=collector.telemetry_path,
         execute_approved=True,
         connectivity_checker=checker,
@@ -231,5 +238,36 @@ def api_execute_human_approved(proposal_id):
         audit_logger=audit,
     )
     execution = result.get("execution") or {}
-    status_code = 200 if execution.get("success") else 409
+    exec_success = bool(execution.get("success"))
+
+    if run and (run.proposal_id == proposal_id or not run.proposal_id):
+        if exec_success:
+            run.complete_stage("executed", evidence=execution)
+            # Post-execution connectivity check
+            try:
+                post_ok = checker()
+            except Exception:
+                post_ok = False
+            if post_ok:
+                run.complete_stage("connectivity_verified", evidence={"post_ping_passed": True})
+                run.status = "CONNECTIVITY_VERIFIED"
+                pipeline_mgr.finalize_run(run, outcome="connectivity_verified")
+            else:
+                run.fail_stage(
+                    "connectivity_verified",
+                    error="Post-execution ping check failed",
+                    evidence={"post_ping_passed": False},
+                    outcome="rolled_back",
+                )
+                pipeline_mgr.finalize_run(run, outcome="rolled_back")
+        else:
+            run.fail_stage(
+                "executed",
+                error=execution.get("error", "execution failed"),
+                evidence=execution,
+                outcome="rolled_back",
+            )
+            pipeline_mgr.finalize_run(run, outcome="rolled_back")
+
+    status_code = 200 if exec_success else 409
     return jsonify({"authenticated_approver": approver, "result": result}), status_code

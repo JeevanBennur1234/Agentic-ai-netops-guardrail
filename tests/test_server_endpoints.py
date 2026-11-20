@@ -71,29 +71,21 @@ def test_endpoint_dashboard(app_and_client):
     assert "text/html" in res.content_type
 
 
-def test_endpoint_simulate_scenarios(app_and_client):
+def test_endpoint_simulate_removed_from_runtime(app_and_client):
     _, client = app_and_client
-    # Scenario: normal
+    # /api/simulate must be completely removed from runtime code
+    res = client.get("/api/simulate")
+    assert res.status_code == 404
     res = client.get("/api/simulate?scenario=normal")
-    assert res.status_code == 200
-    data = res.get_json()
-    assert data["scenario"] == "normal"
-    assert "intent" in data
-    assert "verification" in data
-    assert "decision" in data
-    assert "audit_record" in data
+    assert res.status_code == 404
 
-    # Scenario: unsafe_block
-    res = client.get("/api/simulate?scenario=unsafe_block")
-    assert res.status_code == 200
-    data = res.get_json()
-    assert data["scenario"] == "unsafe_block"
 
-    # Scenario: injection
-    res = client.get("/api/simulate?scenario=injection")
+def test_endpoint_pipeline_current_empty_initially(app_and_client):
+    _, client = app_and_client
+    res = client.get("/api/pipeline/current")
     assert res.status_code == 200
     data = res.get_json()
-    assert data["scenario"] == "injection"
+    assert data["active"] is False
 
 
 def test_endpoint_topology(app_and_client):
@@ -132,6 +124,39 @@ def test_endpoint_audit_chain(app_and_client):
     assert "timestamp" in item
 
 
+def test_api_status_reports_monitor_liveness_and_ai_configuration(app_and_client, tmp_path):
+    app, client = app_and_client
+    status_path = tmp_path / "monitor_status.json"
+    app.config["NETOPS_MONITOR_STATUS_PATH"] = str(status_path)
+
+    stopped = client.get("/api/status").get_json()["monitor"]
+    assert stopped["status"] == "stopped"
+    assert stopped["ai_enabled"] is False
+
+    from datetime import datetime, timezone
+    status_path.write_text(json.dumps({
+        "status": "running",
+        "pid": 1234,
+        "last_heartbeat_utc": datetime.now(timezone.utc).isoformat(),
+        "interval_seconds": 5,
+        "ai_enabled": True,
+        "last_error": None,
+    }), encoding="utf-8")
+    running = client.get("/api/status").get_json()["monitor"]
+    assert running["status"] == "running"
+    assert running["ai_enabled"] is True
+    assert running["pid"] == 1234
+
+    status_path.write_text(json.dumps({
+        "status": "running",
+        "last_heartbeat_utc": "2020-01-01T00:00:00+00:00",
+        "interval_seconds": 5,
+        "ai_enabled": True,
+    }), encoding="utf-8")
+    stale = client.get("/api/status").get_json()["monitor"]
+    assert stale["status"] == "stopped"
+
+
 def test_endpoint_root_json_and_html(app_and_client):
     _, client = app_and_client
     # JSON default
@@ -141,7 +166,13 @@ def test_endpoint_root_json_and_html(app_and_client):
     data = res.get_json()
     assert "name" in data
     assert "endpoints" in data
-    assert len(data["endpoints"]) == 15
+    assert len(data["endpoints"]) == 20
+    assert "/api/faults" in data["endpoints"]
+    assert "/api/pipeline/current" in data["endpoints"]
+    assert "/api/pipeline/inject" in data["endpoints"]
+    assert "/api/pipeline/preflight" in data["endpoints"]
+    assert "/api/pipeline/restore" in data["endpoints"]
+    assert "/api/pipeline/faults" in data["endpoints"]
 
     # HTML when browser requests it
     res = client.get("/", headers={"Accept": "text/html,application/xhtml+xml"})

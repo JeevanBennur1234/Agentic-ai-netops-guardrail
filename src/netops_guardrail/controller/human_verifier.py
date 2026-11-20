@@ -19,10 +19,15 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from netops_guardrail.netops_paths import NETOPS_HOME
+from netops_guardrail.verifier.safety_verifier import (
+    MUTATION_ACTIONS,
+    validate_intent_schema,
+)
 
 PROJECT_ROOT = NETOPS_HOME
 DEFAULT_APPROVAL_PATH = PROJECT_ROOT / "audit" / "human_approvals.json"
 DEFAULT_MAX_TELEMETRY_AGE_SECONDS = 30
+ALLOWLISTED_APPROVAL_ACTIONS = MUTATION_ACTIONS
 
 
 class ApprovalError(ValueError):
@@ -46,6 +51,13 @@ def _canonical(value):
 
 def _sha256(value):
     return hashlib.sha256(_canonical(value)).hexdigest()
+
+
+def compute_evidence_hash(incident_context: dict | None) -> str | None:
+    """Compute canonical sha256 hash of incident evidence dictionary."""
+    if not incident_context or not isinstance(incident_context, dict):
+        return None
+    return _sha256(incident_context)
 
 
 def topology_fingerprint(telemetry):
@@ -139,12 +151,15 @@ class HumanApprovalStore:
                     fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
 
     @staticmethod
-    def proposal_fingerprint(intent, verifier_result, topology_fp):
-        return _sha256({
+    def proposal_fingerprint(intent, verifier_result, topology_fp, evidence_hash=None):
+        payload = {
             "intent": intent,
             "verifier_result": verifier_result,
             "topology_fingerprint": topology_fp,
-        })
+        }
+        if evidence_hash is not None:
+            payload["evidence_hash"] = evidence_hash
+        return _sha256(payload)
 
     def _read(self):
         if not self.path.exists():
@@ -175,16 +190,20 @@ class HumanApprovalStore:
                 os.unlink(temp_path)
 
     def create_proposal(
-        self, intent, verifier_result, telemetry_path, requested_by="agent", execution_allowed=True
+        self, intent, verifier_result, telemetry_path, requested_by="agent", execution_allowed=True, incident_context=None
     ):
-        if not isinstance(intent, dict) or intent.get("action") != "block":
-            raise ApprovalError("Only a validated block proposal requires this human approval workflow")
+        if not isinstance(intent, dict) or intent.get("action") not in ALLOWLISTED_APPROVAL_ACTIONS:
+            raise ApprovalError("Only a validated block proposal or allowlisted remediation action requires this human approval workflow")
+        topology_fp = topology_fingerprint_from_path(telemetry_path)
+        valid, schema_err = validate_intent_schema(intent)
+        if not valid:
+            raise ApprovalError(f"Invalid intent schema: {schema_err}")
         if not isinstance(verifier_result, dict) or verifier_result.get("safe") is not True:
             raise ApprovalError("Unsafe or missing verifier result cannot be sent for approval")
-        topology_fp = topology_fingerprint_from_path(telemetry_path)
         now = _utc_now()
         proposal_id = uuid.uuid4().hex
-        fingerprint = self.proposal_fingerprint(intent, verifier_result, topology_fp)
+        evidence_hash = compute_evidence_hash(incident_context)
+        fingerprint = self.proposal_fingerprint(intent, verifier_result, topology_fp, evidence_hash=evidence_hash)
         proposal = {
             "proposal_id": proposal_id,
             "status": "pending",
@@ -196,6 +215,8 @@ class HumanApprovalStore:
             "verifier_result": copy.deepcopy(verifier_result),
             "topology_fingerprint": topology_fp,
             "proposal_fingerprint": fingerprint,
+            "evidence_hash": evidence_hash,
+            "incident_context": copy.deepcopy(incident_context) if incident_context else None,
             "decision": None,
             "consumed_at": None,
         }
@@ -272,7 +293,7 @@ class HumanApprovalStore:
                 return copy.deepcopy(proposal)
         raise ApprovalError("Proposal not found")
 
-    def validate_approved(self, proposal_id, intent, verifier_result, telemetry_path):
+    def validate_approved(self, proposal_id, intent, verifier_result, telemetry_path, incident_context=None):
         with self._exclusive_lock():
             proposal = next(
                 (p for p in self._read() if p.get("proposal_id") == proposal_id), None
@@ -285,15 +306,24 @@ class HumanApprovalStore:
             raise ApprovalError("This proposal is review-only; network execution is disabled")
         if self._is_expired(proposal):
             raise ApprovalError("Human approval expired; a fresh review is required")
+
+        # Evidence binding check
+        expected_ev_hash = proposal.get("evidence_hash")
+        if expected_ev_hash:
+            ctx = incident_context if incident_context is not None else proposal.get("incident_context")
+            current_ev_hash = compute_evidence_hash(ctx)
+            if current_ev_hash != expected_ev_hash:
+                raise ApprovalError("Incident evidence changed or was tampered with after approval; refusing execution")
+
         current_topology_fp = topology_fingerprint_from_path(telemetry_path)
-        current_fp = self.proposal_fingerprint(intent, verifier_result, current_topology_fp)
+        current_fp = self.proposal_fingerprint(intent, verifier_result, current_topology_fp, evidence_hash=expected_ev_hash)
         if current_fp != proposal.get("proposal_fingerprint"):
             raise ApprovalError("Proposal, verifier result, or topology changed after approval")
         if not proposal.get("decision", {}).get("approver_id"):
             raise ApprovalError("Approval identity missing; refusing execution")
         return copy.deepcopy(proposal)
 
-    def consume_approval(self, proposal_id, intent, verifier_result, telemetry_path):
+    def consume_approval(self, proposal_id, intent, verifier_result, telemetry_path, incident_context=None):
         """Atomically validate and mark an approved proposal as consumed exactly once."""
         with self._exclusive_lock():
             proposals = self._read()
@@ -308,8 +338,17 @@ class HumanApprovalStore:
                 proposal["status"] = "expired"
                 self._write(proposals)
                 raise ApprovalError("Human approval expired; a fresh review is required")
+
+            # Evidence binding check
+            expected_ev_hash = proposal.get("evidence_hash")
+            if expected_ev_hash:
+                ctx = incident_context if incident_context is not None else proposal.get("incident_context")
+                current_ev_hash = compute_evidence_hash(ctx)
+                if current_ev_hash != expected_ev_hash:
+                    raise ApprovalError("Incident evidence changed or was tampered with after approval; refusing execution")
+
             current_topology_fp = topology_fingerprint_from_path(telemetry_path)
-            current_fp = self.proposal_fingerprint(intent, verifier_result, current_topology_fp)
+            current_fp = self.proposal_fingerprint(intent, verifier_result, current_topology_fp, evidence_hash=expected_ev_hash)
             if current_fp != proposal.get("proposal_fingerprint"):
                 raise ApprovalError("Proposal, verifier result, or topology changed after approval")
             if not proposal.get("decision", {}).get("approver_id"):

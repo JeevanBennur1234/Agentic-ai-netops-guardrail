@@ -1,13 +1,16 @@
 """Detection for unexpected standby-trunk forwarding from live Ryu telemetry.
 
 The detector is observation-only. It never changes a switch or fabricates a
-telemetry state. Controlled demonstration alerts are handled separately by the
-fault-injection API and are explicitly labeled as simulations.
+telemetry state. Test fixtures are kept separate from live telemetry and are
+explicitly labeled as fixtures.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Any
+
+from netops_guardrail.controller.trunk_roles import derive_trunk_roles
 
 PRIMARY = (("s1-p2", "s2-p1"),)
 STANDBY = (("s1-p3", "s2-p2"),)
@@ -51,32 +54,68 @@ def inspect_standby_forwarding(telemetry: dict, max_age_seconds: int = 30, now=N
     for link in telemetry.get("links") or []:
         if not isinstance(link, dict):
             continue
-        left = f"s{str(link.get('src_switch', '')).strip()}-p{str(link.get('src_port', '')).strip()}"
-        right = f"s{str(link.get('dst_switch', '')).strip()}-p{str(link.get('dst_port', '')).strip()}"
+        left = (
+            f"s{str(link.get('src_switch', '')).strip()}-p{str(link.get('src_port', '')).strip()}"
+        )
+        right = (
+            f"s{str(link.get('dst_switch', '')).strip()}-p{str(link.get('dst_port', '')).strip()}"
+        )
         if left != "s-p" and right != "s-p":
             discovered_links.add(tuple(sorted((left, right))))
 
-    primary_link_present = tuple(sorted(("s1-p2", "s2-p1"))) in discovered_links
-    standby_link_present = tuple(sorted(("s1-p3", "s2-p2"))) in discovered_links
-    required_ports_present = all(
-        port in ports.get(switch_id, set())
-        for switch_id, port in (("1", "1"), ("1", "2"), ("1", "3"),
-                                ("2", "1"), ("2", "2"), ("2", "3"))
-    )
+    is_multi_switch = len(switches) > 2
+    derived = derive_trunk_roles(telemetry)
 
-    primary_forward = (
-        states.get("1", {}).get("2") == "FORWARD"
-        and states.get("2", {}).get("1") == "FORWARD"
-    )
-    host_access_forward = (
-        states.get("1", {}).get("1") == "FORWARD"
-        and states.get("2", {}).get("3") == "FORWARD"
-    )
-    standby_states = {
-        "s1-p3": states.get("1", {}).get("3", "UNKNOWN"),
-        "s2-p2": states.get("2", {}).get("2", "UNKNOWN"),
-    }
-    standby_both_forward = all(value == "FORWARD" for value in standby_states.values())
+    if is_multi_switch:
+        primary_link_present = len(derived.get("primary_trunks", [])) > 0
+        standby_link_present = (
+            len(derived.get("standby_trunks", [])) > 0 or len(derived.get("blocked_ports", [])) > 0
+        )
+        required_ports_present = all(
+            len(switch_data.get("ports", {})) > 0 for switch_data in switches.values()
+        )
+        primary_forward = all(
+            states.get(link["src"].split("-")[0][1:], {}).get(link["src"].split("-")[1][1:]) == "FORWARD"
+            and states.get(link["dst"].split("-")[0][1:], {}).get(link["dst"].split("-")[1][1:]) == "FORWARD"
+            for link in derived.get("links", [])
+            if link.get("role") == "primary"
+        )
+        host_access_forward = True
+        standby_states = {
+            port: states.get(port.split("-")[0][1:], {}).get(port.split("-")[1][1:], "UNKNOWN")
+            for link in derived.get("links", [])
+            if link.get("role") == "standby"
+            for port in (link["src"], link["dst"])
+        }
+        standby_both_forward = bool(
+            standby_states and all(v == "FORWARD" for v in standby_states.values())
+        )
+    else:
+        primary_link_present = tuple(sorted(("s1-p2", "s2-p1"))) in discovered_links
+        standby_link_present = tuple(sorted(("s1-p3", "s2-p2"))) in discovered_links
+        required_ports_present = all(
+            port in ports.get(switch_id, set())
+            for switch_id, port in (
+                ("1", "1"),
+                ("1", "2"),
+                ("1", "3"),
+                ("2", "1"),
+                ("2", "2"),
+                ("2", "3"),
+            )
+        )
+
+        primary_forward = (
+            states.get("1", {}).get("2") == "FORWARD" and states.get("2", {}).get("1") == "FORWARD"
+        )
+        host_access_forward = (
+            states.get("1", {}).get("1") == "FORWARD" and states.get("2", {}).get("3") == "FORWARD"
+        )
+        standby_states = {
+            "s1-p3": states.get("1", {}).get("3", "UNKNOWN"),
+            "s2-p2": states.get("2", {}).get("2", "UNKNOWN"),
+        }
+        standby_both_forward = all(value == "FORWARD" for value in standby_states.values())
 
     prerequisites = {
         "telemetry_fresh": telemetry_fresh,
@@ -90,18 +129,17 @@ def inspect_standby_forwarding(telemetry: dict, max_age_seconds: int = 30, now=N
     detected = ready and standby_both_forward
 
     if detected:
+        standby_names = " and ".join(standby_states.keys()) or "standby trunk"
         reason = (
-            "Unexpected standby forwarding detected: both s1-p3 and s2-p2 are "
-            "reported FORWARD while the primary trunk and host access ports are forwarding."
+            f"Unexpected standby forwarding detected: {standby_names} are "
+            "reported FORWARD while primary trunks and host access ports are forwarding."
         )
     elif not ready:
         failed = [key for key, value in prerequisites.items() if not value]
         reason = "Cannot safely evaluate standby forwarding; failed checks: " + ", ".join(failed)
     else:
-        reason = (
-            "No live dual-forwarding anomaly detected. Standby states are "
-            f"s1-p3={standby_states['s1-p3']} and s2-p2={standby_states['s2-p2']}."
-        )
+        state_strs = ", ".join(f"{p}={s}" for p, s in standby_states.items())
+        reason = f"No live dual-forwarding anomaly detected. Standby states are {state_strs}."
 
     return {
         "detected": detected,

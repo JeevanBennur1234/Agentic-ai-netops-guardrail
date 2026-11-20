@@ -33,6 +33,7 @@ dev = [
 
 [project.scripts]
 netops-server = "netops_guardrail.observability.server:main"
+netops-monitor = "netops_guardrail.controller.monitor:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

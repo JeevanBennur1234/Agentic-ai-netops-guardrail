@@ -1,0 +1,98 @@
+run_id: 20261115_125948
+evidence_type: LIVE_MININET_OVS
+passed: True
+raw_json: /home/bennurjeevan/netops_guardrail/experiments/results/20261115_125948_phase2_live_faults.json
+
+{
+  "initial_baseline": {
+    "loss_percent": 0.0,
+    "passed": true
+  },
+  "experiments": {
+    "mac_flooding": {
+      "baseline": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "injection": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "generator_result": {
+          "success": true,
+          "output": "frames_sent=32\r\n"
+        },
+        "generated_count": 32
+      },
+      "detection": {
+        "detected": true,
+        "telemetry_available": true,
+        "reason": "MAC flooding indicator: 34 unique source MACs learned within 30 seconds.",
+        "unique_mac_count": 34,
+        "threshold": 20,
+        "window_seconds": 30,
+        "per_switch_unique_mac_count": {
+          "1": 34,
+          "2": 34
+        }
+      },
+      "restoration": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "result": {
+          "success": true,
+          "method": "access-port DOWN/UP invokes controller learning-state flush",
+          "down_rc": 0,
+          "up_rc": 0
+        }
+      },
+      "independent_mac_table_check": {
+        "passed": true,
+        "learned_mac_count_by_switch": {
+          "1": 2,
+          "2": 2
+        },
+        "priority_1_flow_count_by_switch": {
+          "s1": 2,
+          "s2": 2
+        },
+        "expected_max_endpoints_per_switch": 2
+      },
+      "ground_truth": {
+        "passed": true,
+        "checks": {
+          "mac_table": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          },
+          "host_connectivity": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          }
+        }
+      },
+      "connectivity": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "post_30_second_window_detection": {
+        "detected": false,
+        "telemetry_available": true,
+        "reason": "MAC learning is below the flood threshold: 3 unique source MACs within 30 seconds.",
+        "unique_mac_count": 3,
+        "threshold": 20,
+        "window_seconds": 30,
+        "per_switch_unique_mac_count": {
+          "1": 2,
+          "2": 2
+        }
+      },
+      "passed": true
+    }
+  },
+  "error": null,
+  "cleanup_error": null
+}

@@ -1,0 +1,10 @@
+{
+  "updated_at_utc": "2026-11-13T12:00:10+00:00",
+  "link_events": [
+    {"timestamp_utc": "2026-11-13T12:00:01+00:00", "event": "DELETE", "src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+    {"timestamp_utc": "2026-11-13T12:00:02+00:00", "event": "ADD", "src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+    {"timestamp_utc": "2026-11-13T12:00:04+00:00", "event": "DELETE", "src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
+    {"timestamp_utc": "2026-11-13T12:00:05+00:00", "event": "ADD", "src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"}
+  ],
+  "port_status_events": []
+}

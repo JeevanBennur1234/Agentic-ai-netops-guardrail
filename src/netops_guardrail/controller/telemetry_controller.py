@@ -12,8 +12,26 @@ from ryu.lib.packet import ether_types, ethernet, packet
 from ryu.ofproto import ofproto_v1_3
 from ryu.topology import api, event, switches
 
+from netops_guardrail.controller.trunk_roles import derive_discovered_hosts, derive_trunk_roles
+
 CONF = cfg.CONF
 CONF.set_default('observe_links', True)
+
+
+def _serialize_openflow_value(value):
+    """Convert Ryu OpenFlow objects into JSON-safe telemetry values."""
+    if hasattr(value, "to_jsondict"):
+        return _serialize_openflow_value(value.to_jsondict())
+    if isinstance(value, dict):
+        return {
+            str(key): _serialize_openflow_value(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_serialize_openflow_value(item) for item in value]
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
 
 
 class TelemetryController(app_manager.RyuApp):
@@ -34,14 +52,28 @@ class TelemetryController(app_manager.RyuApp):
         self.mac_to_port = {}
         self.stp = kwargs['stplib']
         # Keep testbed convergence short and deterministic while respecting
-        # the minimum 802.1D forward-delay timer. s1 wins root election.
+        # the minimum 802.1D forward-delay timer.
+        # Spanning Tree Bridge Priorities:
+        # s1: 0x8000 (32768) -> Root Bridge (lowest priority wins root election)
+        # s2: 0x9000 (36864) -> Non-root bridge; s2:p1 root port facing s1; s2:p2 designated facing s4
+        # s3: 0xA000 (40960) -> Non-root bridge; s3:p1 root port facing s1; s3:p2 designated facing s4
+        # s4: 0xB000 (45056) -> Non-root bridge (highest ID).
+        # In ring4:
+        # - s1 is Root Bridge (all ports FORWARD).
+        # - s4 has two equal-cost paths to root (cost 4000) via s2 (bridge 0x9000) and s3 (bridge 0xA000).
+        #   Since s2 bridge priority 0x9000 < s3 bridge priority 0xA000, s4 chooses s4:p3 (facing s2)
+        #   as its Root Port.
+        # - s4:p4 (facing s3:p2) is Alternate / BLOCKED.
+        # Documented Root: s1.
+        # Documented Blocked Link: s3-p2 <-> s4-p4 (blocked at s4:p4).
         self.stp.set_config({
             1: {'bridge': {'priority': 0x8000, 'hello_time': 2,
                            'max_age': 6, 'fwd_delay': 4}},
             2: {'bridge': {'priority': 0x9000, 'hello_time': 2,
                            'max_age': 6, 'fwd_delay': 4}},
-            # Keep the triangle test deterministic: s3 is always non-root.
             3: {'bridge': {'priority': 0xA000, 'hello_time': 2,
+                           'max_age': 6, 'fwd_delay': 4}},
+            4: {'bridge': {'priority': 0xB000, 'hello_time': 2,
                            'max_age': 6, 'fwd_delay': 4}},
         })
 
@@ -51,7 +83,12 @@ class TelemetryController(app_manager.RyuApp):
         # Telemetry data
         self.telemetry = {
             "switches": {},
-            "links": []
+            "links": [],
+            "hosts": [],
+            "trunk_roles": {},
+            "link_events": [],
+            "port_status_events": [],
+            "mac_learning_events": [],
         }
 
         # Write to this checkout by default, not the current user's home.
@@ -237,7 +274,23 @@ class TelemetryController(app_manager.RyuApp):
             {}
         )
 
+        is_new_source = src not in self.mac_to_port[dpid]
         self.mac_to_port[dpid][src] = in_port
+        if is_new_source:
+            switch_key = str(dpid)
+            switch_data = self.telemetry["switches"].setdefault(
+                switch_key, {"ports": {}, "flows": []}
+            )
+            switch_data["learned_mac_count"] = len(self.mac_to_port[dpid])
+            self.telemetry["mac_learning_events"].append({
+                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                "switch_id": switch_key,
+                "source_mac": src,
+                "port_id": str(in_port),
+            })
+            self.telemetry["mac_learning_events"] = (
+                self.telemetry["mac_learning_events"][-2000:]
+            )
 
         # ------------------------------------------------------
         # Determine output port
@@ -331,6 +384,18 @@ class TelemetryController(app_manager.RyuApp):
             "link_down": link_down,
             "admin_down": admin_down,
         }
+        self.telemetry.setdefault("port_status_events", []).append({
+            "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+            "switch_id": switch_id,
+            "port_id": port_id,
+            "state": state_name,
+            "reason": reason,
+            "link_down": link_down,
+            "admin_down": admin_down,
+        })
+        self.telemetry["port_status_events"] = (
+            self.telemetry["port_status_events"][-500:]
+        )
         self.logger.warning(
             "OPENFLOW PORT STATUS: switch=%s port=%s state=%s reason=%s link_down=%s admin_down=%s",
             switch_id, port_id, state_name, reason, link_down, admin_down
@@ -456,9 +521,15 @@ class TelemetryController(app_manager.RyuApp):
 
             flows.append(
                 {
+                    "table_id": getattr(stat, "table_id", None),
+                    "cookie": int(getattr(stat, "cookie", 0)),
                     "priority": stat.priority,
+                    "match": _serialize_openflow_value(getattr(stat, "match", {})),
+                    "instructions": _serialize_openflow_value(
+                        getattr(stat, "instructions", [])
+                    ),
                     "packet_count": stat.packet_count,
-                    "byte_count": stat.byte_count
+                    "byte_count": stat.byte_count,
                 }
             )
 
@@ -514,6 +585,29 @@ class TelemetryController(app_manager.RyuApp):
     def _write_telemetry(self):
         """Publish a fresh complete telemetry snapshot atomically for readers."""
         self.telemetry["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+        # Derive dynamic trunk roles and discovered hosts
+        trunk_roles = derive_trunk_roles(self.telemetry)
+        self.telemetry["trunk_roles"] = trunk_roles
+        for link in self.telemetry.get("links", []):
+            src_ep = f"s{link.get('src_switch')}-p{link.get('src_port')}"
+            dst_ep = f"s{link.get('dst_switch')}-p{link.get('dst_port')}"
+            pair = sorted([src_ep, dst_ep])
+            if pair in trunk_roles.get("standby_trunks", []):
+                link["role"] = "standby"
+            elif pair in trunk_roles.get("primary_trunks", []):
+                link["role"] = "primary"
+            elif pair in [[d["src"], d["dst"]] for d in trunk_roles.get("links", []) if d.get("role") == "down"]:
+                link["role"] = "down"
+            else:
+                link["role"] = "converging"
+        self.telemetry["hosts"] = derive_discovered_hosts(self.telemetry)
+        # Provenance is written by the telemetry producer, never accepted from
+        # HTTP/request payloads. Lab injectors may override only through their
+        # trusted controller-side event pipeline.
+        self.telemetry.setdefault("provenance", {
+            "source": "live_telemetry",
+            "producer": "ryu_telemetry_controller",
+        })
         output_dir = os.path.dirname(self.output_file)
         os.makedirs(output_dir, exist_ok=True)
         fd, temp_path = tempfile.mkstemp(
@@ -546,6 +640,18 @@ class TelemetryController(app_manager.RyuApp):
         MAIN_DISPATCHER
     )
     def link_change_handler(self, ev):
+        link = getattr(ev, "link", None)
+        if link is not None:
+            event_name = "ADD" if "Add" in type(ev).__name__ else "DELETE"
+            self.telemetry["link_events"].append({
+                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                "event": event_name,
+                "src_switch": str(link.src.dpid),
+                "src_port": str(link.src.port_no),
+                "dst_switch": str(link.dst.dpid),
+                "dst_port": str(link.dst.port_no),
+            })
+            self.telemetry["link_events"] = self.telemetry["link_events"][-500:]
         self._update_links()
 
     def _update_links(self):

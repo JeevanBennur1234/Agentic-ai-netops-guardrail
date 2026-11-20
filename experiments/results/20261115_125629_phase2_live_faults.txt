@@ -1,0 +1,84 @@
+run_id: 20261115_125629
+evidence_type: LIVE_MININET_OVS
+passed: False
+raw_json: /home/bennurjeevan/netops_guardrail/experiments/results/20261115_125629_phase2_live_faults.json
+
+{
+  "initial_baseline": {
+    "loss_percent": 0.0,
+    "passed": true
+  },
+  "experiments": {
+    "flow_rule_drift": {
+      "baseline": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "injection": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "bridge": "s1",
+        "marker_cookie": 86059674194003,
+        "marker_priority": 65000
+      },
+      "detection": {
+        "detected": true,
+        "telemetry_available": true,
+        "reason": "Unauthorized marker flow detected in OpenFlow telemetry.",
+        "matched_flows": [
+          {
+            "switch_id": "1",
+            "cookie": 86059674194003,
+            "priority": 65000,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_type",
+                      "value": 34997,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 10,
+                "type": 1
+              }
+            },
+            "instructions": []
+          }
+        ],
+        "marker_cookie": 86059674194003
+      },
+      "restoration": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "error": "",
+        "command": [
+          "sudo",
+          "-n",
+          "ovs-ofctl",
+          "-O",
+          "OpenFlow13",
+          "del-flows",
+          "s1",
+          "cookie=0x4e45544f5053/-1"
+        ]
+      },
+      "independent_policy_check": true,
+      "ground_truth": {
+        "available": true,
+        "passed": true,
+        "result": true,
+        "error": null
+      },
+      "connectivity": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "passed": true
+    }
+  },
+  "error": "RuntimeError: flap trial 1 recovery failed: {'trial': 1, 'baseline': {'loss_percent': 0.0, 'passed': True}, 'injection': {'success': True, 'network_mutation_attempted': True, 'interface': 's1-eth3', 'cycles': 2, 'completed_commands': [['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'down'], ['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'up'], ['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'down'], ['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'up']]}, 'detection': {'detected': True, 'telemetry_available': True, 'reason': 'Standby-link instability detected: 11 transitions within 30 seconds.', 'event_count': 11, 'threshold': 4, 'window_seconds': 30, 'events': [{'timestamp_utc': '2026-11-15T07:26:30.510740+00:00', 'event': 'ADD', 'src_switch': '1', 'src_port': '3', 'dst_switch': '2', 'dst_port': '2'}, {'timestamp_utc': '2026-11-15T07:26:30.523421+00:00', 'event': 'ADD', 'src_switch': '2', 'src_port': '2', 'dst_switch': '1', 'dst_port': '3'}, {'timestamp_utc': '2026-11-15T07:26:39.638216+00:00', 'event': 'DELETE', 'src_switch': '1', 'src_port': '3', 'dst_switch': '2', 'dst_port': '2'}, {'timestamp_utc': '2026-11-15T07:26:39.644172+00:00', 'event': 'DELETE', 'src_switch': '2', 'src_port': '2', 'dst_switch': '1', 'dst_port': '3'}, {'timestamp_utc': '2026-11-15T07:26:39.871120+00:00', 'event': 'ADD', 'src_switch': '1', 'src_port': '3', 'dst_switch': '2', 'dst_port': '2'}, {'timestamp_utc': '2026-11-15T07:26:39.627719+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.633369+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'DOWN', 'reason': 'MODIFY', 'link_down': True, 'admin_down': True}, {'timestamp_utc': '2026-11-15T07:26:39.830359+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.841126+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.846460+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'DOWN', 'reason': 'MODIFY', 'link_down': True, 'admin_down': True}, {'timestamp_utc': '2026-11-15T07:26:39.857196+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}]}, 'restoration': {'success': True, 'network_mutation_attempted': True, 'error': '', 'command': ['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'up']}, 'new_port_status_events': [{'timestamp_utc': '2026-11-15T07:26:39.627719+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.633369+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'DOWN', 'reason': 'MODIFY', 'link_down': True, 'admin_down': True}, {'timestamp_utc': '2026-11-15T07:26:39.830359+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.841126+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.846460+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'DOWN', 'reason': 'MODIFY', 'link_down': True, 'admin_down': True}, {'timestamp_utc': '2026-11-15T07:26:39.857196+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}], 'link_stability': {'available': True, 'passed': True, 'result': True, 'error': None}, 'connectivity': {'loss_percent': 100.0, 'passed': False}, 'passed': False}",
+  "cleanup_error": null
+}

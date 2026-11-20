@@ -1,0 +1,1336 @@
+{
+  "run_id": "20261115_125629",
+  "started_at_utc": "2026-11-15T07:26:29.889194+00:00",
+  "evidence_type": "LIVE_MININET_OVS",
+  "repository": "/home/bennurjeevan/netops_guardrail",
+  "branch": "",
+  "experiments": {
+    "flow_rule_drift": {
+      "baseline": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "injection": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "bridge": "s1",
+        "marker_cookie": 86059674194003,
+        "marker_priority": 65000
+      },
+      "detection": {
+        "detected": true,
+        "telemetry_available": true,
+        "reason": "Unauthorized marker flow detected in OpenFlow telemetry.",
+        "matched_flows": [
+          {
+            "switch_id": "1",
+            "cookie": 86059674194003,
+            "priority": 65000,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_type",
+                      "value": 34997,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 10,
+                "type": 1
+              }
+            },
+            "instructions": []
+          }
+        ],
+        "marker_cookie": 86059674194003
+      },
+      "restoration": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "error": "",
+        "command": [
+          "sudo",
+          "-n",
+          "ovs-ofctl",
+          "-O",
+          "OpenFlow13",
+          "del-flows",
+          "s1",
+          "cookie=0x4e45544f5053/-1"
+        ]
+      },
+      "independent_policy_check": true,
+      "ground_truth": {
+        "available": true,
+        "passed": true,
+        "result": true,
+        "error": null
+      },
+      "connectivity": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "passed": true
+    }
+  },
+  "command_log": [
+    {
+      "at": "2026-11-15T07:26:38.798085+00:00",
+      "command": [
+        "ovs-ofctl",
+        "-O",
+        "OpenFlow13",
+        "add-flow",
+        "s1",
+        "cookie=0x4e45544f5053,table=0,priority=65000,dl_type=0x88b5,actions=drop"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:39.609504+00:00",
+      "command": [
+        "ovs-ofctl",
+        "-O",
+        "OpenFlow13",
+        "del-flows",
+        "s1",
+        "cookie=0x4e45544f5053/-1"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:39.612655+00:00",
+      "command": [
+        "ovs-ofctl",
+        "-O",
+        "OpenFlow13",
+        "dump-flows",
+        "s1"
+      ],
+      "returncode": 0,
+      "stdout": "OFPST_FLOW reply (OF1.3) (xid=0x2):\n cookie=0x0, duration=9.120s, table=0, n_packets=21, n_bytes=1260, priority=65535,dl_dst=01:80:c2:00:00:0e,dl_type=0x88cc actions=CONTROLLER:65535\n cookie=0x0, duration=9.104s, table=0, n_packets=3, n_bytes=180, priority=65535,dl_dst=01:80:c2:00:00:00 actions=CONTROLLER:65535\n cookie=0x0, duration=0.835s, table=0, n_packets=4, n_bytes=392, priority=1,in_port=2,dl_dst=00:00:00:00:00:01 actions=output:1\n cookie=0x0, duration=0.830s, table=0, n_packets=3, n_bytes=294, priority=1,in_port=1,dl_dst=00:00:00:00:00:02 actions=output:2\n cookie=0x0, duration=9.137s, table=0, n_packets=4, n_bytes=272, priority=0 actions=CONTROLLER:65535\n",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:39.615431+00:00",
+      "command": [
+        "ovs-ofctl",
+        "-O",
+        "OpenFlow13",
+        "dump-flows",
+        "s1"
+      ],
+      "returncode": 0,
+      "stdout": "OFPST_FLOW reply (OF1.3) (xid=0x2):\n cookie=0x0, duration=9.123s, table=0, n_packets=21, n_bytes=1260, priority=65535,dl_dst=01:80:c2:00:00:0e,dl_type=0x88cc actions=CONTROLLER:65535\n cookie=0x0, duration=9.107s, table=0, n_packets=3, n_bytes=180, priority=65535,dl_dst=01:80:c2:00:00:00 actions=CONTROLLER:65535\n cookie=0x0, duration=0.838s, table=0, n_packets=4, n_bytes=392, priority=1,in_port=2,dl_dst=00:00:00:00:00:01 actions=output:1\n cookie=0x0, duration=0.833s, table=0, n_packets=3, n_bytes=294, priority=1,in_port=1,dl_dst=00:00:00:00:00:02 actions=output:2\n cookie=0x0, duration=9.140s, table=0, n_packets=4, n_bytes=272, priority=0 actions=CONTROLLER:65535\n",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:39.625794+00:00",
+      "command": [
+        "ip",
+        "link",
+        "set",
+        "dev",
+        "s1-eth3",
+        "down"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:39.828060+00:00",
+      "command": [
+        "ip",
+        "link",
+        "set",
+        "dev",
+        "s1-eth3",
+        "up"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:39.829688+00:00",
+      "command": [
+        "ip",
+        "link",
+        "set",
+        "dev",
+        "s1-eth3",
+        "down"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:40.031460+00:00",
+      "command": [
+        "ip",
+        "link",
+        "set",
+        "dev",
+        "s1-eth3",
+        "up"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:40.033055+00:00",
+      "command": [
+        "ip",
+        "link",
+        "set",
+        "dev",
+        "s1-eth3",
+        "up"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:26:43.038941+00:00",
+      "command": [
+        "ip",
+        "-j",
+        "link",
+        "show",
+        "dev",
+        "s1-eth3"
+      ],
+      "returncode": 0,
+      "stdout": "[{\"ifindex\":29,\"link\":\"s2-eth2\",\"ifname\":\"s1-eth3\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"master\":\"ovs-system\",\"operstate\":\"UP\",\"linkmode\":\"DEFAULT\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"86:1d:9d:8a:5f:c5\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\"}]\n",
+      "stderr": ""
+    }
+  ],
+  "passed": false,
+  "initial_baseline": {
+    "loss_percent": 0.0,
+    "passed": true
+  },
+  "error": "RuntimeError: flap trial 1 recovery failed: {'trial': 1, 'baseline': {'loss_percent': 0.0, 'passed': True}, 'injection': {'success': True, 'network_mutation_attempted': True, 'interface': 's1-eth3', 'cycles': 2, 'completed_commands': [['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'down'], ['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'up'], ['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'down'], ['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'up']]}, 'detection': {'detected': True, 'telemetry_available': True, 'reason': 'Standby-link instability detected: 11 transitions within 30 seconds.', 'event_count': 11, 'threshold': 4, 'window_seconds': 30, 'events': [{'timestamp_utc': '2026-11-15T07:26:30.510740+00:00', 'event': 'ADD', 'src_switch': '1', 'src_port': '3', 'dst_switch': '2', 'dst_port': '2'}, {'timestamp_utc': '2026-11-15T07:26:30.523421+00:00', 'event': 'ADD', 'src_switch': '2', 'src_port': '2', 'dst_switch': '1', 'dst_port': '3'}, {'timestamp_utc': '2026-11-15T07:26:39.638216+00:00', 'event': 'DELETE', 'src_switch': '1', 'src_port': '3', 'dst_switch': '2', 'dst_port': '2'}, {'timestamp_utc': '2026-11-15T07:26:39.644172+00:00', 'event': 'DELETE', 'src_switch': '2', 'src_port': '2', 'dst_switch': '1', 'dst_port': '3'}, {'timestamp_utc': '2026-11-15T07:26:39.871120+00:00', 'event': 'ADD', 'src_switch': '1', 'src_port': '3', 'dst_switch': '2', 'dst_port': '2'}, {'timestamp_utc': '2026-11-15T07:26:39.627719+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.633369+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'DOWN', 'reason': 'MODIFY', 'link_down': True, 'admin_down': True}, {'timestamp_utc': '2026-11-15T07:26:39.830359+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.841126+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.846460+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'DOWN', 'reason': 'MODIFY', 'link_down': True, 'admin_down': True}, {'timestamp_utc': '2026-11-15T07:26:39.857196+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}]}, 'restoration': {'success': True, 'network_mutation_attempted': True, 'error': '', 'command': ['sudo', '-n', 'ip', 'link', 'set', 'dev', 's1-eth3', 'up']}, 'new_port_status_events': [{'timestamp_utc': '2026-11-15T07:26:39.627719+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.633369+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'DOWN', 'reason': 'MODIFY', 'link_down': True, 'admin_down': True}, {'timestamp_utc': '2026-11-15T07:26:39.830359+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.841126+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}, {'timestamp_utc': '2026-11-15T07:26:39.846460+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'DOWN', 'reason': 'MODIFY', 'link_down': True, 'admin_down': True}, {'timestamp_utc': '2026-11-15T07:26:39.857196+00:00', 'switch_id': '1', 'port_id': '3', 'state': 'UP', 'reason': 'MODIFY', 'link_down': False, 'admin_down': False}], 'link_stability': {'available': True, 'passed': True, 'result': True, 'error': None}, 'connectivity': {'loss_percent': 100.0, 'passed': False}, 'passed': False}",
+  "finished_at_utc": "2026-11-15T07:26:47.343185+00:00",
+  "final_telemetry": {
+    "switches": {
+      "1": {
+        "ports": {
+          "4294967294": {
+            "rx_packets": 0,
+            "tx_packets": 0,
+            "rx_bytes": 0,
+            "tx_bytes": 0
+          },
+          "1": {
+            "rx_packets": 18,
+            "tx_packets": 48,
+            "rx_bytes": 1640,
+            "tx_bytes": 3402
+          },
+          "2": {
+            "rx_packets": 35,
+            "tx_packets": 46,
+            "rx_bytes": 2562,
+            "tx_bytes": 3222
+          },
+          "3": {
+            "rx_packets": 27,
+            "tx_packets": 45,
+            "rx_bytes": 1856,
+            "tx_bytes": 3034
+          }
+        },
+        "flows": [
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65535,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "01:80:c2:00:00:0e",
+                      "mask": null
+                    }
+                  },
+                  {
+                    "OXMTlv": {
+                      "field": "eth_type",
+                      "value": 35020,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 20,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 30,
+            "byte_count": 1800
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65535,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "01:80:c2:00:00:00",
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 14,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 4,
+            "byte_count": 240
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65534,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 1,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 12,
+                "type": 1
+              }
+            },
+            "instructions": [],
+            "packet_count": 1,
+            "byte_count": 98
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65534,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 2,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 12,
+                "type": 1
+              }
+            },
+            "instructions": [],
+            "packet_count": 1,
+            "byte_count": 70
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65534,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 3,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 12,
+                "type": 1
+              }
+            },
+            "instructions": [],
+            "packet_count": 3,
+            "byte_count": 250
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 0,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [],
+                "length": 4,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 4,
+            "byte_count": 272
+          }
+        ],
+        "port_status": {
+          "3": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          },
+          "1": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          },
+          "2": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          }
+        },
+        "stp_port_states": {
+          "1": "DISABLE",
+          "2": "DISABLE",
+          "3": "DISABLE"
+        },
+        "learned_mac_count": 2
+      },
+      "2": {
+        "ports": {
+          "4294967294": {
+            "rx_packets": 0,
+            "tx_packets": 0,
+            "rx_bytes": 0,
+            "tx_bytes": 0
+          },
+          "1": {
+            "rx_packets": 46,
+            "tx_packets": 35,
+            "rx_bytes": 3222,
+            "tx_bytes": 2562
+          },
+          "2": {
+            "rx_packets": 45,
+            "tx_packets": 27,
+            "rx_bytes": 3034,
+            "tx_bytes": 1856
+          },
+          "3": {
+            "rx_packets": 18,
+            "tx_packets": 45,
+            "rx_bytes": 1584,
+            "tx_bytes": 3192
+          }
+        },
+        "flows": [
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65535,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "01:80:c2:00:00:0e",
+                      "mask": null
+                    }
+                  },
+                  {
+                    "OXMTlv": {
+                      "field": "eth_type",
+                      "value": 35020,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 20,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 30,
+            "byte_count": 1800
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65535,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "01:80:c2:00:00:00",
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 14,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 24,
+            "byte_count": 1440
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65534,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 1,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 12,
+                "type": 1
+              }
+            },
+            "instructions": [],
+            "packet_count": 0,
+            "byte_count": 0
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65534,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 3,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 12,
+                "type": 1
+              }
+            },
+            "instructions": [],
+            "packet_count": 1,
+            "byte_count": 42
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65534,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 2,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 12,
+                "type": 1
+              }
+            },
+            "instructions": [],
+            "packet_count": 14,
+            "byte_count": 1144
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 0,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [],
+                "length": 4,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 7,
+            "byte_count": 422
+          }
+        ],
+        "port_status": {
+          "2": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          },
+          "3": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          },
+          "1": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          }
+        },
+        "stp_port_states": {
+          "1": "DISABLE",
+          "2": "DISABLE",
+          "3": "DISABLE"
+        },
+        "learned_mac_count": 2
+      }
+    },
+    "links": [],
+    "link_events": [
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.500945+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.507214+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.515799+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.519533+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.739685+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.745169+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.785792+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.791594+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:45.988329+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:45.992834+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:46.034972+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:46.038321+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.066781+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.070982+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.105796+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.110355+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.510740+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.514426+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.523421+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.526732+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.638216+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.644172+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.871120+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:40.824294+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.130650+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.134605+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.179151+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.183183+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      }
+    ],
+    "port_status_events": [
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.594914+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.608819+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.679036+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.685042+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.728327+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.733962+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.775641+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.782052+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:57.980521+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:57.994993+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.019845+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.023114+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.062460+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.075028+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.102239+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.114018+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.627719+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.633369+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.651461+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.660367+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.830359+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.841126+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.846460+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.852109+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.857196+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.047998+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.053341+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.081170+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.085121+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.115202+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.119182+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.123489+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.127411+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.169475+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.174168+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      }
+    ],
+    "mac_learning_events": [
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.498591+00:00",
+        "switch_id": "1",
+        "source_mac": "e6:1e:2d:0b:86:35",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.587126+00:00",
+        "switch_id": "2",
+        "source_mac": "1e:49:9e:e4:f8:d4",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.577739+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.578752+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.579576+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.580541+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.028792+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.529989+00:00",
+        "switch_id": "1",
+        "source_mac": "a6:b7:09:a4:b3:00",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:38.774608+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:38.775354+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:38.776018+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:38.776939+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      }
+    ],
+    "updated_at_utc": "2026-11-15T07:26:47.192161+00:00"
+  }
+}

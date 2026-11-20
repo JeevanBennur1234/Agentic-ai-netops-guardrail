@@ -1,0 +1,2461 @@
+{
+  "switches": {
+    "1": {
+      "ports": {
+        "4294967294": {
+          "rx_packets": 0,
+          "tx_packets": 0,
+          "rx_bytes": 0,
+          "tx_bytes": 0
+        },
+        "4": {
+          "rx_packets": 19,
+          "tx_packets": 37,
+          "rx_bytes": 1306,
+          "tx_bytes": 2506
+        },
+        "1": {
+          "rx_packets": 17,
+          "tx_packets": 42,
+          "rx_bytes": 1430,
+          "tx_bytes": 2988
+        },
+        "2": {
+          "rx_packets": 17,
+          "tx_packets": 41,
+          "rx_bytes": 1430,
+          "tx_bytes": 2882
+        },
+        "3": {
+          "rx_packets": 33,
+          "tx_packets": 40,
+          "rx_bytes": 2390,
+          "tx_bytes": 2856
+        }
+      },
+      "flows": [
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65535,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "01:80:c2:00:00:0e",
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_type",
+                    "value": 35020,
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 20,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 22,
+          "byte_count": 1320
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65535,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "01:80:c2:00:00:00",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 14,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 2,
+          "byte_count": 120
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 2,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:01",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 1,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 2,
+          "byte_count": 196
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 1,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:02",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 2,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 1,
+          "byte_count": 98
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 3,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:01",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 1,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 5,
+          "byte_count": 434
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 1,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:03",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 3,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 1,
+          "byte_count": 98
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 3,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:02",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 2,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 5,
+          "byte_count": 434
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 2,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:03",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 3,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 1,
+          "byte_count": 98
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 0,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [],
+              "length": 4,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 18,
+          "byte_count": 1260
+        }
+      ],
+      "port_status": {},
+      "stp_port_states": {
+        "4": "FORWARD",
+        "1": "FORWARD",
+        "2": "FORWARD",
+        "3": "FORWARD"
+      },
+      "learned_mac_count": 3
+    },
+    "4": {
+      "ports": {
+        "4294967294": {
+          "rx_packets": 0,
+          "tx_packets": 0,
+          "rx_bytes": 0,
+          "tx_bytes": 0
+        },
+        "1": {
+          "rx_packets": 17,
+          "tx_packets": 40,
+          "rx_bytes": 1430,
+          "tx_bytes": 2716
+        },
+        "4": {
+          "rx_packets": 36,
+          "tx_packets": 19,
+          "rx_bytes": 2370,
+          "tx_bytes": 1306
+        },
+        "2": {
+          "rx_packets": 17,
+          "tx_packets": 40,
+          "rx_bytes": 1430,
+          "tx_bytes": 2716
+        },
+        "3": {
+          "rx_packets": 40,
+          "tx_packets": 34,
+          "rx_bytes": 2780,
+          "tx_bytes": 2420
+        }
+      },
+      "flows": [
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65535,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "01:80:c2:00:00:0e",
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_type",
+                    "value": 35020,
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 20,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 22,
+          "byte_count": 1320
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65535,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "01:80:c2:00:00:00",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 14,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 17,
+          "byte_count": 1020
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65534,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 4,
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 12,
+              "type": 1
+            }
+          },
+          "instructions": [],
+          "packet_count": 16,
+          "byte_count": 1140
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 1,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:01",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 3,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 2,
+          "byte_count": 196
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 3,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:03",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 1,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 3,
+          "byte_count": 294
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 2,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:01",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 3,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 2,
+          "byte_count": 196
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 3,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:04",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 2,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 3,
+          "byte_count": 294
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 1,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:02",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 3,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 2,
+          "byte_count": 196
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 2,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:02",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 3,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 2,
+          "byte_count": 196
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 2,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:03",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 1,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 2,
+          "byte_count": 196
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 1,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:04",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 2,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 1,
+          "byte_count": 98
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 0,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [],
+              "length": 4,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 14,
+          "byte_count": 756
+        }
+      ],
+      "port_status": {},
+      "stp_port_states": {
+        "1": "FORWARD",
+        "4": "BLOCK",
+        "2": "FORWARD",
+        "3": "FORWARD"
+      },
+      "learned_mac_count": 4
+    },
+    "2": {
+      "ports": {
+        "4294967294": {
+          "rx_packets": 0,
+          "tx_packets": 0,
+          "rx_bytes": 0,
+          "tx_bytes": 0
+        },
+        "1": {
+          "rx_packets": 40,
+          "tx_packets": 33,
+          "rx_bytes": 2856,
+          "tx_bytes": 2390
+        },
+        "2": {
+          "rx_packets": 34,
+          "tx_packets": 40,
+          "rx_bytes": 2420,
+          "tx_bytes": 2780
+        }
+      },
+      "flows": [
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65535,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "01:80:c2:00:00:0e",
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_type",
+                    "value": 35020,
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 20,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 20,
+          "byte_count": 1200
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65535,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "01:80:c2:00:00:00",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 14,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 8,
+          "byte_count": 480
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 2,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:01",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 1,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 5,
+          "byte_count": 434
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 1,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:03",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 2,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 3,
+          "byte_count": 294
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 1,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "in_port",
+                    "value": 2,
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "00:00:00:00:00:02",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 22,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65509,
+                      "port": 1,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 5,
+          "byte_count": 434
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 0,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [],
+              "length": 4,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 18,
+          "byte_count": 1156
+        }
+      ],
+      "port_status": {},
+      "stp_port_states": {
+        "1": "FORWARD",
+        "2": "FORWARD"
+      },
+      "learned_mac_count": 3
+    },
+    "3": {
+      "ports": {
+        "4294967294": {
+          "rx_packets": 0,
+          "tx_packets": 0,
+          "rx_bytes": 0,
+          "tx_bytes": 0
+        },
+        "1": {
+          "rx_packets": 37,
+          "tx_packets": 19,
+          "rx_bytes": 2506,
+          "tx_bytes": 1306
+        },
+        "2": {
+          "rx_packets": 19,
+          "tx_packets": 36,
+          "rx_bytes": 1306,
+          "tx_bytes": 2370
+        }
+      },
+      "flows": [
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65535,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "01:80:c2:00:00:0e",
+                    "mask": null
+                  }
+                },
+                {
+                  "OXMTlv": {
+                    "field": "eth_type",
+                    "value": 35020,
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 20,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 20,
+          "byte_count": 1200
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 65535,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [
+                {
+                  "OXMTlv": {
+                    "field": "eth_dst",
+                    "value": "01:80:c2:00:00:00",
+                    "mask": null
+                  }
+                }
+              ],
+              "length": 14,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 7,
+          "byte_count": 420
+        },
+        {
+          "table_id": 0,
+          "cookie": 0,
+          "priority": 0,
+          "match": {
+            "OFPMatch": {
+              "oxm_fields": [],
+              "length": 4,
+              "type": 1
+            }
+          },
+          "instructions": [
+            {
+              "OFPInstructionActions": {
+                "actions": [
+                  {
+                    "OFPActionOutput": {
+                      "len": 16,
+                      "max_len": 65535,
+                      "port": 4294967293,
+                      "type": 0
+                    }
+                  }
+                ],
+                "len": 24,
+                "type": 4
+              }
+            }
+          ],
+          "packet_count": 13,
+          "byte_count": 824
+        }
+      ],
+      "port_status": {},
+      "stp_port_states": {
+        "1": "FORWARD",
+        "2": "FORWARD"
+      },
+      "learned_mac_count": 3
+    }
+  },
+  "links": [
+    {
+      "src_switch": "1",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "1",
+      "role": "primary"
+    },
+    {
+      "src_switch": "1",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "1",
+      "role": "primary"
+    },
+    {
+      "src_switch": "4",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "2",
+      "role": "standby"
+    },
+    {
+      "src_switch": "3",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "4",
+      "role": "standby"
+    },
+    {
+      "src_switch": "4",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "2",
+      "role": "primary"
+    },
+    {
+      "src_switch": "3",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "4",
+      "role": "primary"
+    },
+    {
+      "src_switch": "2",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "3",
+      "role": "primary"
+    },
+    {
+      "src_switch": "2",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "3",
+      "role": "primary"
+    }
+  ],
+  "hosts": [
+    {
+      "id": "host-000000000001",
+      "label": "Host 00:01",
+      "mac": "00:00:00:00:00:01",
+      "switch_id": "1",
+      "port_id": "1",
+      "last_seen_utc": "2026-11-19T14:45:05.990188+00:00"
+    },
+    {
+      "id": "host-000000000002",
+      "label": "Host 00:02",
+      "mac": "00:00:00:00:00:02",
+      "switch_id": "1",
+      "port_id": "2",
+      "last_seen_utc": "2026-11-19T14:45:05.992635+00:00"
+    },
+    {
+      "id": "host-000000000003",
+      "label": "Host 00:03",
+      "mac": "00:00:00:00:00:03",
+      "switch_id": "4",
+      "port_id": "1",
+      "last_seen_utc": "2026-11-19T14:45:06.000304+00:00"
+    },
+    {
+      "id": "host-000000000004",
+      "label": "Host 00:04",
+      "mac": "00:00:00:00:00:04",
+      "switch_id": "4",
+      "port_id": "2",
+      "last_seen_utc": "2026-11-19T14:45:06.013039+00:00"
+    }
+  ],
+  "trunk_roles": {
+    "primary_trunks": [
+      [
+        "s1-p3",
+        "s2-p1"
+      ],
+      [
+        "s1-p4",
+        "s3-p1"
+      ],
+      [
+        "s2-p2",
+        "s4-p3"
+      ]
+    ],
+    "standby_trunks": [
+      [
+        "s3-p2",
+        "s4-p4"
+      ]
+    ],
+    "blocked_ports": [
+      "s4-p4"
+    ],
+    "links": [
+      {
+        "src": "s1-p3",
+        "dst": "s2-p1",
+        "role": "primary",
+        "stp_states": {
+          "s1-p3": "FORWARD",
+          "s2-p1": "FORWARD"
+        }
+      },
+      {
+        "src": "s1-p4",
+        "dst": "s3-p1",
+        "role": "primary",
+        "stp_states": {
+          "s1-p4": "FORWARD",
+          "s3-p1": "FORWARD"
+        }
+      },
+      {
+        "src": "s4-p4",
+        "dst": "s3-p2",
+        "role": "standby",
+        "stp_states": {
+          "s4-p4": "BLOCK",
+          "s3-p2": "FORWARD"
+        }
+      },
+      {
+        "src": "s3-p2",
+        "dst": "s4-p4",
+        "role": "standby",
+        "stp_states": {
+          "s3-p2": "FORWARD",
+          "s4-p4": "BLOCK"
+        }
+      },
+      {
+        "src": "s4-p3",
+        "dst": "s2-p2",
+        "role": "primary",
+        "stp_states": {
+          "s4-p3": "FORWARD",
+          "s2-p2": "FORWARD"
+        }
+      },
+      {
+        "src": "s3-p1",
+        "dst": "s1-p4",
+        "role": "primary",
+        "stp_states": {
+          "s3-p1": "FORWARD",
+          "s1-p4": "FORWARD"
+        }
+      },
+      {
+        "src": "s2-p2",
+        "dst": "s4-p3",
+        "role": "primary",
+        "stp_states": {
+          "s2-p2": "FORWARD",
+          "s4-p3": "FORWARD"
+        }
+      },
+      {
+        "src": "s2-p1",
+        "dst": "s1-p3",
+        "role": "primary",
+        "stp_states": {
+          "s2-p1": "FORWARD",
+          "s1-p3": "FORWARD"
+        }
+      }
+    ]
+  },
+  "link_events": [
+    {
+      "timestamp_utc": "2026-11-19T14:44:29.083160+00:00",
+      "event": "ADD",
+      "src_switch": "1",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:29.089475+00:00",
+      "event": "ADD",
+      "src_switch": "1",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:29.097973+00:00",
+      "event": "ADD",
+      "src_switch": "3",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:29.104301+00:00",
+      "event": "ADD",
+      "src_switch": "2",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:29.108961+00:00",
+      "event": "ADD",
+      "src_switch": "3",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:29.113347+00:00",
+      "event": "ADD",
+      "src_switch": "2",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:29.123736+00:00",
+      "event": "ADD",
+      "src_switch": "4",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:29.128988+00:00",
+      "event": "ADD",
+      "src_switch": "4",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.797663+00:00",
+      "event": "DELETE",
+      "src_switch": "1",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.804687+00:00",
+      "event": "DELETE",
+      "src_switch": "2",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.826376+00:00",
+      "event": "DELETE",
+      "src_switch": "1",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.833849+00:00",
+      "event": "DELETE",
+      "src_switch": "3",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.863851+00:00",
+      "event": "DELETE",
+      "src_switch": "2",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.871783+00:00",
+      "event": "DELETE",
+      "src_switch": "4",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.924325+00:00",
+      "event": "DELETE",
+      "src_switch": "4",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.931118+00:00",
+      "event": "DELETE",
+      "src_switch": "3",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:41.770996+00:00",
+      "event": "ADD",
+      "src_switch": "1",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:41.775790+00:00",
+      "event": "ADD",
+      "src_switch": "4",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:41.781324+00:00",
+      "event": "ADD",
+      "src_switch": "3",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:41.787427+00:00",
+      "event": "ADD",
+      "src_switch": "2",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:41.794632+00:00",
+      "event": "ADD",
+      "src_switch": "3",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:41.800246+00:00",
+      "event": "ADD",
+      "src_switch": "2",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:41.806026+00:00",
+      "event": "ADD",
+      "src_switch": "1",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:41.812113+00:00",
+      "event": "ADD",
+      "src_switch": "4",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.429388+00:00",
+      "event": "DELETE",
+      "src_switch": "2",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.434810+00:00",
+      "event": "DELETE",
+      "src_switch": "1",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.467437+00:00",
+      "event": "DELETE",
+      "src_switch": "1",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.472951+00:00",
+      "event": "DELETE",
+      "src_switch": "3",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.516595+00:00",
+      "event": "DELETE",
+      "src_switch": "4",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.522789+00:00",
+      "event": "DELETE",
+      "src_switch": "2",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.569073+00:00",
+      "event": "DELETE",
+      "src_switch": "3",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.575281+00:00",
+      "event": "DELETE",
+      "src_switch": "4",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.245045+00:00",
+      "event": "ADD",
+      "src_switch": "1",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.251265+00:00",
+      "event": "ADD",
+      "src_switch": "1",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.259952+00:00",
+      "event": "ADD",
+      "src_switch": "4",
+      "src_port": "4",
+      "dst_switch": "3",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.265350+00:00",
+      "event": "ADD",
+      "src_switch": "3",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.270659+00:00",
+      "event": "ADD",
+      "src_switch": "4",
+      "src_port": "3",
+      "dst_switch": "2",
+      "dst_port": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.276185+00:00",
+      "event": "ADD",
+      "src_switch": "3",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "4"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.285441+00:00",
+      "event": "ADD",
+      "src_switch": "2",
+      "src_port": "2",
+      "dst_switch": "4",
+      "dst_port": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.291312+00:00",
+      "event": "ADD",
+      "src_switch": "2",
+      "src_port": "1",
+      "dst_switch": "1",
+      "dst_port": "3"
+    }
+  ],
+  "port_status_events": [
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.642223+00:00",
+      "switch_id": "1",
+      "port_id": "1",
+      "state": "UP",
+      "reason": "MODIFY",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.648961+00:00",
+      "switch_id": "1",
+      "port_id": "1",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.677263+00:00",
+      "switch_id": "1",
+      "port_id": "2",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.777522+00:00",
+      "switch_id": "1",
+      "port_id": "3",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.784260+00:00",
+      "switch_id": "2",
+      "port_id": "1",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.812453+00:00",
+      "switch_id": "1",
+      "port_id": "4",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.819861+00:00",
+      "switch_id": "3",
+      "port_id": "1",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.841725+00:00",
+      "switch_id": "2",
+      "port_id": "2",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.847436+00:00",
+      "switch_id": "4",
+      "port_id": "3",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.904250+00:00",
+      "switch_id": "4",
+      "port_id": "4",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.910874+00:00",
+      "switch_id": "4",
+      "port_id": "1",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.917531+00:00",
+      "switch_id": "3",
+      "port_id": "2",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:38.999961+00:00",
+      "switch_id": "4",
+      "port_id": "2",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.314324+00:00",
+      "switch_id": "1",
+      "port_id": "1",
+      "state": "UP",
+      "reason": "MODIFY",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.322464+00:00",
+      "switch_id": "1",
+      "port_id": "1",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.377904+00:00",
+      "switch_id": "1",
+      "port_id": "2",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.416708+00:00",
+      "switch_id": "2",
+      "port_id": "1",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.422611+00:00",
+      "switch_id": "1",
+      "port_id": "3",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.460992+00:00",
+      "switch_id": "1",
+      "port_id": "4",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.479243+00:00",
+      "switch_id": "3",
+      "port_id": "1",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.504210+00:00",
+      "switch_id": "4",
+      "port_id": "3",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.510986+00:00",
+      "switch_id": "2",
+      "port_id": "2",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.556548+00:00",
+      "switch_id": "3",
+      "port_id": "2",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.562232+00:00",
+      "switch_id": "4",
+      "port_id": "4",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.638905+00:00",
+      "switch_id": "4",
+      "port_id": "1",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:54.665139+00:00",
+      "switch_id": "4",
+      "port_id": "2",
+      "state": "MISSING",
+      "reason": "DELETE",
+      "link_down": false,
+      "admin_down": false
+    }
+  ],
+  "mac_learning_events": [
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.557572+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.558773+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.559476+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.559549+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.561586+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.568762+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.570064+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.571109+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.584025+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:04",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.595278+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.595844+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.596503+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:37.622957+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.245657+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.246986+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.247469+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.247536+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.248862+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.254857+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.255589+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.256329+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.266256+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:04",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.274439+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.274709+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.275214+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:53.298067+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.313097+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:44:57.362369+00:00",
+      "switch_id": "2",
+      "source_mac": "3e:59:96:f3:eb:b9",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:05.990188+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:05.992635+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:05.992829+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:05.992883+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:05.994410+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:01",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:06.000304+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:06.001016+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:06.001823+00:00",
+      "switch_id": "1",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:06.013039+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:04",
+      "port_id": "2"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:06.024313+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:06.024432+00:00",
+      "switch_id": "2",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "1"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:06.024987+00:00",
+      "switch_id": "4",
+      "source_mac": "00:00:00:00:00:02",
+      "port_id": "3"
+    },
+    {
+      "timestamp_utc": "2026-11-19T14:45:06.050630+00:00",
+      "switch_id": "3",
+      "source_mac": "00:00:00:00:00:03",
+      "port_id": "1"
+    }
+  ],
+  "updated_at_utc": "2026-11-19T14:45:06.630879+00:00",
+  "provenance": {
+    "source": "live_telemetry",
+    "producer": "ryu_telemetry_controller"
+  },
+  "_fixture_metadata": {
+    "source": "captured_live_lab_trial_3",
+    "topology": "ring4",
+    "switches": 4,
+    "hosts": 4,
+    "stp_blocked_port": "s4-p4",
+    "stp_convergence_time_s": 8.86,
+    "pingall_loss_pct": 0.0
+  }
+}

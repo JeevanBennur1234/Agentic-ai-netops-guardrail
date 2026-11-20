@@ -3,1435 +3,336 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agentic AI-NetOps Guardrail — Live Console</title>
+  <title>Agentic AI-NetOps Guardrail | Live Observability Console</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.9/dist/vis-network.min.js"></script>
-  <style>
-    :root {
-      --bg-base: #090d16;
-      --bg-panel: #111827;
-      --bg-card: #1f2937;
-      --border-color: #374151;
-      --border-highlight: #4b5563;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --accent-blue: #3b82f6;
-      --accent-cyan: #06b6d4;
-      --approved-green: #10b981;
-      --approved-bg: rgba(16, 185, 129, 0.2);
-      --rejected-red: #ef4444;
-      --rejected-bg: rgba(239, 68, 68, 0.2);
-      --warning-amber: #f59e0b;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg-base);
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* Top Navigation Header */
-    header {
-      background-color: var(--bg-panel);
-      border-bottom: 2px solid var(--border-color);
-      padding: 12px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 18px;
-      color: white;
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
-    }
-
-    h1 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-main);
-    }
-
-    .system-status {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 6px;
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-    }
-
-    .approval-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border: 1px solid rgba(6, 182, 212, 0.65);
-      border-radius: 8px;
-      background: rgba(6, 182, 212, 0.10);
-      color: #a5f3fc;
-      text-decoration: none;
-      font-weight: 700;
-      white-space: nowrap;
-      transition: background 160ms ease, border-color 160ms ease;
-    }
-    .approval-link:hover, .approval-link:focus-visible {
-      background: rgba(6, 182, 212, 0.20);
-      border-color: var(--accent-cyan);
-      outline: none;
-    }
-
-    .pulsing-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: var(--approved-green);
-      box-shadow: 0 0 8px var(--approved-green);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    /* Main Grid Layout */
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      padding: 14px;
-      height: calc(100vh - 60px);
-      overflow: hidden;
-    }
-
-    /* Panel Generic Styles */
-    .panel {
-      background-color: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .panel-header {
-      padding: 10px 16px;
-      background-color: rgba(31, 41, 55, 0.6);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .panel-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .panel-subtitle {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    /* Left Panel: Topology Graph */
-    #panel-topology {
-      grid-column: 1 / 2;
-      height: 100%;
-      transition: all 0.4s ease;
-    }
-
-    #panel-topology.tint-safe {
-      border: 2px solid var(--approved-green);
-      box-shadow: inset 0 0 40px rgba(16, 185, 129, 0.15), 0 0 20px rgba(16, 185, 129, 0.2);
-    }
-
-    #panel-topology.tint-unsafe {
-      border: 2px solid var(--rejected-red);
-      box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.2), 0 0 25px rgba(239, 68, 68, 0.25);
-    }
-
-    /* Lifecycle states must not look like a successful safety/execution result. */
-    #panel-topology.tint-pending {
-      border: 2px solid #f59e0b;
-      box-shadow: inset 0 0 40px rgba(245, 158, 11, 0.10), 0 0 20px rgba(245, 158, 11, 0.20);
-    }
-
-    #panel-topology.tint-human-approved {
-      border: 2px solid #60a5fa;
-      box-shadow: inset 0 0 40px rgba(96, 165, 250, 0.10), 0 0 20px rgba(96, 165, 250, 0.20);
-    }
-
-    #topology-canvas {
-      flex: 1;
-      min-height: 260px;
-      width: 100%;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(30, 64, 175, .14), transparent 48%),
-        linear-gradient(145deg, #07111f, #0b1424 55%, #0a1020);
-    }
-    #topology-canvas::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: .18;
-      background-image: radial-gradient(rgba(148, 163, 184, .45) .7px, transparent .7px);
-      background-size: 22px 22px;
-      z-index: 0;
-    }
-    #topology-canvas .vis-network { position: relative; z-index: 1; }
-    #packet-overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .topology-legend {
-      padding: 8px 16px;
-      background: rgba(17, 24, 39, .8);
-      border-top: 1px solid var(--border-color);
-      font-size: .72rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 14px;
-      align-items: center;
-    }
-    .legend-swatch {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 5px;
-    }
-    .packet-sim-panel {
-      padding: 10px 14px;
-      border-top: 1px solid rgba(6, 182, 212, .18);
-      background: linear-gradient(120deg, rgba(8, 47, 73, .28), rgba(15, 23, 42, .8));
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .packet-sim-title { color: #e2e8f0; font-size: .8rem; font-weight: 700; }
-    .packet-sim-note { color: #94a3b8; font-size: .68rem; margin-top: 3px; }
-    .packet-sim-state { color: #7dd3fc; font-size: .72rem; }
-    .packet-stat {
-      padding: 5px 9px;
-      border: 1px solid rgba(71, 85, 105, .5);
-      border-radius: 8px;
-      background: rgba(2, 6, 23, .42);
-      min-width: 76px;
-    }
-    .packet-stat strong { display: block; color: #f1f5f9; font-size: .9rem; font-variant-numeric: tabular-nums; }
-    .packet-stat span { color: #94a3b8; font-size: .6rem; text-transform: uppercase; letter-spacing: .05em; }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .legend-box {
-      width: 14px;
-      height: 14px;
-      background: #2563eb;
-      border: 1px solid #60a5fa;
-      border-radius: 3px;
-    }
-
-    .legend-circle {
-      width: 12px;
-      height: 12px;
-      background: #06b6d4;
-      border: 1px solid #22d3ee;
-      border-radius: 50%;
-    }
-
-    .tint-status-tag {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
-      text-transform: uppercase;
-    }
-
-    .tag-safe {
-      background-color: var(--approved-bg);
-      color: var(--approved-green);
-      border: 1px solid var(--approved-green);
-    }
-
-    .tag-unsafe {
-      background-color: var(--rejected-bg);
-      color: var(--rejected-red);
-      border: 1px solid var(--rejected-red);
-    }
-
-    .tag-pending-state {
-      background-color: rgba(245, 158, 11, 0.12);
-      color: #fbbf24;
-      border: 1px solid #f59e0b;
-    }
-
-    .tag-human-approved {
-      background-color: rgba(96, 165, 250, 0.12);
-      color: #93c5fd;
-      border: 1px solid #60a5fa;
-    }
-
-    /* Right Column: Split Panels */
-    .right-column {
-      grid-column: 2 / 3;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    /* Panel 2: Pipeline Trace (Top Right, ~60% height) */
-    #panel-trace {
-      flex: 6;
-      min-height: 0;
-    }
-
-    .trace-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .trace-card {
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      animation: fadeIn 0.3s ease-out;
-      transition: transform 0.15s ease, border-color 0.15s ease;
-    }
-
-    .trace-card:hover {
-      border-color: var(--border-highlight);
-      transform: translateX(2px);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .trace-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .trace-timestamp {
-      font-family: monospace;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .trace-badge {
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.05em;
-    }
-
-    .badge-approved {
-      background-color: var(--approved-bg);
-      color: var(--approved-green);
-      border: 1px solid var(--approved-green);
-    }
-
-    .badge-rejected {
-      background-color: var(--rejected-bg);
-      color: var(--rejected-red);
-      border: 1px solid var(--rejected-red);
-    }
-
-    .trace-action {
-      font-weight: 700;
-      font-size: 0.88rem;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .action-tag {
-      background-color: rgba(59, 130, 246, 0.2);
-      color: var(--accent-blue);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 0.8rem;
-    }
-
-    .trace-check {
-      font-size: 0.82rem;
-      font-family: monospace;
-      padding: 5px 8px;
-      border-radius: 4px;
-      background-color: rgba(17, 24, 39, 0.6);
-      color: #e2e8f0;
-      border-left: 3px solid var(--border-highlight);
-      word-break: break-all;
-    }
-
-    .trace-reason {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      line-height: 1.3;
-    }
-
-    /* Panel 3: Audit Chain (Bottom Right, ~40% height) */
-    #panel-audit {
-      flex: 4;
-      min-height: 0;
-    }
-
-    .audit-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding: 12px;
-      gap: 10px;
-    }
-
-    .chain-scroll {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      flex-shrink: 0;
-    }
-
-    .chain-scroll::-webkit-scrollbar {
-      height: 6px;
-    }
-    .chain-scroll::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 3px;
-    }
-
-    .audit-block {
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 8px 12px;
-      min-width: 135px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      transition: all 0.2s ease;
-      flex-shrink: 0;
-    }
-
-    .audit-block:hover {
-      border-color: var(--accent-blue);
-      transform: translateY(-2px);
-    }
-
-    .audit-block.selected {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
-    }
-
-    .block-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-
-    .block-index {
-      color: var(--accent-cyan);
-      font-family: monospace;
-    }
-
-    .block-hash {
-      font-family: monospace;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      background: rgba(17, 24, 39, 0.6);
-      padding: 2px 4px;
-      border-radius: 3px;
-    }
-
-    .chain-link {
-      color: var(--border-highlight);
-      font-size: 1rem;
-      font-weight: 900;
-      user-select: none;
-    }
-
-    /* Inline Audit Detail */
-    .audit-detail-card {
-      flex: 1;
-      background-color: var(--bg-base);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-size: 0.8rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      animation: fadeIn 0.2s ease;
-    }
-
-    .detail-row {
-      display: flex;
-      gap: 8px;
-      font-family: monospace;
-    }
-
-    .detail-label {
-      color: var(--text-muted);
-      min-width: 90px;
-    }
-
-    .detail-val {
-      color: var(--text-main);
-      word-break: break-all;
-    }
-
-    /* Fallback / Connecting State */
-    .connecting-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      gap: 10px;
-    }
-
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid rgba(156, 163, 175, 0.2);
-      border-top-color: var(--accent-blue);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Chaos Fault Injection Button (Distinct Amber/Red) */
-    .chaos-btn {
-      background: linear-gradient(135deg, #b45309, #dc2626);
-      color: #ffffff;
-      border: 1px solid #f87171;
-      padding: 6px 14px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .chaos-btn:hover {
-      background: linear-gradient(135deg, #d97706, #ef4444);
-      box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
-      transform: translateY(-1px);
-    }
-
-    .chaos-btn:active {
-      transform: translateY(1px);
-    }
-
-    .scenario-btn {
-      background: linear-gradient(135deg, #1d4ed8, #6d28d9);
-      color: #ffffff;
-      border: 1px solid #818cf8;
-      padding: 6px 10px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .scenario-btn:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
-    .scenario-btn:disabled { opacity: 0.6; cursor: wait; }
-    @media (max-width: 1250px) {
-      .system-status { flex-wrap: wrap; justify-content: flex-end; }
-    }
-
-    /* Chaos Notification Toast */
-    .toast {
-      position: fixed;
-      top: 68px;
-      right: 24px;
-      background: rgba(17, 24, 39, 0.95);
-      border: 1px solid #f59e0b;
-      color: #fef3c7;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-family: monospace;
-      font-weight: 600;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-      z-index: 9999;
-      opacity: 0;
-      transform: translateY(-8px);
-      pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      max-width: 480px;
-      word-break: break-all;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-  </style>
+  <link rel="stylesheet" href="/static/css/dashboard.css">
 </head>
 <body>
-  <div id="toast" class="toast"></div>
 
-  <!-- Top Banner -->
-  <header>
-    <div class="brand">
-      <div class="brand-icon">🛡</div>
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-badge">AGY</div>
       <div>
-        <h1>Agentic AI-NetOps Guardrail — Live Console</h1>
+        <h1 class="app-title">Agentic AI-NetOps Guardrail</h1>
+        <div class="app-subtitle">Invariant-based runtime verification</div>
       </div>
     </div>
-    <div class="system-status">
-      <a class="approval-link" href="/approvals" target="_blank" rel="noopener noreferrer" aria-label="Open Human Verifier approval queue">
-        👤 Human Verifier
-      </a>
-      <button id="chaos-btn" class="chaos-btn" onclick="triggerChaosLoop()">
-        ⚠ Inject Fault -> AI Proposal
-      </button>
-      <button id="issue2-btn" class="scenario-btn" title="Issue 2 controlled demo signal; does not modify switch or STP state" onclick="triggerStandbyAnomaly()">
-        ◈ Issue 2: Standby Forwarding
-      </button>
-      <div class="status-badge">
-        <span class="pulsing-dot"></span>
-        <span>GUARDRAIL ACTIVE</span>
+    <div class="header-badges">
+      <div class="status-pill unknown" id="badge-telemetry">
+        <span class="pill-dot"></span>
+        <span class="pill-label">Telemetry:</span>
+        <span class="pill-value" id="val-telemetry">UNKNOWN</span>
       </div>
-      <div class="status-badge" style="color: var(--accent-cyan);">
-        <span>OVS LIVE DISCOVERY</span>
+      <div class="status-pill unknown" id="badge-monitor">
+        <span class="pill-dot"></span>
+        <span class="pill-label">Monitor:</span>
+        <span class="pill-value" id="val-monitor">UNKNOWN</span>
+      </div>
+      <div class="status-pill unknown" id="badge-connectivity">
+        <span class="pill-dot"></span>
+        <span class="pill-label">Connectivity:</span>
+        <span class="pill-value" id="val-connectivity">UNKNOWN</span>
+      </div>
+      <div class="status-pill unknown" id="badge-preflight">
+        <span class="pill-dot"></span>
+        <span class="pill-label">Preflight:</span>
+        <span class="pill-value" id="val-preflight">UNKNOWN</span>
       </div>
     </div>
   </header>
 
-  <!-- Main Multi-Panel Workspace -->
-  <main>
+  <!-- Main Multi-Column Workspace -->
+  <main class="dashboard-grid">
 
-    <!-- PANEL 1: Topology Graph (Left, ~50% width) -->
-    <section class="panel" id="panel-topology">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span>Topology Graph</span>
+    <!-- LEFT COLUMN: Controls & System Status -->
+    <aside class="col-left">
+
+      <!-- Operator Token Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Operator Authentication</h2>
         </div>
-        <div id="tint-badge" class="tint-status-tag tag-pending-state"
-             title="Loading latest status. Safety verification, human approval, and execution are separate stages.">
-          ● STATUS: LOADING
-        </div>
-      </div>
-      <div id="topology-canvas">
-        <div class="connecting-placeholder" id="topo-loader">
-          <div class="spinner"></div>
-          <span>Connecting to live topology...</span>
-        </div>
-        <canvas id="packet-overlay" aria-hidden="true"></canvas>
-      </div>
-      <div class="topology-legend">
-        <div class="legend-item"><i class="legend-swatch" style="background:#38bdf8"></i><span>Switch</span></div>
-        <div class="legend-item"><i class="legend-swatch" style="background:#34d399"></i><span>Port</span></div>
-        <div class="legend-item"><i class="legend-swatch" style="background:#fbbf24"></i><span>Host</span></div>
-        <div class="legend-item"><i class="legend-swatch" style="background:#22c55e"></i><span>Forwarding trunk</span></div>
-        <div class="legend-item"><i class="legend-swatch" style="background:#f59e0b"></i><span>STP blocked / standby</span></div>
-      </div>
-      <div class="packet-sim-panel">
-        <div>
-          <div class="packet-sim-title">◉ Packet Transfer Simulation</div>
-          <div class="packet-sim-state" id="packet-sim-state">Ready · h1 → h2 · visual simulation only</div>
-          <div class="packet-sim-note">Animated markers illustrate packet movement; no traffic is injected into Mininet/OVS.</div>
-        </div>
-        <div class="d-flex align-items-center flex-wrap gap-2">
-          <div class="packet-stat"><strong id="packet-count">0</strong><span>Simulated packets</span></div>
-          <div class="packet-stat"><strong id="packet-route">—</strong><span>Selected path</span></div>
-          <button id="packet-start" class="scenario-btn" onclick="startPacketSimulation()">▶ Start</button>
-          <button id="packet-stop" class="scenario-btn" onclick="stopPacketSimulation()" disabled>■ Stop</button>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="operator-token" class="form-label">Operator Bearer Token</label>
+            <div class="input-with-button">
+              <input type="password" id="operator-token" class="form-input" placeholder="Enter chaos / operator token" autocomplete="off" />
+              <button id="btn-set-token" class="btn btn-secondary" onclick="updateToken()">Set</button>
+            </div>
+            <span class="form-hint" id="token-status-hint">Chaos/injection token is kept in page memory only. (Stored in ~/.config/netops-guardrail/local-secrets.env)</span>
+          </div>
+          <div class="form-group"><label for="approver-token" class="form-label">Human Approver Bearer Token</label><div class="input-with-button"><input type="password" id="approver-token" class="form-input" placeholder="Enter human approver token" autocomplete="off" /><button id="btn-set-approver-token" class="btn btn-secondary" onclick="updateApproverToken()">Set</button></div><span class="form-hint" id="approver-token-status-hint">Required separately for proposal decisions and recommendation acknowledgement. (Stored in ~/.config/netops-guardrail/local-secrets.env)</span></div>
         </div>
       </div>
+
+      <!-- Preflight Status Card -->
+      <div class="card" id="preflight-card">
+        <div class="card-header">
+          <h2 class="card-title">Preflight Preconditions</h2>
+          <span class="badge unknown" id="preflight-summary-badge">CHECKING</span>
+        </div>
+        <div class="card-body preflight-list">
+          <div class="preflight-item" id="pf-telemetry">
+            <span class="pf-indicator unknown" id="pf-telemetry-dot">●</span>
+            <span class="pf-label">Telemetry Freshness (&le;30s):</span>
+            <span class="pf-val" id="pf-telemetry-val">UNKNOWN</span>
+          </div>
+          <div class="preflight-item" id="pf-monitor">
+            <span class="pf-indicator unknown" id="pf-monitor-dot">●</span>
+            <span class="pf-label">Incident Monitor (&le;15s):</span>
+            <span class="pf-val" id="pf-monitor-val">UNKNOWN</span>
+          </div>
+          <div class="preflight-item" id="pf-connectivity">
+            <span class="pf-indicator unknown" id="pf-connectivity-dot">●</span>
+            <span class="pf-label">Baseline Connectivity (h1⇄h2):</span>
+            <span class="pf-val" id="pf-connectivity-val">UNKNOWN</span>
+          </div>
+          <div class="preflight-item" id="pf-run">
+            <span class="pf-indicator unknown" id="pf-run-dot">●</span>
+            <span class="pf-label">No Active Pipeline Run:</span>
+            <span class="pf-val" id="pf-run-val">UNKNOWN</span>
+          </div>
+          <div class="preflight-item" id="pf-token">
+            <span class="pf-indicator unknown" id="pf-token-dot">●</span>
+            <span class="pf-label">Operator Token Configured:</span>
+            <span class="pf-val" id="pf-token-val">UNKNOWN</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Fault Injection Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Live Fault Injection</h2>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="fault-select" class="form-label">Select Registered Live Fault</label>
+            <select id="fault-select" class="form-select" onchange="onFaultSelectionChanged()">
+              <option value="" disabled selected>Loading faults...</option>
+            </select>
+          </div>
+          <div class="fault-meta" id="fault-meta-box">
+            <div class="fault-target"><strong>Target:</strong> <span id="fault-target-text">--</span></div>
+            <div class="fault-desc" id="fault-desc-text">--</div>
+            <div class="fault-commands-box">
+              <strong>Exact Command(s):</strong>
+              <pre class="code-preview" id="fault-commands-preview">--</pre>
+            </div>
+          </div>
+          <button id="btn-inject-fault" class="btn btn-danger btn-block" onclick="injectSelectedFault()" disabled>
+            Inject Fault
+          </button>
+          <div id="injection-feedback" class="action-feedback" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- Lab Baseline Restore Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Lab Baseline Restore</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Emergency backup: restores the original lab network using fixed recovery commands and deletes only tagged guardrail/drift-cookie flows. It does not approve, reject, or delete pending proposals.</p>
+          <button id="btn-restore-lab" class="btn btn-warning btn-block" onclick="restoreLabBaseline()">
+            LAB RESET — EMERGENCY RECOVERY
+          </button>
+          <div id="restore-feedback" class="action-feedback" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- Continuous Incident Monitor Card -->
+      <div class="card" id="panel-incidents">
+        <div class="card-header">
+          <h2 class="card-title">Continuous Incident Monitor</h2>
+          <span class="card-subtitle" id="incident-monitor-state">Telemetry Invariants</span>
+        </div>
+        <div class="card-body">
+          <div id="incident-monitor-summary" class="monitor-summary">Waiting for monitor telemetry scan…</div>
+          <div id="incident-list" class="incident-list">
+            <div class="monitor-empty"><strong>Monitor starting</strong><p>Waiting for the first completed telemetry scan.</p></div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER COLUMN: Topology & Pipeline Timeline -->
+    <section class="col-center">
+
+      <!-- Topology Card -->
+      <div class="card card-topology" id="panel-topology">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Live Topology & STP State</h2>
+            <span class="card-subtitle" id="topology-freshness">Real OpenFlow switches, physical ports, and connected hosts</span>
+          </div>
+          <div class="topology-tags">
+            <span class="badge unknown" id="topo-state-tag">DISCOVERING</span>
+            <span class="badge pending" id="tint-badge" style="display:none">● STATUS: LOADING</span>
+          </div>
+        </div>
+        <div class="topology-wrapper">
+          <div id="stale-telemetry-banner" class="stale-banner" style="display:none">
+            ⚠️ STALE TELEMETRY (&gt;30s) — Network state may not reflect live topology!
+          </div>
+          <div id="topology-canvas" class="topology-viewport">
+            <div class="topology-loader" id="topo-loader">
+              <div class="spinner"></div>
+              <span>Connecting to live topology...</span>
+            </div>
+          </div>
+        </div>
+        <div class="topology-legend">
+          <span class="legend-chip"><i class="dot dot-switch"></i> Switch (Catalyst 2960)</span>
+          <span class="legend-chip"><i class="dot dot-port-fwd"></i> Port (Forwarding)</span>
+          <span class="legend-chip"><i class="dot dot-port-blk"></i> Port (STP Blocked)</span>
+          <span class="legend-chip"><i class="dot dot-host"></i> Host (PC)</span>
+          <span class="legend-chip"><i class="line line-primary"></i> Primary Trunk (s1-eth2 &harr; s2-eth1)</span>
+          <span class="legend-chip"><i class="line line-standby"></i> Standby Trunk (s1-eth3 &harr; s2-eth2)</span>
+        </div>
+      </div>
+
+      <!-- Pipeline Timeline Card -->
+      <div class="card card-timeline">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Pipeline Timeline</h2>
+            <span class="card-subtitle" id="timeline-run-id">No active remediation run</span>
+          </div>
+          <div id="timeline-run-status-badge" class="badge idle">IDLE</div>
+        </div>
+        <div class="card-body">
+          <div id="pipeline-timeline-container" class="timeline-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
     </section>
 
-    <!-- RIGHT COLUMN -->
-    <div class="right-column">
+    <!-- RIGHT COLUMN: AI Reasoning & Proposal Detail -->
+    <aside class="col-right">
 
-      <!-- PANEL 2: Pipeline Trace (Top Right, ~60% height) -->
-      <section class="panel" id="panel-trace">
-        <div class="panel-header">
-          <div class="panel-title">
-            <span>Pipeline Trace</span>
+      <!-- AI Reasoning Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">AI Remediation Reasoning</h2>
+            <span class="card-subtitle" id="ai-model-name">Model: Awaiting Analysis</span>
           </div>
-          <div class="panel-subtitle">Latest 10 Decision Events</div>
+          <span class="badge pending" id="ai-verdict-badge">PENDING</span>
         </div>
-        <div class="trace-list" id="trace-container">
-          <div class="connecting-placeholder">
-            <div class="spinner"></div>
-            <span>Connecting to pipeline trace stream...</span>
+        <div class="card-body" id="ai-panel-body">
+          <div id="ai-empty-state" class="empty-state">
+            <span>AI reasoning details will appear when the <strong>ai_analysis</strong> stage activates.</span>
           </div>
-        </div>
-      </section>
-
-      <!-- PANEL 3: Audit Chain (Bottom Right, ~40% height) -->
-      <section class="panel" id="panel-audit">
-        <div class="panel-header">
-          <div class="panel-title">
-            <span>Audit Chain</span>
-          </div>
-          <div class="panel-subtitle">SHA3-256 + ECDSA Integrity Blocks</div>
-        </div>
-        <div class="audit-body">
-          <div class="chain-scroll" id="chain-container">
-            <div class="connecting-placeholder">
-              <div class="spinner"></div>
-              <span>Connecting to audit chain...</span>
+          <div id="ai-details-content" style="display:none">
+            <div id="ai-advisory-banner" class="alert-banner warning" style="display:none; margin-bottom: 8px;">
+              ⚠️ Advisory only — no automated execution for this fault type.
+            </div>
+            <div class="ai-proposal-grid">
+              <div class="ai-proposal-cell"><span class="detail-label">Proposed Action</span><strong id="ai-action-summary">--</strong></div>
+              <div class="ai-proposal-cell"><span class="detail-label">Target</span><strong id="ai-target-summary">--</strong></div>
+              <div class="ai-proposal-cell"><span class="detail-label">Confidence</span><strong id="ai-confidence-summary">--</strong></div>
+              <div class="ai-proposal-cell"><span class="detail-label">Model Status</span><strong id="ai-model-status">--</strong></div>
+            </div>
+            <div class="detail-section">
+              <span class="detail-label">Detected Anomaly & Evidence:</span>
+              <div class="detail-value" id="ai-anomaly-evidence">--</div>
+            </div>
+            <div class="detail-section" style="margin-top: 6px;">
+              <span class="detail-label">AI Decision Rationale (model-provided summary):</span>
+              <div class="detail-value" id="ai-recommendation-text">--</div>
+            </div>
+            <details class="ai-output-details">
+              <summary>View model response / structured output</summary>
+              <pre id="ai-raw-output" class="ai-raw-output">--</pre>
+            </details>
+            <div class="detail-section" style="margin-top: 6px;">
+              <span class="detail-label">Evidence References Cited:</span>
+              <div class="detail-value" id="ai-evidence-refs">--</div>
+            </div>
+            <div class="detail-section" style="margin-top: 6px;">
+              <span class="detail-label">Safety Verifier Verdict:</span>
+              <div class="detail-value" id="ai-safety-verdict-text">--</div>
+            </div>
+            <div class="detail-section" style="margin-top: 6px;">
+              <span class="detail-label">Provenance Sources:</span>
+              <div class="source-tags" id="ai-source-tags">
+                <span class="source-tag tag-ai">AI: Model</span>
+                <span class="source-tag tag-det">DETERMINISTIC: Detector</span>
+                <span class="source-tag tag-safety">SAFETY: Verifier</span>
+              </div>
             </div>
           </div>
-          <div class="audit-detail-card" id="audit-detail">
-            <span style="color: var(--text-muted); font-style: italic;">
-              Select any audit block above to inspect cryptographic signature and verified state.
-            </span>
+        </div>
+      </div>
+
+      <!-- Human Verification & Remediation Execution Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Human Verification & Execution</h2>
+            <span class="card-subtitle" id="proposal-target-desc">No proposal pending approval</span>
+          </div>
+          <span class="badge unknown" id="proposal-status-badge">NONE</span>
+        </div>
+        <div class="card-body">
+          <div id="proposal-detail-box" class="proposal-box" style="display:none">
+            <div class="prop-row"><strong>Proposal ID:</strong> <span id="prop-id-val">--</span></div>
+            <div class="prop-row"><strong>Fingerprint:</strong> <code id="prop-fingerprint-val" class="code-preview" style="display:inline; padding:2px 4px;">--</code></div>
+            <div class="prop-row"><strong>Action:</strong> <span id="prop-action-val">--</span></div>
+            <div class="prop-row"><strong>Scope:</strong> <span id="prop-scope-val">--</span></div>
+          </div>
+
+          <div class="form-group" style="margin-top: 4px;">
+            <label for="decision-reason" class="form-label">Decision Reason <span class="required">*</span></label>
+            <input type="text" id="decision-reason" class="form-input" placeholder="Enter reason for approval or rejection" />
+          </div>
+
+          <div class="action-buttons-grid">
+            <button id="btn-approve-proposal" class="btn btn-success" onclick="decideProposal('approved')" disabled>
+              Approve
+            </button>
+            <button id="btn-reject-proposal" class="btn btn-danger" onclick="decideProposal('rejected')" disabled>
+              Reject
+            </button>
+          </div>
+          <div id="approval-disabled-hint" class="form-hint" style="margin-top:8px;color:#fbbf24;">Approve/Reject are enabled only when a proposal is created and its status is PENDING. Your token alone does not create a proposal.</div>
+
+          <hr class="divider" />
+
+          <div class="execution-section">
+            <div class="exec-info">
+              <strong>Execution Guardrail:</strong>
+              <span id="exec-status-desc">Execution requires explicit human approval and executable action scope.</span>
+            </div>
+            <button id="btn-execute-remediation" class="btn btn-primary btn-block" onclick="executeApprovedRemediation()" disabled>
+              Execute Approved Remediation
+            </button>
+            <div class="form-group" style="margin-top:12px">
+              <label for="recommendation-ack-reason" class="form-label">Recommendation acknowledgement reason</label>
+              <input type="text" id="recommendation-ack-reason" class="form-input" placeholder="Explain what you reviewed; this does not authorize execution" />
+            </div>
+            <button id="btn-acknowledge-recommendation" class="btn btn-secondary btn-block" onclick="acknowledgeRecommendation()" disabled>
+              Acknowledge Recommendation (No Execution)
+            </button>
+            <div id="exec-feedback" class="action-feedback" style="display:none"></div>
+            <div id="audit-proof-box" class="audit-proof" style="display:none">
+              <div class="audit-proof-title">Verified Audit Trail Record</div>
+              <div><strong>Audit Record ID:</strong> <span id="audit-record-id">--</span></div>
+              <div><strong>SHA3-256 Hash:</strong> <code id="audit-current-hash">--</code></div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-    </div>
+    </aside>
+
   </main>
 
-  <script>
-    // Global State
-    let networkInstance = null;
-    let nodesDataSet = null;
-    let edgesDataSet = null;
-    let topologyInitialized = false;
-    let currentTopology = null;
-    let currentTelemetry = null;
-    let lastTraceSafeState = null;
-    let selectedAuditIndex = null;
-    let auditRecordsCache = [];
-    let packetTimer = null;
-    let packetAnimationFrame = null;
-    let packetSequence = 0;
-    let simulatedPacketCount = 0;
-    let simulatedPackets = [];
-    let packetSimulationRunning = false;
-
-    // Fixed coordinates keep the network diagram still while live status colors update.
-    function fixedNodePosition(id) {
-      const positions = {
-        h1: [-510, 0], h2: [510, 0],
-        s1: [-180, 0], s2: [180, 0],
-        's1-p1': [-345, 0], 's1-p2': [-45, -105], 's1-p3': [-45, 105],
-        's2-p1': [45, -105], 's2-p2': [45, 105], 's2-p3': [345, 0]
-      };
-      if (positions[id]) return { x: positions[id][0], y: positions[id][1] };
-      const portMatch = /^s(\d+)-p(\d+)$/.exec(id);
-      if (portMatch) {
-        const switchIndex = Number(portMatch[1]);
-        const portIndex = Number(portMatch[2]);
-        const centerX = switchIndex === 1 ? -180 : switchIndex === 2 ? 180 : (switchIndex - 1) * 360 - 180;
-        const angle = ((portIndex - 1) / 4) * Math.PI * 2 - Math.PI / 2;
-        return { x: centerX + Math.cos(angle) * 125, y: Math.sin(angle) * 125 };
-      }
-      const switchMatch = /^s(\d+)$/.exec(id);
-      if (switchMatch) {
-        const index = Number(switchMatch[1]);
-        return { x: index === 1 ? -180 : index === 2 ? 180 : (index - 1) * 360 - 180, y: 0 };
-      }
-      return { x: 0, y: 0 };
-    }
-
-    function syncDataSet(dataSet, items) {
-      const incomingIds = new Set(items.map(item => item.id));
-      const removeIds = dataSet.getIds().filter(id => !incomingIds.has(id));
-      if (removeIds.length) dataSet.remove(removeIds);
-      dataSet.update(items);
-    }
-
-    function getPortState(nodeId) {
-      const match = /^s(\d+)-p(\d+)$/.exec(nodeId || '');
-      if (!match || !currentTelemetry?.switches) return 'UNKNOWN';
-      return String(currentTelemetry.switches[match[1]]?.stp_port_states?.[match[2]] || 'UNKNOWN').toUpperCase();
-    }
-
-    // =========================================================================
-    // 1. TOPOLOGY GRAPH (live state polling, fixed layout)
-    // =========================================================================
-    async function updateTopology() {
-      try {
-        const [topologyResponse, statusResponse] = await Promise.all([
-          fetch('/api/topology'),
-          fetch('/api/status')
-        ]);
-        if (!topologyResponse.ok || !statusResponse.ok) throw new Error('Topology/status endpoint unavailable');
-        const data = await topologyResponse.json();
-        const status = await statusResponse.json();
-        currentTopology = data;
-        currentTelemetry = status.telemetry || {};
-
-        const loader = document.getElementById('topo-loader');
-        if (loader) loader.style.display = 'none';
-
-        const visNodes = (data.nodes || []).map(node => {
-          const isSwitch = node.type === 'switch';
-          const isPort = node.type === 'port';
-          const position = fixedNodePosition(node.id);
-          const state = isPort ? getPortState(node.id) : 'UNKNOWN';
-          const blocked = state === 'BLOCK' || state === 'DISABLE';
-          const background = isSwitch ? '#0c4a6e' : isPort
-            ? (blocked ? '#78350f' : state === 'FORWARD' ? '#065f46' : '#164e63')
-            : '#334155';
-          const border = isSwitch ? '#38bdf8' : isPort
-            ? (blocked ? '#f59e0b' : state === 'FORWARD' ? '#34d399' : '#67e8f9')
-            : '#64748b';
-          return {
-            id: node.id,
-            label: isSwitch ? `SWITCH\n${node.id.toUpperCase()}` : isPort ? `${node.id.split('-').pop().toUpperCase()}\n${state}` : node.id,
-            x: position.x, y: position.y,
-            fixed: { x: true, y: true }, physics: false,
-            shape: isSwitch ? 'box' : 'dot',
-            size: isSwitch ? 30 : 19,
-            margin: isSwitch ? 13 : 5,
-            color: {
-              background, border,
-              highlight: { background, border: '#e2e8f0' }
-            },
-            borderWidth: 2,
-            shadow: { enabled: true, color: 'rgba(2, 6, 23, .65)', size: isSwitch ? 16 : 8, x: 0, y: 4 },
-            font: { color: blocked ? '#fde68a' : '#e0f2fe', size: isSwitch ? 14 : 10, bold: true, face: 'Arial' },
-            title: isPort ? `${node.id} · STP ${state}` : node.id
-          };
-        });
-
-        // The demo testbed has two Mininet endpoints attached to these access ports.
-        if ((data.nodes || []).some(node => node.id === 's1-p1')) {
-          const p = fixedNodePosition('h1');
-          visNodes.push({
-            id: 'h1', label: 'HOST h1\n10.0.0.1', x: p.x, y: p.y,
-            fixed: { x: true, y: true }, physics: false, shape: 'box', margin: 12,
-            color: { background: '#78350f', border: '#fbbf24' }, borderWidth: 2,
-            font: { color: '#fef3c7', size: 12, bold: true }
-          });
-        }
-        if ((data.nodes || []).some(node => node.id === 's2-p3')) {
-          const p = fixedNodePosition('h2');
-          visNodes.push({
-            id: 'h2', label: 'HOST h2\n10.0.0.2', x: p.x, y: p.y,
-            fixed: { x: true, y: true }, physics: false, shape: 'box', margin: 12,
-            color: { background: '#78350f', border: '#fbbf24' }, borderWidth: 2,
-            font: { color: '#fef3c7', size: 12, bold: true }
-          });
-        }
-
-        const visEdges = (data.edges || []).map(edge => {
-          const sourceMatch = /^s(\d+)-p(\d+)$/.exec(edge.source);
-          const targetMatch = /^s(\d+)-p(\d+)$/.exec(edge.target);
-          const isTrunk = Boolean(sourceMatch && targetMatch);
-          const sourceState = isTrunk ? getPortState(edge.source) : 'UNKNOWN';
-          const targetState = isTrunk ? getPortState(edge.target) : 'UNKNOWN';
-          const blocked = isTrunk && ['BLOCK', 'DISABLE'].includes(sourceState) || isTrunk && ['BLOCK', 'DISABLE'].includes(targetState);
-          const forwarding = isTrunk && sourceState === 'FORWARD' && targetState === 'FORWARD';
-          const lineColor = blocked ? '#f59e0b' : forwarding ? '#34d399' : isTrunk ? '#38bdf8' : '#475569';
-          return {
-            id: `e-${[edge.source, edge.target].sort().join('--')}`,
-            from: edge.source, to: edge.target,
-            color: { color: lineColor, opacity: .95 },
-            width: forwarding ? 4 : 2,
-            dashes: blocked ? [7, 5] : false,
-            label: isTrunk ? (blocked ? 'STP BLOCKED' : forwarding ? 'FORWARDING' : 'TRUNK') : '',
-            font: { color: lineColor, size: 10, bold: true, background: '#0b1424', strokeWidth: 0 },
-            smooth: false,
-            title: isTrunk ? `${edge.source} ↔ ${edge.target} · ${blocked ? 'STP blocked' : forwarding ? 'forwarding' : 'trunk'}` : ''
-          };
-        });
-        if (visNodes.some(node => node.id === 'h1') && visNodes.some(node => node.id === 's1-p1')) {
-          visEdges.push({ id: 'host-h1', from: 'h1', to: 's1-p1', color: { color: '#fbbf24' }, width: 2, dashes: [5, 5], smooth: false });
-        }
-        if (visNodes.some(node => node.id === 'h2') && visNodes.some(node => node.id === 's2-p3')) {
-          visEdges.push({ id: 'host-h2', from: 's2-p3', to: 'h2', color: { color: '#fbbf24' }, width: 2, dashes: [5, 5], smooth: false });
-        }
-
-        const container = document.getElementById('topology-canvas');
-        const options = {
-          physics: { enabled: false },
-          layout: { improvedLayout: false, randomSeed: 7 },
-          interaction: { hover: true, dragNodes: false, dragView: true, zoomView: true, selectable: false },
-          nodes: { chosen: false },
-          edges: { smooth: false, selectionWidth: 0, hoverWidth: 0 }
-        };
-
-        if (!topologyInitialized) {
-          nodesDataSet = new vis.DataSet(visNodes);
-          edgesDataSet = new vis.DataSet(visEdges);
-          networkInstance = new vis.Network(container, { nodes: nodesDataSet, edges: edgesDataSet }, options);
-          topologyInitialized = true;
-          networkInstance.once('afterDrawing', () => {
-            networkInstance.fit({ animation: false });
-            resizePacketOverlay();
-          });
-        } else {
-          // Keep the same DataSets and fixed coordinates; update only telemetry styling.
-          syncDataSet(nodesDataSet, visNodes);
-          syncDataSet(edgesDataSet, visEdges);
-          networkInstance.redraw();
-        }
-        updatePacketRouteLabel();
-      } catch (err) {
-        console.warn('Topology fetch error:', err);
-      }
-    }
-
-    function getPacketPath() {
-      if (!currentTopology || !currentTelemetry) return null;
-      const trunkEdges = (currentTopology.edges || []).filter(edge =>
-        /^s\d+-p\d+$/.test(edge.source) && /^s\d+-p\d+$/.test(edge.target)
-      );
-      const candidates = trunkEdges.map(edge => ({
-        source: edge.source,
-        target: edge.target,
-        active: getPortState(edge.source) === 'FORWARD' && getPortState(edge.target) === 'FORWARD'
-      }));
-      const selected = candidates.find(edge => edge.active);
-      if (!selected) return null;
-      let source = selected.source;
-      let target = selected.target;
-      if (source.startsWith('s2-') && target.startsWith('s1-')) [source, target] = [target, source];
-      const targetSwitch = target.split('-')[0];
-      return {
-        nodes: ['h1', 's1-p1', 's1', source, target, targetSwitch, 's2-p3', 'h2'],
-        label: selected.active ? 'Forwarding' : 'Fallback'
-      };
-    }
-
-    function updatePacketRouteLabel() {
-      const element = document.getElementById('packet-route');
-      const route = getPacketPath();
-      if (element) element.textContent = route ? route.label : 'Unavailable';
-    }
-
-    function resizePacketOverlay() {
-      const canvas = document.getElementById('packet-overlay');
-      const container = document.getElementById('topology-canvas');
-      if (!canvas || !container) return;
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = Math.max(1, Math.floor(container.clientWidth * ratio));
-      canvas.height = Math.max(1, Math.floor(container.clientHeight * ratio));
-      canvas.style.width = container.clientWidth + 'px';
-      canvas.style.height = container.clientHeight + 'px';
-      canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
-    }
-
-    function drawSimulatedPackets(now) {
-      const canvas = document.getElementById('packet-overlay');
-      if (!canvas || !networkInstance) return;
-      const context = canvas.getContext('2d');
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      context.clearRect(0, 0, width, height);
-
-      simulatedPackets = simulatedPackets.filter(packet => now - packet.startedAt < packet.duration);
-      for (const packet of simulatedPackets) {
-        const positions = networkInstance.getPositions(packet.nodes);
-        const points = packet.nodes.map(id => positions[id] ? networkInstance.canvasToDOM(positions[id]) : null);
-        if (points.some(point => !point)) continue;
-        const progress = Math.min(.999, (now - packet.startedAt) / packet.duration);
-        const scaled = progress * (points.length - 1);
-        const segment = Math.min(points.length - 2, Math.floor(scaled));
-        const local = scaled - segment;
-        const x = points[segment].x + (points[segment + 1].x - points[segment].x) * local;
-        const y = points[segment].y + (points[segment + 1].y - points[segment].y) * local;
-        const pulse = 1 + Math.sin(now / 90 + packet.id) * .25;
-        context.beginPath();
-        context.arc(x, y, 5.5 * pulse, 0, Math.PI * 2);
-        context.fillStyle = '#67e8f9';
-        context.shadowColor = '#22d3ee';
-        context.shadowBlur = 16;
-        context.fill();
-        context.shadowBlur = 0;
-        context.beginPath();
-        context.arc(x, y, 2, 0, Math.PI * 2);
-        context.fillStyle = '#ffffff';
-        context.fill();
-      }
-      if (packetSimulationRunning || simulatedPackets.length) {
-        packetAnimationFrame = requestAnimationFrame(drawSimulatedPackets);
-      } else {
-        packetAnimationFrame = null;
-      }
-    }
-
-    function startPacketSimulation() {
-      if (packetSimulationRunning) return;
-      const route = getPacketPath();
-      if (!route) {
-        document.getElementById('packet-sim-state').textContent = 'Waiting for a discovered inter-switch path';
-        return;
-      }
-      packetSimulationRunning = true;
-      document.getElementById('packet-start').disabled = true;
-      document.getElementById('packet-stop').disabled = false;
-      document.getElementById('packet-sim-state').textContent = 'Simulating h1 → h2 · visual markers only · no live traffic generated';
-      const emitPacket = () => {
-        const activeRoute = getPacketPath();
-        if (!activeRoute) {
-          stopPacketSimulation();
-          return;
-        }
-        simulatedPackets.push({ id: ++packetSequence, startedAt: performance.now(), duration: 1900, nodes: activeRoute.nodes });
-        simulatedPacketCount += 1;
-        document.getElementById('packet-count').textContent = simulatedPacketCount.toLocaleString();
-      };
-      emitPacket();
-      packetTimer = setInterval(emitPacket, 500);
-      if (!packetAnimationFrame) packetAnimationFrame = requestAnimationFrame(drawSimulatedPackets);
-    }
-
-    function stopPacketSimulation() {
-      packetSimulationRunning = false;
-      if (packetTimer) clearInterval(packetTimer);
-      packetTimer = null;
-      document.getElementById('packet-start').disabled = false;
-      document.getElementById('packet-stop').disabled = true;
-      document.getElementById('packet-sim-state').textContent = 'Paused · visual simulation only · no live traffic generated';
-    }
-
-    window.addEventListener('resize', () => {
-      resizePacketOverlay();
-      if (networkInstance) networkInstance.redraw();
-    });
-
-    function approvalInfoForTrace(record) {
-      return record?.human_approval ||
-        record?.audit_record?.execution_result?.human_approval ||
-        {};
-    }
-
-    // Status precedence is intentional:
-    // real execution success > active human approval state > safety result.
-    function applyTopologyStatus(record) {
-      const panel = document.getElementById('panel-topology');
-      const tintBadge = document.getElementById('tint-badge');
-      if (!record || !panel || !tintBadge) return;
-
-      const approval = approvalInfoForTrace(record);
-      const decision = String(record.decision || '').toUpperCase();
-      const approvalStatus = String(approval.status || '').toLowerCase();
-      const proposalRef = approval.proposal_id ? ' Proposal ID: ' + approval.proposal_id + '.' : '';
-      const execution = record.execution ||
-        record.audit_record?.execution_result?.execution ||
-        record.execution_result || {};
-      const executionSucceeded = execution.success === true ||
-        ['success', 'succeeded'].includes(String(execution.status || '').toLowerCase());
-
-      const setState = (panelClass, badgeClass, label, explanation) => {
-        panel.className = 'panel ' + panelClass;
-        tintBadge.className = 'tint-status-tag ' + badgeClass;
-        tintBadge.innerText = label;
-        tintBadge.title = explanation;
-      };
-
-      if (executionSucceeded) {
-        setState('tint-safe', 'tag-safe', '● EXECUTION: SUCCESS',
-          'The executor reported success. Check the pipeline trace and connectivity result for details.');
-        return;
-      }
-
-      if (decision === 'PENDING_HUMAN_APPROVAL' || approvalStatus === 'pending') {
-        const expiry = Date.parse(approval.expires_at || '');
-        const isExpired = Number.isFinite(expiry) && expiry <= Date.now();
-        setState('tint-pending', 'tag-pending-state',
-          isExpired ? '● APPROVAL: EXPIRED' : '● HUMAN APPROVAL: PENDING',
-          (isExpired
-            ? 'This proposal has expired and cannot be approved for execution.'
-            : 'Safety checks are separate from approval. A human decision is still required; remediation has not executed.') + proposalRef);
-        return;
-      }
-
-      if (decision === 'REJECTED' || approvalStatus === 'rejected') {
-        setState('tint-unsafe', 'tag-unsafe', '● HUMAN DECISION: REJECTED',
-          'The human reviewer rejected this proposal. It must not be executed.');
-        return;
-      }
-
-      if (decision === 'CHANGES_REQUESTED' || approvalStatus === 'changes_requested') {
-        setState('tint-pending', 'tag-pending-state', '● HUMAN REVIEW: CHANGES REQUESTED',
-          'The reviewer requested changes. This proposal has not been authorized for execution.');
-        return;
-      }
-
-      if (decision === 'APPROVED' || approvalStatus === 'approved') {
-        setState('tint-human-approved', 'tag-human-approved',
-          '● HUMAN APPROVAL: APPROVED · NOT EXECUTED',
-          'Approval was recorded, but that alone does not mean remediation executed successfully.' + proposalRef);
-        return;
-      }
-
-      const safe = record.verification?.safe ??
-        record.audit_record?.verifier_result?.safe;
-      if (safe === true) {
-        setState('tint-safe', 'tag-safe', '● SAFETY CHECK: PASS',
-          'Automated safety verification passed. This is not human approval or execution status.');
-      } else if (safe === false) {
-        setState('tint-unsafe', 'tag-unsafe', '● SAFETY CHECK: FAIL (BLOCKED)',
-          'Automated safety verification failed; remediation should remain blocked.');
-      } else {
-        setState('', 'tag-pending-state', '● STATUS: NOT AVAILABLE',
-          'No safety, human approval, or execution result is available in the latest trace record.');
-      }
-    }
-
-    // =========================================================================
-    // 2. PIPELINE TRACE (Poll GET /api/pipeline/trace?limit=10 every 2s)
-    // =========================================================================
-    async function updatePipelineTrace() {
-      try {
-        const res = await fetch('/api/pipeline/trace?limit=10');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const records = await res.json();
-
-        const container = document.getElementById('trace-container');
-
-        if (!records || records.length === 0) {
-          container.innerHTML = `
-            <div class="connecting-placeholder">
-              <span>Awaiting first pipeline execution event...</span>
-            </div>
-          `;
-          return;
-        }
-
-        // Drive the topology badge from the newest proposal lifecycle event.
-        // This keeps approval state tied to a proposal and ignores later unrelated
-        // guardrail records that have no proposal ID. Never prioritize any old pending
-        // proposal over the latest proposal's human decision.
-        const chronological = records.slice().sort((a, b) => {
-          const aTime = Date.parse(a.timestamp || '') || 0;
-          const bTime = Date.parse(b.timestamp || '') || 0;
-          return aTime - bTime;
-        });
-        const lifecycleRecords = chronological.filter(item =>
-          Boolean(approvalInfoForTrace(item).proposal_id)
-        );
-        const latest = lifecycleRecords.length
-          ? lifecycleRecords[lifecycleRecords.length - 1]
-          : chronological[chronological.length - 1];
-        if (latest) applyTopologyStatus(latest);
-
-        // Display list with most recent at top
-        const reversed = records.slice().reverse();
-        container.innerHTML = reversed.map(item => {
-          const decision = item.decision || 'UNKNOWN';
-          const isApproved = decision === 'APPROVED';
-          const badgeClass = isApproved ? 'badge-approved' : 'badge-rejected';
-          const action = item.intent?.action || 'no_action';
-          const rawTime = item.timestamp || '';
-          const timeDisplay = rawTime.includes('T') ? rawTime.split('T')[1].slice(0, 8) + ' UTC' : rawTime;
-
-          let checkMsg = 'PASS: Nominal verification';
-          if (item.verification?.checks && item.verification.checks.length > 0) {
-            checkMsg = item.verification.checks[0];
-          } else if (item.verification?.reason) {
-            checkMsg = item.verification.reason;
-          }
-
-          const isHumanDecision = item.event_type === 'human_approval_decision';
-          const decisionLabel = isHumanDecision
-            ? 'Human decision recorded: ' + decision.replaceAll('_', ' ')
-            : checkMsg;
-          const reason = isHumanDecision && item.decision_reason
-            ? 'Operator reason: ' + item.decision_reason
-            : (item.intent?.reason ? 'Reason: ' + item.intent.reason : '');
-          const verifierDetail = isHumanDecision
-            ? '<div class="trace-check">Proposal-time safety result: ' + checkMsg + '</div>'
-            : '';
-
-          return `
-            <div class="trace-card">
-              <div class="trace-top">
-                <span class="trace-action">
-                  <span class="action-tag">${action.toUpperCase()}</span>
-                  ${item.intent?.target_switch ? `s${item.intent.target_switch}-p${item.intent.from_port || ''}` : ''}
-                </span>
-                <span class="trace-badge ${badgeClass}">${decision}</span>
-              </div>
-              <div class="trace-check">${decisionLabel}</div>
-              ${verifierDetail}
-              ${reason ? `<div class="trace-reason">${reason}</div>` : ''}
-              <div class="trace-timestamp">${timeDisplay} ${rawTime ? `(${rawTime.split('T')[0]})` : ''}</div>
-            </div>
-          `;
-        }).join('');
-      } catch (err) {
-        console.warn('Trace fetch error:', err);
-      }
-    }
-
-    // =========================================================================
-    // 3. AUDIT CHAIN (Poll GET /api/audit/chain?limit=10 every 2s)
-    // =========================================================================
-    async function updateAuditChain() {
-      try {
-        const res = await fetch('/api/audit/chain?limit=10');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const records = await res.json();
-
-        auditRecordsCache = records || [];
-        const container = document.getElementById('chain-container');
-
-        if (!records || records.length === 0) {
-          container.innerHTML = `
-            <div class="connecting-placeholder">
-              <span>Connecting to audit chain...</span>
-            </div>
-          `;
-          return;
-        }
-
-        // Render horizontal linked blocks
-        container.innerHTML = records.map((r, i) => {
-          const isSelected = selectedAuditIndex === r.index;
-          const isApproved = r.decision === 'APPROVED';
-          const badgeClass = isApproved ? 'badge-approved' : 'badge-rejected';
-          const hashShort = (r.current_hash || '0000000000').slice(0, 10);
-          const isLast = i === records.length - 1;
-
-          return `
-            <div class="audit-block ${isSelected ? 'selected' : ''}" onclick="selectAuditBlock(${r.index})">
-              <div class="block-header">
-                <span class="block-index">#${r.index}</span>
-                <span class="trace-badge ${badgeClass}" style="padding: 1px 5px; font-size: 0.68rem;">${r.decision}</span>
-              </div>
-              <div style="font-size: 0.78rem; font-weight: 600;">${r.action || 'action'}</div>
-              <div class="block-hash">${hashShort}...</div>
-            </div>
-            ${!isLast ? '<span class="chain-link">➔</span>' : ''}
-          `;
-        }).join('');
-
-        // If a block is currently selected, refresh its details inline
-        if (selectedAuditIndex !== null) {
-          const activeRecord = auditRecordsCache.find(x => x.index === selectedAuditIndex);
-          if (activeRecord) renderAuditDetail(activeRecord);
-        } else if (records.length > 0) {
-          // Default select the latest record on initial load
-          selectAuditBlock(records[records.length - 1].index);
-        }
-      } catch (err) {
-        console.warn('Audit fetch error:', err);
-      }
-    }
-
-    function selectAuditBlock(index) {
-      selectedAuditIndex = index;
-      document.querySelectorAll('.audit-block').forEach(b => b.classList.remove('selected'));
-      const active = auditRecordsCache.find(x => x.index === index);
-      if (active) renderAuditDetail(active);
-    }
-
-    function renderAuditDetail(record) {
-      const detailContainer = document.getElementById('audit-detail');
-      const isApproved = record.decision === 'APPROVED';
-      const badgeClass = isApproved ? 'badge-approved' : 'badge-rejected';
-
-      detailContainer.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 6px;">
-          <strong style="color: var(--accent-cyan);">Block #${record.index} Details</strong>
-          <span class="trace-badge ${badgeClass}">${record.decision}</span>
-        </div>
-        <div class="detail-row"><span class="detail-label">Action:</span><span class="detail-val">${record.action}</span></div>
-        <div class="detail-row"><span class="detail-label">Timestamp:</span><span class="detail-val">${record.timestamp || 'N/A'}</span></div>
-        <div class="detail-row"><span class="detail-label">SHA3-256:</span><span class="detail-val" style="color: var(--accent-blue);">${record.current_hash || 'N/A'}</span></div>
-        <div class="detail-row"><span class="detail-label">Integrity:</span><span class="detail-val" style="color: var(--approved-green);">✓ Cryptographically Chained & Signed (SECP256k1)</span></div>
-      `;
-    }
-
-    // =========================================================================
-    // Independent Polling Initialization (Every 2 seconds)
-    // =========================================================================
-    updateTopology();
-    updatePipelineTrace();
-    updateAuditChain();
-
-    setInterval(updateTopology, 2000);
-    setInterval(updatePipelineTrace, 2000);
-    setInterval(updateAuditChain, 2000);
-  
-    // =========================================================================
-    // Chaos Fault Injection Handler
-    // =========================================================================
-    async function triggerChaosLoop() {
-      const ok = confirm(
-        "This restores the known redundant trunk in the local Mininet lab, then runs the AI proposal and safety-verification pipeline. STP stays enabled. No remediation runs until a human approves and separately clicks Execute. Continue?"
-      );
-      if (!ok) return;
-      const token = prompt("Enter the local lab operator token:");
-      if (!token) return;
-
-      const button = document.getElementById('chaos-btn');
-      if (button) { button.disabled = true; button.textContent = 'Analyzing fault...'; }
-      try {
-        const resp = await fetch('/api/chaos/inject-loop?confirm=true', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-          body: '{}'
-        });
-        const data = await resp.json();
-        if (!resp.ok) {
-          showToast((data.error || 'Fault pipeline failed') + (data.pipeline ? ' | ' + JSON.stringify(data.pipeline) : ''));
-          return;
-        }
-        const pipeline = data.pipeline || {};
-        const intent = pipeline.intent || {};
-        const checks = pipeline.verification && pipeline.verification.checks || [];
-        showToast('AI proposal: ' + data.proposal_id + ' | ' + intent.action + ' ' +
-          (intent.target_switch ? 's' + intent.target_switch + '-p' + intent.from_port : '') +
-          ' | ' + checks.join('; '));
-        window.setTimeout(() => window.open('/approvals', '_blank', 'noopener'), 500);
-      } catch (err) {
-        showToast("Error: " + err.message);
-      } finally {
-        if (button) { button.disabled = false; button.textContent = 'Inject Fault -> AI Proposal'; }
-      }
-    }
-
-    async function triggerStandbyAnomaly() {
-      const ok = confirm(
-        "Issue 2: check live Ryu telemetry for both standby endpoints unexpectedly forwarding. If the live anomaly is not present, this creates an explicitly labeled controlled demo alert only. It does NOT change OVS, switch ports, STP state, or create a real loop. The AI proposal still uses live topology evidence and must pass the safety verifier. Continue?"
-      );
-      if (!ok) return;
-      const token = prompt("Enter the local lab operator token:");
-      if (!token) return;
-
-      const button = document.getElementById('issue2-btn');
-      if (button) { button.disabled = true; button.textContent = 'Checking standby state...'; }
-      try {
-        const resp = await fetch('/api/chaos/standby-forwarding?confirm=true', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ allow_controlled_simulation: true })
-        });
-        const data = await resp.json();
-        if (!resp.ok) {
-          showToast((data.error || 'Issue 2 analysis failed') +
-            (data.observation ? ' | ' + JSON.stringify(data.observation) : ''));
-          return;
-        }
-        if (data.status === 'no_live_anomaly') {
-          showToast(data.message || 'No live standby-forwarding anomaly detected.');
-          return;
-        }
-        const isSimulation = data.detection_mode === 'controlled_simulation';
-        const pipeline = data.pipeline || {};
-        const intent = pipeline.intent || {};
-        const decision = pipeline.decision || 'PENDING_HUMAN_APPROVAL';
-        const text = isSimulation
-          ? 'CONTROLLED SIMULATION | ' + decision + ' (no switch/STP state changed) | '
-          : 'LIVE ANOMALY DETECTED | ' + decision + ' | ';
-        showToast(text + 'AI proposal ' + data.proposal_id + ': ' +
-          intent.action + ' ' + (intent.target_switch ? 's' + intent.target_switch + '-p' + intent.from_port : '') +
-          ' | ' + ((pipeline.verification || {}).checks || []).join('; '));
-        window.setTimeout(() => window.open('/approvals', '_blank', 'noopener'), 500);
-      } catch (err) {
-        showToast('Issue 2 error: ' + err.message);
-      } finally {
-        if (button) { button.disabled = false; button.textContent = 'Issue 2: Standby Forwarding'; }
-      }
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      if (!t) return;
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => {
-        t.classList.remove('show');
-      }, 3000);
-    }
-
-  </script>
+  <script src="/static/js/dashboard.js" defer></script>
 </body>
 </html>

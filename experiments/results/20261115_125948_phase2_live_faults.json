@@ -1,0 +1,3404 @@
+{
+  "run_id": "20261115_125948",
+  "started_at_utc": "2026-11-15T07:29:48.627307+00:00",
+  "evidence_type": "LIVE_MININET_OVS",
+  "repository": "/home/bennurjeevan/netops_guardrail",
+  "branch": "",
+  "experiments": {
+    "mac_flooding": {
+      "baseline": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "injection": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "generator_result": {
+          "success": true,
+          "output": "frames_sent=32\r\n"
+        },
+        "generated_count": 32
+      },
+      "detection": {
+        "detected": true,
+        "telemetry_available": true,
+        "reason": "MAC flooding indicator: 34 unique source MACs learned within 30 seconds.",
+        "unique_mac_count": 34,
+        "threshold": 20,
+        "window_seconds": 30,
+        "per_switch_unique_mac_count": {
+          "1": 34,
+          "2": 34
+        }
+      },
+      "restoration": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "result": {
+          "success": true,
+          "method": "access-port DOWN/UP invokes controller learning-state flush",
+          "down_rc": 0,
+          "up_rc": 0
+        }
+      },
+      "independent_mac_table_check": {
+        "passed": true,
+        "learned_mac_count_by_switch": {
+          "1": 2,
+          "2": 2
+        },
+        "priority_1_flow_count_by_switch": {
+          "s1": 2,
+          "s2": 2
+        },
+        "expected_max_endpoints_per_switch": 2
+      },
+      "ground_truth": {
+        "passed": true,
+        "checks": {
+          "mac_table": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          },
+          "host_connectivity": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          }
+        }
+      },
+      "connectivity": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "post_30_second_window_detection": {
+        "detected": false,
+        "telemetry_available": true,
+        "reason": "MAC learning is below the flood threshold: 3 unique source MACs within 30 seconds.",
+        "unique_mac_count": 3,
+        "threshold": 20,
+        "window_seconds": 30,
+        "per_switch_unique_mac_count": {
+          "1": 2,
+          "2": 2
+        }
+      },
+      "passed": true
+    }
+  },
+  "command_log": [
+    {
+      "at": "2026-11-15T07:30:02.570243+00:00",
+      "command": [
+        "ip",
+        "link",
+        "set",
+        "dev",
+        "s1-eth1",
+        "down"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:30:02.872365+00:00",
+      "command": [
+        "ip",
+        "link",
+        "set",
+        "dev",
+        "s1-eth1",
+        "up"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:30:02.874236+00:00",
+      "command": [
+        "ip",
+        "-j",
+        "link",
+        "show",
+        "dev",
+        "s1-eth1"
+      ],
+      "returncode": 0,
+      "stdout": "[{\"ifindex\":42,\"link_index\":2,\"ifname\":\"s1-eth1\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"master\":\"ovs-system\",\"operstate\":\"UP\",\"linkmode\":\"DEFAULT\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"a6:4e:96:b8:59:50\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"link_netnsid\":0}]\n",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:30:13.316222+00:00",
+      "command": [
+        "ovs-ofctl",
+        "-O",
+        "OpenFlow13",
+        "dump-flows",
+        "s1"
+      ],
+      "returncode": 0,
+      "stdout": "OFPST_FLOW reply (OF1.3) (xid=0x2):\n cookie=0x0, duration=21.138s, table=0, n_packets=33, n_bytes=1980, priority=65535,dl_dst=01:80:c2:00:00:0e,dl_type=0x88cc actions=CONTROLLER:65535\n cookie=0x0, duration=21.117s, table=0, n_packets=4, n_bytes=240, priority=65535,dl_dst=01:80:c2:00:00:00 actions=CONTROLLER:65535\n cookie=0x0, duration=2.016s, table=0, n_packets=6, n_bytes=588, priority=1,in_port=2,dl_dst=00:00:00:00:00:01 actions=output:1\n cookie=0x0, duration=2.014s, table=0, n_packets=5, n_bytes=490, priority=1,in_port=1,dl_dst=00:00:00:00:00:02 actions=output:2\n cookie=0x0, duration=21.159s, table=0, n_packets=38, n_bytes=1036, priority=0 actions=CONTROLLER:65535\n",
+      "stderr": ""
+    },
+    {
+      "at": "2026-11-15T07:30:13.318577+00:00",
+      "command": [
+        "ovs-ofctl",
+        "-O",
+        "OpenFlow13",
+        "dump-flows",
+        "s2"
+      ],
+      "returncode": 0,
+      "stdout": "OFPST_FLOW reply (OF1.3) (xid=0x2):\n cookie=0x0, duration=21.126s, table=0, n_packets=43, n_bytes=2580, priority=65535,dl_dst=01:80:c2:00:00:0e,dl_type=0x88cc actions=CONTROLLER:65535\n cookie=0x0, duration=21.092s, table=0, n_packets=29, n_bytes=1740, priority=65535,dl_dst=01:80:c2:00:00:00 actions=CONTROLLER:65535\n cookie=0x0, duration=12.976s, table=0, n_packets=42, n_bytes=1412, priority=65534,in_port=2 actions=drop\n cookie=0x0, duration=2.019s, table=0, n_packets=7, n_bytes=630, priority=1,in_port=3,dl_dst=00:00:00:00:00:01 actions=output:1\n cookie=0x0, duration=2.015s, table=0, n_packets=5, n_bytes=490, priority=1,in_port=1,dl_dst=00:00:00:00:00:02 actions=output:3\n cookie=0x0, duration=21.160s, table=0, n_packets=44, n_bytes=1464, priority=0 actions=CONTROLLER:65535\n",
+      "stderr": ""
+    }
+  ],
+  "passed": true,
+  "initial_baseline": {
+    "loss_percent": 0.0,
+    "passed": true
+  },
+  "finished_at_utc": "2026-11-15T07:30:47.637793+00:00",
+  "final_telemetry": {
+    "switches": {
+      "1": {
+        "ports": {
+          "4294967294": {
+            "rx_packets": 0,
+            "tx_packets": 0,
+            "rx_bytes": 0,
+            "tx_bytes": 0
+          },
+          "1": {
+            "rx_packets": 59,
+            "tx_packets": 118,
+            "rx_bytes": 3010,
+            "tx_bytes": 7894
+          },
+          "2": {
+            "rx_packets": 86,
+            "tx_packets": 144,
+            "rx_bytes": 5714,
+            "tx_bytes": 8030
+          },
+          "3": {
+            "rx_packets": 21,
+            "tx_packets": 131,
+            "rx_bytes": 1446,
+            "tx_bytes": 6822
+          }
+        },
+        "flows": [
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65535,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "01:80:c2:00:00:0e",
+                      "mask": null
+                    }
+                  },
+                  {
+                    "OXMTlv": {
+                      "field": "eth_type",
+                      "value": 35020,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 20,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 65,
+            "byte_count": 3900
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65535,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "01:80:c2:00:00:00",
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 14,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 4,
+            "byte_count": 240
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 1,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 2,
+                      "mask": null
+                    }
+                  },
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "00:00:00:00:00:01",
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 22,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65509,
+                        "port": 1,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 9,
+            "byte_count": 826
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 1,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 1,
+                      "mask": null
+                    }
+                  },
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "00:00:00:00:00:02",
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 22,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65509,
+                        "port": 2,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 8,
+            "byte_count": 728
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 0,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [],
+                "length": 4,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 42,
+            "byte_count": 1316
+          }
+        ],
+        "port_status": {
+          "1": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          },
+          "2": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          },
+          "3": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          }
+        },
+        "stp_port_states": {
+          "1": "DISABLE",
+          "2": "DISABLE",
+          "3": "DISABLE"
+        },
+        "learned_mac_count": 4
+      },
+      "2": {
+        "ports": {
+          "4294967294": {
+            "rx_packets": 0,
+            "tx_packets": 0,
+            "rx_bytes": 0,
+            "tx_bytes": 0
+          },
+          "1": {
+            "rx_packets": 144,
+            "tx_packets": 86,
+            "rx_bytes": 8030,
+            "tx_bytes": 5714
+          },
+          "2": {
+            "rx_packets": 131,
+            "tx_packets": 21,
+            "rx_bytes": 6822,
+            "tx_bytes": 1446
+          },
+          "3": {
+            "rx_packets": 28,
+            "tx_packets": 143,
+            "rx_bytes": 2284,
+            "tx_bytes": 8020
+          }
+        },
+        "flows": [
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65535,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "01:80:c2:00:00:0e",
+                      "mask": null
+                    }
+                  },
+                  {
+                    "OXMTlv": {
+                      "field": "eth_type",
+                      "value": 35020,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 20,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 107,
+            "byte_count": 6420
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65535,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "01:80:c2:00:00:00",
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 14,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 57,
+            "byte_count": 3420
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 65534,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 2,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 12,
+                "type": 1
+              }
+            },
+            "instructions": [],
+            "packet_count": 46,
+            "byte_count": 1692
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 1,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 3,
+                      "mask": null
+                    }
+                  },
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "00:00:00:00:00:01",
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 22,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65509,
+                        "port": 1,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 10,
+            "byte_count": 868
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 1,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "in_port",
+                      "value": 1,
+                      "mask": null
+                    }
+                  },
+                  {
+                    "OXMTlv": {
+                      "field": "eth_dst",
+                      "value": "00:00:00:00:00:02",
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 22,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65509,
+                        "port": 3,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 8,
+            "byte_count": 728
+          },
+          {
+            "table_id": 0,
+            "cookie": 0,
+            "priority": 0,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [],
+                "length": 4,
+                "type": 1
+              }
+            },
+            "instructions": [
+              {
+                "OFPInstructionActions": {
+                  "actions": [
+                    {
+                      "OFPActionOutput": {
+                        "len": 16,
+                        "max_len": 65535,
+                        "port": 4294967293,
+                        "type": 0
+                      }
+                    }
+                  ],
+                  "len": 24,
+                  "type": 4
+                }
+              }
+            ],
+            "packet_count": 48,
+            "byte_count": 1744
+          }
+        ],
+        "port_status": {
+          "3": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          },
+          "1": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          },
+          "2": {
+            "state": "MISSING",
+            "reason": "DELETE",
+            "link_down": false,
+            "admin_down": false
+          }
+        },
+        "stp_port_states": {
+          "1": "DISABLE",
+          "2": "DISABLE",
+          "3": "DISABLE"
+        },
+        "learned_mac_count": 4
+      }
+    },
+    "links": [],
+    "link_events": [
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.500945+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.507214+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.515799+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.519533+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.739685+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.745169+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.785792+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.791594+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:45.988329+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:45.992834+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:46.034972+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:46.038321+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.066781+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.070982+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.105796+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.110355+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.510740+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.514426+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.523421+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.526732+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.638216+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.644172+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.871120+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:40.824294+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.130650+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.134605+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.179151+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.183183+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:28.826624+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:28.832756+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:28.842235+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:28.846550+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.500516+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.504888+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.741864+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.756492+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.947085+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.951850+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.193639+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.205158+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.388515+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.393604+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.642956+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.652220+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.832304+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.837808+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.085545+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.094623+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.204298+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.210545+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.605786+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.612723+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:40.937665+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:40.944349+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:41.027374+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:41.037903+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:29:49.273575+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:29:49.279717+00:00",
+        "event": "ADD",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:29:49.295246+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:29:49.301035+00:00",
+        "event": "ADD",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:06.850307+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "2",
+        "dst_switch": "1",
+        "dst_port": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.384519+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "2",
+        "dst_switch": "2",
+        "dst_port": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.391098+00:00",
+        "event": "DELETE",
+        "src_switch": "2",
+        "src_port": "1",
+        "dst_switch": "1",
+        "dst_port": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.456660+00:00",
+        "event": "DELETE",
+        "src_switch": "1",
+        "src_port": "3",
+        "dst_switch": "2",
+        "dst_port": "2"
+      }
+    ],
+    "port_status_events": [
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.594914+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.608819+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.679036+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.685042+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.728327+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.733962+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.775641+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.782052+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:57.980521+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:57.994993+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.019845+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.023114+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.062460+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.075028+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.102239+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.114018+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.627719+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.633369+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.651461+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.660367+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.830359+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.841126+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.846460+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.852109+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:39.857196+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.047998+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.053341+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.081170+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.085121+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.115202+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.119182+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.123489+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.127411+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.169475+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:47.174168+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.492726+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.496509+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.508824+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.512720+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.695293+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.701064+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.710389+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.715144+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.719181+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.722970+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.732773+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.737477+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.938120+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.942766+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.956804+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.960508+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.140905+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.152368+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.158000+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.162847+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.167212+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.171361+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.182859+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:50.188929+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.379551+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.384187+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.397472+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.401052+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.581991+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.588290+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.597671+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.601129+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.605717+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.609985+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.619405+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.629172+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.822557+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.827991+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.842575+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.847397+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.026125+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.032574+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.041930+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.045982+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.050404+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.054474+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.063218+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:09.072597+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.193236+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.199228+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.215486+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.219517+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.395690+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.406647+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.411707+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.415880+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.420135+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.424767+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.569210+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.574579+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:33.518939+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:33.525304+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:33.822730+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:40.833791+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:40.839638+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:40.874478+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:40.878949+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:40.931203+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:40.951347+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:41.018571+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:41.044334+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.571780+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.578971+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "DOWN",
+        "reason": "MODIFY",
+        "link_down": true,
+        "admin_down": true
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.874091+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.265587+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.273559+00:00",
+        "switch_id": "1",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.313267+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "UP",
+        "reason": "MODIFY",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.319226+00:00",
+        "switch_id": "2",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.378504+00:00",
+        "switch_id": "1",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.397148+00:00",
+        "switch_id": "2",
+        "port_id": "1",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.443996+00:00",
+        "switch_id": "2",
+        "port_id": "2",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:47.449822+00:00",
+        "switch_id": "1",
+        "port_id": "3",
+        "state": "MISSING",
+        "reason": "DELETE",
+        "link_down": false,
+        "admin_down": false
+      }
+    ],
+    "mac_learning_events": [
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.498591+00:00",
+        "switch_id": "1",
+        "source_mac": "e6:1e:2d:0b:86:35",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:44.587126+00:00",
+        "switch_id": "2",
+        "source_mac": "1e:49:9e:e4:f8:d4",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.577739+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.578752+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.579576+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:22:53.580541+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:25:58.028792+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:30.529989+00:00",
+        "switch_id": "1",
+        "source_mac": "a6:b7:09:a4:b3:00",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:38.774608+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:38.775354+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:38.776018+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:26:38.776939+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.046769+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.048119+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.049066+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:40.050165+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.920621+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.921485+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.922490+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:49.923215+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.066216+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.067374+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.367212+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:27:59.368239+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.809630+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.810377+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.810973+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:08.812071+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.179785+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.180600+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.181325+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:21.182171+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.025865+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.026693+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.027630+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.028789+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.088365+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:00",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.089117+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:00",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.138441+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.139105+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.188777+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:02",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.189314+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:02",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.239036+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:03",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.239827+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:03",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.289173+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:04",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.289931+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:04",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.339651+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:05",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.340351+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:05",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.389970+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:06",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.390698+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:06",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.440273+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:07",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.441013+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:07",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.490243+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:08",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.491512+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:08",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.540518+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:09",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.541378+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:09",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.590787+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0a",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.591654+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0a",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.641176+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0b",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.641904+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0b",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.691248+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.691879+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.741504+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0d",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.742182+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0d",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.791842+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0e",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.792576+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0e",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.842081+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.842865+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.892335+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:10",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.893103+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:10",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.943126+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:11",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.944296+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:11",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.993395+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:12",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:31.994236+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:12",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.043327+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:13",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.044175+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:13",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.093239+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:14",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.094253+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:14",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.143548+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:15",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.144237+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:15",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.193707+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:16",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.194413+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:16",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.244081+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:17",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.244751+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:17",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.294596+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:18",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.295938+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:18",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.344670+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:19",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.345476+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:19",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.394682+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1a",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.395566+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1a",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.444925+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1b",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.445762+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1b",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.495498+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.496436+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.545580+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1d",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.546534+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1d",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.595989+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1e",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.597331+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1e",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.646148+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:32.647335+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:33.837805+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:33.838610+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:28:36.296826+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.459885+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.461426+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.462153+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.463437+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.545549+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:00",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.547451+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:00",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.594951+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.595876+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.645113+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:02",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.645922+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:02",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.698010+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:03",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.700811+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:03",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.745913+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:04",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.746610+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:04",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.796251+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:05",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.797226+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:05",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.846715+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:06",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.847703+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:06",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.897491+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:07",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.898480+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:07",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.947595+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:08",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.948537+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:08",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.997722+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:09",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:00.999753+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:09",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.048444+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0a",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.049353+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0a",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.098711+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0b",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.100096+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0b",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.148442+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.150018+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.198778+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0d",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.199873+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0d",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.248841+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0e",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.249646+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0e",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.299290+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:0f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.300147+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:0f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.349675+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:10",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.351152+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:10",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.399522+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:11",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.400365+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:11",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.449783+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:12",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.450610+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:12",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.500284+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:13",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.501167+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:13",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.550894+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:14",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.552069+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:14",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.601923+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:15",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.603172+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:15",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.651898+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:16",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.652939+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:16",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.703241+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:17",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.704605+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:17",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.752699+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:18",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.754284+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:18",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.802029+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:19",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.803311+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:19",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.852418+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1a",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.854246+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1a",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.902804+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1b",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.904445+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1b",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.952578+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:01.953275+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.002750+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1d",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.003583+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1d",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.052950+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1e",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.053747+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1e",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.103183+00:00",
+        "switch_id": "1",
+        "source_mac": "02:aa:bb:cc:dd:1f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.104146+00:00",
+        "switch_id": "2",
+        "source_mac": "02:aa:bb:cc:dd:1f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.889619+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:02.890653+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:05.480962+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:07.016870+00:00",
+        "switch_id": "2",
+        "source_mac": "ea:6e:a4:6c:32:2c",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:11.297239+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:11.298148+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:01",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:11.298853+00:00",
+        "switch_id": "2",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:11.299969+00:00",
+        "switch_id": "1",
+        "source_mac": "00:00:00:00:00:02",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:19.560980+00:00",
+        "switch_id": "1",
+        "source_mac": "2a:65:72:8f:22:ae",
+        "port_id": "2"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:21.352854+00:00",
+        "switch_id": "1",
+        "source_mac": "82:63:1e:35:13:5f",
+        "port_id": "3"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:21.353567+00:00",
+        "switch_id": "2",
+        "source_mac": "82:63:1e:35:13:5f",
+        "port_id": "1"
+      },
+      {
+        "timestamp_utc": "2026-11-15T07:30:25.449101+00:00",
+        "switch_id": "2",
+        "source_mac": "ea:6e:a4:6c:32:2c",
+        "port_id": "1"
+      }
+    ],
+    "updated_at_utc": "2026-11-15T07:30:47.468693+00:00"
+  }
+}

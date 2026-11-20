@@ -7,6 +7,10 @@ audit/human_approvals.json
 audit/human_approvals.json.lock
 observability/data/
 
+# Telemetry live snapshots
+telemetry/data/*.json
+telemetry/data/latest.json
+
 # Local private signing keys must never be committed
 experiments/results/*_key.pem
 observability/server_runtime.log
@@ -14,3 +18,15 @@ observability/server_runtime.log
 *.egg-info/
 build/
 dist/
+
+# Runtime-only audit state: keys, logs, approvals, ledgers and lock files.
+# Keep this directory local; commit only source-controlled documentation elsewhere.
+audit/
+
+# Live telemetry snapshots and atomic-writer temporary files are runtime state.
+telemetry/data/
+
+# Local review artifacts (the protected diff is supplied separately to the reviewer).
+/phase_b3_protected*.diff
+/ping_loss_window.log
+/ping_rtt_under_bcast.log

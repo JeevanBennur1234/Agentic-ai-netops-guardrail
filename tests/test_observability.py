@@ -13,23 +13,11 @@ def mock_telemetry(tmp_path):
         "switches": {
             "1": {
                 "ports": {
-                    "4294967294": {
-                        "rx_packets": 0, "tx_packets": 0, "rx_bytes": 0, "tx_bytes": 0
-                    },
-                    "1": {
-                        "rx_packets": 15, "tx_packets": 25, "rx_bytes": 1500, "tx_bytes": 2500
-                    },
-                    "2": {
-                        "rx_packets": 30, "tx_packets": 40, "rx_bytes": 3000, "tx_bytes": 4000
-                    }
+                    "4294967294": {"rx_packets": 0, "tx_packets": 0, "rx_bytes": 0, "tx_bytes": 0},
+                    "1": {"rx_packets": 15, "tx_packets": 25, "rx_bytes": 1500, "tx_bytes": 2500},
+                    "2": {"rx_packets": 30, "tx_packets": 40, "rx_bytes": 3000, "tx_bytes": 4000},
                 },
-                "flows": [
-                    {
-                        "priority": 0,
-                        "packet_count": 55,
-                        "byte_count": 5500
-                    }
-                ]
+                "flows": [{"priority": 0, "packet_count": 55, "byte_count": 5500}],
             }
         }
     }
@@ -49,14 +37,19 @@ def mock_audit_log(tmp_path):
         decision="APPROVED",
         intent={"action": "no_action", "reason": "nominal"},
         verifier_result={"safe": True},
-        execution_result={"success": True, "action": "no_action", "change_verified": True, "safety_verified": True}
+        execution_result={
+            "success": True,
+            "action": "no_action",
+            "change_verified": True,
+            "safety_verified": True,
+        },
     )
 
     # Record 2: REJECTED block
     trail.record_decision(
         decision="REJECTED",
         intent={"action": "block", "target_switch": "1", "from_port": "99", "reason": "bad port"},
-        verifier_result={"safe": False, "reason": "Port s1-p99 does not exist"}
+        verifier_result={"safe": False, "reason": "Port s1-p99 does not exist"},
     )
 
     return log_path
@@ -72,7 +65,6 @@ def get_samples_by_name(collector):
 
 
 class TestObservabilityMetrics:
-
     def test_endpoint_health(self):
         app = create_metrics_app()
         client = app.test_client()
@@ -93,7 +85,9 @@ class TestObservabilityMetrics:
         assert "netops_switches_total 1.0" in content
 
     def test_network_telemetry_metrics(self, mock_telemetry, mock_audit_log):
-        collector = NetOpsMetricsCollector(telemetry_path=mock_telemetry, audit_log_path=mock_audit_log)
+        collector = NetOpsMetricsCollector(
+            telemetry_path=mock_telemetry, audit_log_path=mock_audit_log
+        )
         samples = get_samples_by_name(collector)
 
         # Switches & Ports
@@ -116,7 +110,9 @@ class TestObservabilityMetrics:
         assert flow_samples[("1", "0")] == 55.0
 
     def test_local_port_excluded_from_metrics(self, mock_telemetry, mock_audit_log):
-        collector = NetOpsMetricsCollector(telemetry_path=mock_telemetry, audit_log_path=mock_audit_log)
+        collector = NetOpsMetricsCollector(
+            telemetry_path=mock_telemetry, audit_log_path=mock_audit_log
+        )
         samples = get_samples_by_name(collector)
 
         port_samples = samples["netops_port_rx_packets"]
@@ -124,7 +120,9 @@ class TestObservabilityMetrics:
             assert s.labels["port"] != "4294967294"
 
     def test_guardrail_decisions_metrics(self, mock_telemetry, mock_audit_log):
-        collector = NetOpsMetricsCollector(telemetry_path=mock_telemetry, audit_log_path=mock_audit_log)
+        collector = NetOpsMetricsCollector(
+            telemetry_path=mock_telemetry, audit_log_path=mock_audit_log
+        )
         samples = get_samples_by_name(collector)
 
         assert samples["netops_guardrail_ai_decisions_total"][0].value == 2.0
@@ -140,7 +138,9 @@ class TestObservabilityMetrics:
         assert dec_samples[("REJECTED", "block")] == 1.0
 
     def test_remediation_execution_metrics(self, mock_telemetry, mock_audit_log):
-        collector = NetOpsMetricsCollector(telemetry_path=mock_telemetry, audit_log_path=mock_audit_log)
+        collector = NetOpsMetricsCollector(
+            telemetry_path=mock_telemetry, audit_log_path=mock_audit_log
+        )
         samples = get_samples_by_name(collector)
 
         assert samples["netops_remediation_attempts_total"][0].value == 1.0
@@ -148,7 +148,9 @@ class TestObservabilityMetrics:
         assert samples["netops_remediation_post_verification_failures_total"][0].value == 0.0
 
     def test_audit_chain_valid_metric(self, mock_telemetry, mock_audit_log):
-        collector = NetOpsMetricsCollector(telemetry_path=mock_telemetry, audit_log_path=mock_audit_log)
+        collector = NetOpsMetricsCollector(
+            telemetry_path=mock_telemetry, audit_log_path=mock_audit_log
+        )
         samples = get_samples_by_name(collector)
 
         assert samples["netops_audit_records_total"][0].value == 2.0
@@ -231,21 +233,24 @@ class TestObservabilityMetrics:
         res = client.get("/dashboard")
         assert res.status_code == 200
         html = res.get_data(as_text=True)
+        from pathlib import Path
+
+        dashboard_js = Path(app.static_folder) / "js" / "dashboard.js"
+        js = dashboard_js.read_text(encoding="utf-8")
 
         # The topology badge follows the newest proposal lifecycle event,
         # not a global list of any pending proposal or an unrelated guardrail event.
-        assert "const lifecycleRecords = chronological.filter(item =>" in html
-        assert "Boolean(approvalInfoForTrace(item).proposal_id)" in html
-        assert "const activePending = chronological.filter" not in html
-        assert "Proposal ID: ' + approval.proposal_id" in html
-        assert "HUMAN APPROVAL: APPROVED · NOT EXECUTED" in html
+        assert "const lifecycleRecords = chronological.filter(item =>" in js
+        assert "Boolean(approvalInfoForTrace(item).proposal_id)" in js
+        assert "const activePending = chronological.filter" not in js
+        assert "Proposal ID: ' + approval.proposal_id" in js
+        assert "HUMAN APPROVAL: APPROVED · NOT EXECUTED" in js
 
     def test_grafana_dashboard_schema(self):
         from netops_guardrail.netops_paths import NETOPS_HOME
 
         dashboard_path = (
-            NETOPS_HOME / "observability" / "grafana"
-            / "netops_guardrail_dashboard.json"
+            NETOPS_HOME / "observability" / "grafana" / "netops_guardrail_dashboard.json"
         )
         assert dashboard_path.exists()
         with dashboard_path.open("r", encoding="utf-8") as f:
@@ -260,8 +265,9 @@ class TestObservabilityMetrics:
         assert "Safety Gate Verdicts" in panel_titles
         assert "Total Signed Audit Records" in panel_titles
 
-
-    def test_chaos_endpoint_disabled_without_token(self, monkeypatch, mock_telemetry, mock_audit_log):
+    def test_chaos_endpoint_disabled_without_token(
+        self, monkeypatch, mock_telemetry, mock_audit_log
+    ):
         monkeypatch.delenv("NETOPS_CHAOS_API_TOKEN", raising=False)
         app = create_metrics_app(telemetry_path=mock_telemetry, audit_log_path=mock_audit_log)
         client = app.test_client()
@@ -269,15 +275,20 @@ class TestObservabilityMetrics:
         assert res.status_code == 503
         assert "disabled" in res.get_json()["error"].lower()
 
-    def test_chaos_endpoint_rejects_missing_or_invalid_token(self, monkeypatch, mock_telemetry, mock_audit_log):
+    def test_chaos_endpoint_rejects_missing_or_invalid_token(
+        self, monkeypatch, mock_telemetry, mock_audit_log
+    ):
         monkeypatch.setenv("NETOPS_CHAOS_API_TOKEN", "test-only-secret-token")
         app = create_metrics_app(telemetry_path=mock_telemetry, audit_log_path=mock_audit_log)
         client = app.test_client()
         assert client.post("/api/chaos/inject-loop?confirm=true").status_code == 401
-        assert client.post(
-            "/api/chaos/inject-loop?confirm=true",
-            headers={"Authorization": "Bearer wrong-token"}
-        ).status_code == 401
+        assert (
+            client.post(
+                "/api/chaos/inject-loop?confirm=true",
+                headers={"Authorization": "Bearer wrong-token"},
+            ).status_code
+            == 401
+        )
 
 
 def test_human_approval_api_requires_authenticated_operator(
@@ -294,7 +305,9 @@ def test_human_approval_api_requires_authenticated_operator(
 
     assert client.get("/approvals").status_code == 200
     assert client.get("/api/approvals").status_code == 401
-    assert client.get("/api/approvals", headers={"Authorization": "Bearer wrong"}).status_code == 401
+    assert (
+        client.get("/api/approvals", headers={"Authorization": "Bearer wrong"}).status_code == 401
+    )
     authorized = client.get(
         "/api/approvals",
         headers={"Authorization": "Bearer test-only-strong-token"},
@@ -427,7 +440,9 @@ def test_review_only_human_approval_cannot_reach_execution_endpoint(
     assert store.get_proposal(proposal["proposal_id"])["status"] == "approved"
 
 
-def test_human_verifier_request_changes_is_audited(mock_telemetry, mock_audit_log, tmp_path, monkeypatch):
+def test_human_verifier_request_changes_is_audited(
+    mock_telemetry, mock_audit_log, tmp_path, monkeypatch
+):
     from datetime import datetime, timezone
 
     from netops_guardrail.controller.human_verifier import HumanApprovalStore
@@ -479,10 +494,18 @@ def test_human_verifier_request_changes_is_audited(mock_telemetry, mock_audit_lo
     assert trace[-1]["decision_reason"] == "Add impact evidence before resubmission."
     auth_headers = {"Authorization": "Bearer test-only-strong-token"}
     visible = client.get("/api/approvals", headers=auth_headers).get_json()["proposals"]
-    assert any(p["proposal_id"] == proposal["proposal_id"] and p["status"] == "changes_requested" for p in visible)
+    assert any(
+        p["proposal_id"] == proposal["proposal_id"] and p["status"] == "changes_requested"
+        for p in visible
+    )
 
     rejected = store.create_proposal(
-        intent={"action": "block", "target_switch": "1", "from_port": "3", "reason": "reject regression test"},
+        intent={
+            "action": "block",
+            "target_switch": "1",
+            "from_port": "3",
+            "reason": "reject regression test",
+        },
         verifier_result={"safe": True, "checks": ["test only"]},
         telemetry_path=mock_telemetry,
     )
@@ -506,7 +529,9 @@ def test_human_verifier_request_changes_is_audited(mock_telemetry, mock_audit_lo
     assert trace[-1]["decision"] == "REJECTED"
     assert trace[-1]["decision_reason"] == rejected_reason
     visible = client.get("/api/approvals", headers=auth_headers).get_json()["proposals"]
-    assert any(p["proposal_id"] == rejected["proposal_id"] and p["status"] == "rejected" for p in visible)
+    assert any(
+        p["proposal_id"] == rejected["proposal_id"] and p["status"] == "rejected" for p in visible
+    )
 
 
 def test_fault_injection_runs_ai_gate_and_returns_human_proposal(monkeypatch, tmp_path):
@@ -523,10 +548,14 @@ def test_fault_injection_runs_ai_gate_and_returns_human_proposal(monkeypatch, tm
             {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
         ],
         "switches": {
-            "1": {"ports": {"1": {}, "2": {}, "3": {}},
-                  "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"}},
-            "2": {"ports": {"1": {}, "2": {}, "3": {}},
-                  "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"}},
+            "1": {
+                "ports": {"1": {}, "2": {}, "3": {}},
+                "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"},
+            },
+            "2": {
+                "ports": {"1": {}, "2": {}, "3": {}},
+                "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"},
+            },
         },
     }
     telemetry_path.write_text(json.dumps(telemetry), encoding="utf-8")
@@ -540,13 +569,16 @@ def test_fault_injection_runs_ai_gate_and_returns_human_proposal(monkeypatch, tm
     monkeypatch.setenv("NETOPS_CHAOS_API_TOKEN", "test-fault-token")
     monkeypatch.setenv("NETOPS_CONNECTIVITY_CHECKER", "fake_checker:check")
     monkeypatch.setattr(
-        server_module.subprocess, "run",
+        server_module.subprocess,
+        "run",
         lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout="", stderr=""),
     )
     monkeypatch.setattr(
-        server_module.importlib, "import_module",
-        lambda name: SimpleNamespace(check=lambda: True) if name == "fake_checker"
-        else __import__(name),
+        server_module.importlib,
+        "import_module",
+        lambda name: (
+            SimpleNamespace(check=lambda: True) if name == "fake_checker" else __import__(name)
+        ),
     )
     seen = {}
 
@@ -554,7 +586,12 @@ def test_fault_injection_runs_ai_gate_and_returns_human_proposal(monkeypatch, tm
         seen.update(kwargs)
         return {
             "decision": "PENDING_HUMAN_APPROVAL",
-            "intent": {"action": "block", "target_switch": "1", "from_port": "3", "reason": "AI fault diagnosis"},
+            "intent": {
+                "action": "block",
+                "target_switch": "1",
+                "from_port": "3",
+                "reason": "AI fault diagnosis",
+            },
             "verification": {"safe": True, "checks": ["PASS: reachability preserved"]},
             "human_approval": {
                 "proposal_id": "real-flow-test-proposal",
@@ -562,7 +599,7 @@ def test_fault_injection_runs_ai_gate_and_returns_human_proposal(monkeypatch, tm
             },
         }
 
-    monkeypatch.setattr(server_module, "decide", fake_decide)
+    app.config["NETOPS_DECIDE"] = fake_decide
     response = app.test_client().post(
         "/api/chaos/inject-loop?confirm=true",
         headers={"Authorization": "Bearer test-fault-token"},
@@ -577,9 +614,7 @@ def test_fault_injection_runs_ai_gate_and_returns_human_proposal(monkeypatch, tm
     assert seen["audit_logger"] is not None
 
 
-def test_issue2_standby_forwarding_simulation_creates_review_only_proposal(
-    monkeypatch, tmp_path
-):
+def test_issue2_standby_forwarding_ignores_controlled_demo_input(monkeypatch, tmp_path):
     from datetime import datetime, timezone
     from types import SimpleNamespace
 
@@ -593,10 +628,14 @@ def test_issue2_standby_forwarding_simulation_creates_review_only_proposal(
             {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
         ],
         "switches": {
-            "1": {"ports": {"1": {}, "2": {}, "3": {}},
-                  "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"}},
-            "2": {"ports": {"1": {}, "2": {}, "3": {}},
-                  "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"}},
+            "1": {
+                "ports": {"1": {}, "2": {}, "3": {}},
+                "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"},
+            },
+            "2": {
+                "ports": {"1": {}, "2": {}, "3": {}},
+                "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"},
+            },
         },
     }
     telemetry_path.write_text(json.dumps(telemetry), encoding="utf-8")
@@ -609,13 +648,16 @@ def test_issue2_standby_forwarding_simulation_creates_review_only_proposal(
     monkeypatch.setenv("NETOPS_CHAOS_API_TOKEN", "issue2-test-token")
     monkeypatch.setenv("NETOPS_CONNECTIVITY_CHECKER", "fake_checker:check")
     monkeypatch.setattr(
-        server_module.subprocess, "run",
+        server_module.subprocess,
+        "run",
         lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout="", stderr=""),
     )
     monkeypatch.setattr(
-        server_module.importlib, "import_module",
-        lambda name: SimpleNamespace(check=lambda: True) if name == "fake_checker"
-        else __import__(name),
+        server_module.importlib,
+        "import_module",
+        lambda name: (
+            SimpleNamespace(check=lambda: True) if name == "fake_checker" else __import__(name)
+        ),
     )
     observed = {}
 
@@ -624,17 +666,22 @@ def test_issue2_standby_forwarding_simulation_creates_review_only_proposal(
         return {
             "decision": "PENDING_HUMAN_APPROVAL",
             "intent": {
-                "action": "block", "target_switch": "1", "from_port": "3",
-                "reason": "CONTROLLED DEMO SIGNAL: simulated issue for review.",
+                "action": "block",
+                "target_switch": "1",
+                "from_port": "3",
+                "reason": "TEST FIXTURE — NOT LIVE TELEMETRY: simulated issue for review.",
             },
-            "verification": {"safe": True, "checks": ["PASS: primary path and host reachability preserved"]},
+            "verification": {
+                "safe": True,
+                "checks": ["PASS: primary path and host reachability preserved"],
+            },
             "human_approval": {
                 "proposal_id": "issue2-test-proposal",
                 "expires_at": "2030-01-01T00:05:00+00:00",
             },
         }
 
-    monkeypatch.setattr(server_module, "decide", fake_decide)
+    app.config["NETOPS_DECIDE"] = fake_decide
     response = app.test_client().post(
         "/api/chaos/standby-forwarding?confirm=true",
         headers={"Authorization": "Bearer issue2-test-token"},
@@ -642,19 +689,15 @@ def test_issue2_standby_forwarding_simulation_creates_review_only_proposal(
     )
     assert response.status_code == 200, response.get_json()
     result = response.get_json()
-    assert result["status"] == "issue2_proposal_created"
-    assert result["detection_mode"] == "controlled_simulation"
+    assert result["status"] == "no_live_anomaly"
     assert result["network_mutation_attempted"] is False
     assert result["execution_started"] is False
     assert result["observation"]["detected"] is False
-    assert observed["execute_approved"] is False
-    assert observed["incident_context"]["fault_type"] == "standby_forwarding_anomaly"
-    assert observed["incident_context"]["simulation_mode"] is True
+    # No live evidence means no AI/proposal pipeline call.
+    assert observed == {}
 
 
-def test_issue2_detector_only_reports_no_live_anomaly_without_simulation(
-    monkeypatch, tmp_path
-):
+def test_issue2_detector_only_reports_no_live_anomaly_without_simulation(monkeypatch, tmp_path):
     from datetime import datetime, timezone
     from types import SimpleNamespace
 
@@ -668,10 +711,14 @@ def test_issue2_detector_only_reports_no_live_anomaly_without_simulation(
             {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"},
         ],
         "switches": {
-            "1": {"ports": {"1": {}, "2": {}, "3": {}},
-                  "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"}},
-            "2": {"ports": {"1": {}, "2": {}, "3": {}},
-                  "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"}},
+            "1": {
+                "ports": {"1": {}, "2": {}, "3": {}},
+                "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"},
+            },
+            "2": {
+                "ports": {"1": {}, "2": {}, "3": {}},
+                "stp_port_states": {"1": "FORWARD", "2": "BLOCK", "3": "FORWARD"},
+            },
         },
     }
     telemetry_path.write_text(json.dumps(telemetry), encoding="utf-8")
@@ -684,13 +731,16 @@ def test_issue2_detector_only_reports_no_live_anomaly_without_simulation(
     monkeypatch.setenv("NETOPS_CHAOS_API_TOKEN", "issue2-test-token")
     monkeypatch.setenv("NETOPS_CONNECTIVITY_CHECKER", "fake_checker:check")
     monkeypatch.setattr(
-        server_module.subprocess, "run",
+        server_module.subprocess,
+        "run",
         lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout="", stderr=""),
     )
     monkeypatch.setattr(
-        server_module.importlib, "import_module",
-        lambda name: SimpleNamespace(check=lambda: True) if name == "fake_checker"
-        else __import__(name),
+        server_module.importlib,
+        "import_module",
+        lambda name: (
+            SimpleNamespace(check=lambda: True) if name == "fake_checker" else __import__(name)
+        ),
     )
     response = app.test_client().post(
         "/api/chaos/standby-forwarding?confirm=true",
@@ -719,6 +769,6 @@ def test_human_verifier_has_compact_issue_and_decision_sections(
     assert "Automated safety checks" in html
     assert "Your Decision" in html
     assert "Issue 2 — Unexpected standby forwarding" in html
-    assert "CONTROLLED DEMO SIGNAL" in html
+    assert "TEST FIXTURE — NOT LIVE TELEMETRY" in html
     assert "Proposed only — not applied to the network yet." in html
     assert "Technical details (fingerprints, timestamps and original reason)" in html

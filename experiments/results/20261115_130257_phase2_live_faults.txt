@@ -1,0 +1,2014 @@
+run_id: 20261115_130257
+evidence_type: LIVE_MININET_OVS
+passed: True
+raw_json: /home/bennurjeevan/netops_guardrail/experiments/results/20261115_130257_phase2_live_faults.json
+
+{
+  "initial_baseline": {
+    "loss_percent": 0.0,
+    "passed": true
+  },
+  "experiments": {
+    "flow_rule_drift": {
+      "baseline": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "injection": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "bridge": "s1",
+        "marker_cookie": 86059674194003,
+        "marker_priority": 65000
+      },
+      "detection": {
+        "detected": true,
+        "telemetry_available": true,
+        "reason": "Unauthorized marker flow detected in OpenFlow telemetry.",
+        "matched_flows": [
+          {
+            "switch_id": "1",
+            "cookie": 86059674194003,
+            "priority": 65000,
+            "match": {
+              "OFPMatch": {
+                "oxm_fields": [
+                  {
+                    "OXMTlv": {
+                      "field": "eth_type",
+                      "value": 34997,
+                      "mask": null
+                    }
+                  }
+                ],
+                "length": 10,
+                "type": 1
+              }
+            },
+            "instructions": []
+          }
+        ],
+        "marker_cookie": 86059674194003
+      },
+      "restoration": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "error": "",
+        "command": [
+          "sudo",
+          "-n",
+          "ovs-ofctl",
+          "-O",
+          "OpenFlow13",
+          "del-flows",
+          "s1",
+          "cookie=0x4e45544f5053/-1"
+        ]
+      },
+      "independent_policy_check": true,
+      "ground_truth": {
+        "available": true,
+        "passed": true,
+        "result": true,
+        "error": null
+      },
+      "connectivity": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "passed": true
+    },
+    "link_flapping": {
+      "requested_trials": 5,
+      "completed_trials": 5,
+      "interface": "s1-eth3",
+      "cycles_per_trial": 2,
+      "trials": [
+        {
+          "trial": 1,
+          "baseline": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "injection": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "interface": "s1-eth3",
+            "cycles": 2,
+            "completed_commands": [
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ]
+            ]
+          },
+          "detection": {
+            "detected": true,
+            "telemetry_available": true,
+            "reason": "Standby-link instability detected: 12 transitions within 30 seconds.",
+            "event_count": 12,
+            "threshold": 4,
+            "window_seconds": 30,
+            "events": [
+              {
+                "timestamp_utc": "2026-11-15T07:32:58.348428+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:32:58.370748+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.457972+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.464575+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.712667+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.728446+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.444986+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.451698+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.647600+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.680471+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.686357+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.706298+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              }
+            ]
+          },
+          "restoration": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "error": "",
+            "command": [
+              "sudo",
+              "-n",
+              "ip",
+              "link",
+              "set",
+              "dev",
+              "s1-eth3",
+              "up"
+            ]
+          },
+          "new_port_status_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.444986+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.451698+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.647600+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.680471+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.686357+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.706298+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            }
+          ],
+          "new_link_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.457972+00:00",
+              "event": "DELETE",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.464575+00:00",
+              "event": "DELETE",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.712667+00:00",
+              "event": "ADD",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:07.728446+00:00",
+              "event": "ADD",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            }
+          ],
+          "new_detector_event_count": 10,
+          "link_stability": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          },
+          "connectivity": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "trial": 2,
+          "baseline": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "injection": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "interface": "s1-eth3",
+            "cycles": 2,
+            "completed_commands": [
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ]
+            ]
+          },
+          "detection": {
+            "detected": true,
+            "telemetry_available": true,
+            "reason": "Standby-link instability detected: 21 transitions within 30 seconds.",
+            "event_count": 21,
+            "threshold": 4,
+            "window_seconds": 30,
+            "events": [
+              {
+                "timestamp_utc": "2026-11-15T07:32:58.348428+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:32:58.370748+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.457972+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.464575+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.712667+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.728446+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.312092+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.319718+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.576653+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.444986+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.451698+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.647600+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.680471+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.686357+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.706298+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.299209+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.305297+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.501581+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.515711+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.522567+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.561230+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              }
+            ]
+          },
+          "restoration": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "error": "",
+            "command": [
+              "sudo",
+              "-n",
+              "ip",
+              "link",
+              "set",
+              "dev",
+              "s1-eth3",
+              "up"
+            ]
+          },
+          "new_port_status_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.299209+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.305297+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.501581+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.515711+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.522567+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.561230+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            }
+          ],
+          "new_link_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.312092+00:00",
+              "event": "DELETE",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.319718+00:00",
+              "event": "DELETE",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:17.576653+00:00",
+              "event": "ADD",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:18.528680+00:00",
+              "event": "ADD",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            }
+          ],
+          "new_detector_event_count": 9,
+          "link_stability": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          },
+          "connectivity": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "trial": 3,
+          "baseline": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "injection": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "interface": "s1-eth3",
+            "cycles": 2,
+            "completed_commands": [
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ]
+            ]
+          },
+          "detection": {
+            "detected": true,
+            "telemetry_available": true,
+            "reason": "Standby-link instability detected: 26 transitions within 30 seconds.",
+            "event_count": 26,
+            "threshold": 4,
+            "window_seconds": 30,
+            "events": [
+              {
+                "timestamp_utc": "2026-11-15T07:32:58.348428+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:32:58.370748+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.457972+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.464575+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.712667+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.728446+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.312092+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.319718+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.576653+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:18.528680+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.166329+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.173388+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.444986+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.451698+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.647600+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.680471+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.686357+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:07.706298+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.299209+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.305297+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.501581+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.515711+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.522567+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.561230+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.152275+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.159526+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              }
+            ]
+          },
+          "restoration": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "error": "",
+            "command": [
+              "sudo",
+              "-n",
+              "ip",
+              "link",
+              "set",
+              "dev",
+              "s1-eth3",
+              "up"
+            ]
+          },
+          "new_port_status_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:27.152275+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:27.159526+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:27.558612+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            }
+          ],
+          "new_link_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:27.166329+00:00",
+              "event": "DELETE",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:27.173388+00:00",
+              "event": "DELETE",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:27.588664+00:00",
+              "event": "ADD",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:27.603545+00:00",
+              "event": "ADD",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            }
+          ],
+          "new_detector_event_count": 4,
+          "link_stability": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          },
+          "connectivity": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "trial": 4,
+          "baseline": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "injection": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "interface": "s1-eth3",
+            "cycles": 2,
+            "completed_commands": [
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ]
+            ]
+          },
+          "detection": {
+            "detected": true,
+            "telemetry_available": true,
+            "reason": "Standby-link instability detected: 26 transitions within 30 seconds.",
+            "event_count": 26,
+            "threshold": 4,
+            "window_seconds": 30,
+            "events": [
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.312092+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.319718+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.576653+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:18.528680+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.166329+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.173388+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.588664+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.603545+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:39.946939+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:39.954337+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.221648+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.299209+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.305297+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.501581+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.515711+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.522567+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:17.561230+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.152275+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.159526+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.558612+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:39.933310+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:39.940800+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.138089+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.154262+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.161060+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.194734+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              }
+            ]
+          },
+          "restoration": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "error": "",
+            "command": [
+              "sudo",
+              "-n",
+              "ip",
+              "link",
+              "set",
+              "dev",
+              "s1-eth3",
+              "up"
+            ]
+          },
+          "new_port_status_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:39.933310+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:39.940800+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:40.138089+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:40.154262+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:40.161060+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:40.194734+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            }
+          ],
+          "new_link_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:39.946939+00:00",
+              "event": "DELETE",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:39.954337+00:00",
+              "event": "DELETE",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:40.221648+00:00",
+              "event": "ADD",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:41.163190+00:00",
+              "event": "ADD",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            }
+          ],
+          "new_detector_event_count": 9,
+          "link_stability": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          },
+          "connectivity": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "trial": 5,
+          "baseline": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "injection": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "interface": "s1-eth3",
+            "cycles": 2,
+            "completed_commands": [
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "down"
+              ],
+              [
+                "sudo",
+                "-n",
+                "ip",
+                "link",
+                "set",
+                "dev",
+                "s1-eth3",
+                "up"
+              ]
+            ]
+          },
+          "detection": {
+            "detected": true,
+            "telemetry_available": true,
+            "reason": "Standby-link instability detected: 27 transitions within 30 seconds.",
+            "event_count": 27,
+            "threshold": 4,
+            "window_seconds": 30,
+            "events": [
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.166329+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.173388+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.588664+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.603545+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:39.946939+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:39.954337+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.221648+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:41.163190+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:49.803391+00:00",
+                "event": "DELETE",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:49.811215+00:00",
+                "event": "DELETE",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:50.102034+00:00",
+                "event": "ADD",
+                "src_switch": "1",
+                "src_port": "3",
+                "dst_switch": "2",
+                "dst_port": "2"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:50.110491+00:00",
+                "event": "ADD",
+                "src_switch": "2",
+                "src_port": "2",
+                "dst_switch": "1",
+                "dst_port": "3"
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.152275+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.159526+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:27.558612+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:39.933310+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:39.940800+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.138089+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.154262+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.161060+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:40.194734+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:49.788382+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:49.796138+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:49.990206+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:50.005427+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:50.012768+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "DOWN",
+                "reason": "MODIFY",
+                "link_down": true,
+                "admin_down": true
+              },
+              {
+                "timestamp_utc": "2026-11-15T07:33:50.045737+00:00",
+                "switch_id": "1",
+                "port_id": "3",
+                "state": "UP",
+                "reason": "MODIFY",
+                "link_down": false,
+                "admin_down": false
+              }
+            ]
+          },
+          "restoration": {
+            "success": true,
+            "network_mutation_attempted": true,
+            "error": "",
+            "command": [
+              "sudo",
+              "-n",
+              "ip",
+              "link",
+              "set",
+              "dev",
+              "s1-eth3",
+              "up"
+            ]
+          },
+          "new_port_status_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:49.788382+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:49.796138+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:49.990206+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:50.005427+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:50.012768+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "DOWN",
+              "reason": "MODIFY",
+              "link_down": true,
+              "admin_down": true
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:50.045737+00:00",
+              "switch_id": "1",
+              "port_id": "3",
+              "state": "UP",
+              "reason": "MODIFY",
+              "link_down": false,
+              "admin_down": false
+            }
+          ],
+          "new_link_events": [
+            {
+              "timestamp_utc": "2026-11-15T07:33:49.803391+00:00",
+              "event": "DELETE",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:49.811215+00:00",
+              "event": "DELETE",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:50.102034+00:00",
+              "event": "ADD",
+              "src_switch": "1",
+              "src_port": "3",
+              "dst_switch": "2",
+              "dst_port": "2"
+            },
+            {
+              "timestamp_utc": "2026-11-15T07:33:50.110491+00:00",
+              "event": "ADD",
+              "src_switch": "2",
+              "src_port": "2",
+              "dst_switch": "1",
+              "dst_port": "3"
+            }
+          ],
+          "new_detector_event_count": 10,
+          "link_stability": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          },
+          "connectivity": {
+            "loss_percent": 0.0,
+            "passed": true
+          },
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "mac_flooding": {
+      "baseline": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "injection": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "generator_result": {
+          "success": true,
+          "output": "frames_sent=32\r\n"
+        },
+        "generated_count": 32
+      },
+      "detection": {
+        "detected": true,
+        "telemetry_available": true,
+        "reason": "MAC flooding indicator: 36 unique source MACs learned within 30 seconds.",
+        "unique_mac_count": 36,
+        "threshold": 20,
+        "window_seconds": 30,
+        "per_switch_unique_mac_count": {
+          "1": 35,
+          "2": 35
+        }
+      },
+      "restoration": {
+        "success": true,
+        "network_mutation_attempted": true,
+        "result": {
+          "success": true,
+          "method": "access-port DOWN/UP invokes controller learning-state flush",
+          "down_rc": 0,
+          "up_rc": 0
+        }
+      },
+      "independent_mac_table_check": {
+        "passed": true,
+        "learned_mac_count_by_switch": {
+          "1": 1,
+          "2": 1
+        },
+        "priority_1_flow_count_by_switch": {
+          "s1": 2,
+          "s2": 2
+        },
+        "expected_max_endpoints_per_switch": 2
+      },
+      "ground_truth": {
+        "passed": true,
+        "checks": {
+          "mac_table": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          },
+          "host_connectivity": {
+            "available": true,
+            "passed": true,
+            "result": true,
+            "error": null
+          }
+        }
+      },
+      "connectivity": {
+        "loss_percent": 0.0,
+        "passed": true
+      },
+      "post_30_second_window_detection": {
+        "detected": false,
+        "telemetry_available": true,
+        "reason": "MAC learning is below the flood threshold: 0 unique source MACs within 30 seconds.",
+        "unique_mac_count": 0,
+        "threshold": 20,
+        "window_seconds": 30,
+        "per_switch_unique_mac_count": {}
+      },
+      "passed": true
+    }
+  },
+  "error": null,
+  "cleanup_error": null
+}

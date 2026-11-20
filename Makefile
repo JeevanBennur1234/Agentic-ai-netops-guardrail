@@ -1,4 +1,4 @@
-.PHONY: help install test lint run-dashboard demo
+.PHONY: help install test lint run-dashboard demo generate-dashboard
 
 # Default target
 help:
@@ -33,3 +33,6 @@ run-dashboard:
 
 demo:
 	python3 -m netops_guardrail.testbed.create_demo_approval
+
+generate-dashboard:
+	python3 scripts/generate_dashboard.py

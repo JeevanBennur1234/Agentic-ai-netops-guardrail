@@ -1,0 +1,17 @@
+{
+  "baseline_snapshots": [],
+  "command": "scripts/run_phase_b3_live_ring4.py",
+  "commit": "unavailable",
+  "failure": {
+    "message": "before_7a_active_trunk: admin-down ports on s1: ['4']",
+    "type": "AssertionError"
+  },
+  "model": null,
+  "phase": "B3",
+  "provenance": "live_mininet_ovs",
+  "result_file": "/home/bennurjeevan/netops_guardrail/experiments/results/phase_b3/20261120T130049Z_phase_b3_live_ring4.json",
+  "scenarios": {},
+  "started_at_utc": "2026-11-20T13:00:49.569635+00:00",
+  "status": "failed",
+  "updated_at_utc": "2026-11-20T13:00:59.775040+00:00"
+}

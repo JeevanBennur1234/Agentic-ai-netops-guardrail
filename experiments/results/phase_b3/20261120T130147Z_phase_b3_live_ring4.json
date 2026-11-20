@@ -1,0 +1,17 @@
+{
+  "baseline_snapshots": [],
+  "command": "scripts/run_phase_b3_live_ring4.py",
+  "commit": "8f64f094a25fdf2b35aff18c1f6ba823d282a09a",
+  "failure": {
+    "message": "before_7a_active_trunk: admin-down ports on s1: ['4']; dump='OFPST_PORT_DESC reply (OF1.3) (xid=0x2):\\n 1(s1-eth1): addr:82:2d:56:c6:ac:63\\n     config:     0\\n     state:      LIVE\\n     current:    10GB-FD COPPER\\n     speed: 10000 Mbps now, 0 Mbps max\\n 2(s1-eth2): addr:4a:20:5b:04:1f:0b\\n     config:     0\\n     state:      LIVE\\n     current:    10GB-FD COPPER\\n     speed: 10000 Mbps now, 0 Mbps max\\n 3(s1-eth3): addr:e2:f2:a9:56:7c:86\\n     config:     0\\n     state:      LIVE\\n     current:    10GB-FD COPPER\\n     speed: 10000 Mbps now, 0 Mbps max\\n 4(s1-eth4): addr:f2:af:eb:eb:e0:36\\n     config:     0\\n     state:      LIVE\\n     current:    10GB-FD COPPER\\n     speed: 10000 Mbps now, 0 Mbps max\\n LOCAL(s1): addr:36:79:bc:3a:7c:47\\n     config:     PORT_DOWN\\n     state:      LINK_DOWN\\n     speed: 0 Mbps now, 0 Mbps max\\n'",
+    "type": "AssertionError"
+  },
+  "model": null,
+  "phase": "B3",
+  "provenance": "live_mininet_ovs",
+  "result_file": "/home/bennurjeevan/netops_guardrail/experiments/results/phase_b3/20261120T130147Z_phase_b3_live_ring4.json",
+  "scenarios": {},
+  "started_at_utc": "2026-11-20T13:01:47.189510+00:00",
+  "status": "failed",
+  "updated_at_utc": "2026-11-20T13:01:57.630062+00:00"
+}

@@ -1,0 +1,25 @@
+{
+  "updated_at_utc": "2026-11-13T12:00:30+00:00",
+  "mac_learning_events": [
+    {"timestamp_utc": "2026-11-13T12:00:01+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:01", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:02+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:02", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:03+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:03", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:04+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:04", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:05+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:05", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:06+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:06", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:07+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:07", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:08+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:08", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:09+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:09", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:10+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:10", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:11+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:11", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:12+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:12", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:13+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:13", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:14+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:14", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:15+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:15", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:16+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:16", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:17+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:17", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:18+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:18", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:19+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:19", "port_id": "1"},
+    {"timestamp_utc": "2026-11-13T12:00:20+00:00", "switch_id": "1", "source_mac": "02:00:00:00:00:20", "port_id": "1"}
+  ]
+}

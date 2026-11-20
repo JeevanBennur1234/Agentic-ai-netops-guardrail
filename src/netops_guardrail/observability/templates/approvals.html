@@ -57,7 +57,7 @@ function issuePresentation(p){
   const action=String(intent.action||'review').toLowerCase();
   const sw=String(intent.target_switch||'?');
   const port=String(intent.from_port||'?');
-  const isDemo2=/CONTROLLED DEMO SIGNAL/i.test(raw);
+  const isDemo2=/TEST FIXTURE — NOT LIVE TELEMETRY/i.test(raw);
   const isIssue2=isDemo2||/standby.forwarding.anomaly|standby_forwarding_anomaly|unexpected standby forwarding/i.test(raw);
   const isIssue1=!isIssue2&&/re.isolate|restored standby trunk|redundant_trunk_restored/i.test(raw);
   const status=String(p.status||'').toLowerCase();

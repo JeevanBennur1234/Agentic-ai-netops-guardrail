@@ -1,0 +1,17 @@
+{
+  "updated_at_utc": "2026-11-13T12:00:00+00:00",
+  "links": [
+    {"src_switch": "1", "src_port": "2", "dst_switch": "2", "dst_port": "1"},
+    {"src_switch": "1", "src_port": "3", "dst_switch": "2", "dst_port": "2"}
+  ],
+  "switches": {
+    "1": {
+      "ports": {"1": {}, "2": {}, "3": {}},
+      "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"}
+    },
+    "2": {
+      "ports": {"1": {}, "2": {}, "3": {}},
+      "stp_port_states": {"1": "FORWARD", "2": "FORWARD", "3": "FORWARD"}
+    }
+  }
+}

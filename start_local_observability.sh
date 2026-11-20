@@ -62,8 +62,21 @@ if ss -ltn 2>/dev/null | grep -q ':8000'; then
 fi
 
 echo "Starting local NetOps Guardrail observability server."
-echo "Human Verifier token: $NETOPS_APPROVER_TOKEN"
-echo "Lab operator token:   $NETOPS_CHAOS_API_TOKEN"
+echo "Human Verifier token: ${NETOPS_APPROVER_TOKEN}"
+echo "Lab operator token:   ${NETOPS_CHAOS_API_TOKEN}"
 echo "Tokens are stored in $SECRETS_FILE (directory mode 700, file mode 600)."
 echo "Keep this terminal open. These are local development credentials; do not share them."
-exec "$PY" "$ROOT/src/netops_guardrail/observability/server.py"
+
+echo "Starting background Incident Monitor with periodic heartbeat..."
+"$PY" -m netops_guardrail.controller.monitor \
+  --telemetry "$ROOT/telemetry/data/latest.json" \
+  --incident-dir "$ROOT/observability/data/incidents" &
+MONITOR_PID=$!
+
+cleanup() {
+  echo "Shutting down Incident Monitor (PID $MONITOR_PID)..."
+  kill "$MONITOR_PID" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+"$PY" "$ROOT/src/netops_guardrail/observability/server.py"

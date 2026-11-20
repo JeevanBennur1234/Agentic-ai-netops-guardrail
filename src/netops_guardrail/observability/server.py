@@ -3,6 +3,7 @@
 import importlib
 import os
 import subprocess
+from pathlib import Path
 
 from flask import Flask
 
@@ -14,7 +15,9 @@ from netops_guardrail.netops_paths import NETOPS_HOME
 from netops_guardrail.observability.blueprints import (
     audit_bp,
     auth_bp,
+    faults_bp,
     metrics_bp,
+    pipeline_bp,
     proposals_bp,
     topology_bp,
 )
@@ -42,6 +45,14 @@ def create_metrics_app(
     trace_log_path=None,
     approval_path=None,
 ) -> Flask:
+    app_base_dir = Path(base_dir)
+    if telemetry_path:
+        telemetry_file = Path(telemetry_path).resolve()
+        if (telemetry_file.name == "latest.json" and telemetry_file.parent.name == "data"
+                and telemetry_file.parent.parent.name == "telemetry"):
+            app_base_dir = telemetry_file.parents[2]
+        else:
+            app_base_dir = telemetry_file.parent
     template_folder = os.path.join(os.path.dirname(__file__), "templates")
     static_folder = os.path.join(os.path.dirname(__file__), "static")
     app = Flask(
@@ -57,7 +68,7 @@ def create_metrics_app(
     )
     audit = AuditTrail(log_path=audit_log_path, auto_load=True)
     trace_file = trace_log_path or os.path.join(
-        base_dir, "observability", "data", "pipeline_trace.jsonl"
+        str(app_base_dir), "observability", "data", "pipeline_trace.jsonl"
     )
     approval_store = HumanApprovalStore(path=approval_path)
 
@@ -65,13 +76,21 @@ def create_metrics_app(
     app.config["NETOPS_AUDIT"] = audit
     app.config["NETOPS_TRACE_FILE"] = trace_file
     app.config["NETOPS_APPROVAL_STORE"] = approval_store
-    app.config["BASE_DIR"] = base_dir
+    incident_dir = app_base_dir / "observability" / "data" / "incidents"
+    app.config["NETOPS_INCIDENT_PATH"] = str(incident_dir / "incidents.json")
+    app.config["NETOPS_MONITOR_STATUS_PATH"] = str(incident_dir / "monitor_status.json")
+    app.config["NETOPS_DECIDE"] = decide
+    app.config["NETOPS_APPLY_INTENT_TO_GRAPH"] = apply_intent_to_graph
+    app.config["BASE_DIR"] = str(app_base_dir)
+    app.config["NETOPS_PIPELINE_RUNS_DIR"] = str(app_base_dir / "observability" / "data" / "pipeline_runs")
 
     app.register_blueprint(auth_bp)
+    app.register_blueprint(faults_bp)
     app.register_blueprint(metrics_bp)
     app.register_blueprint(proposals_bp)
     app.register_blueprint(topology_bp)
     app.register_blueprint(audit_bp)
+    app.register_blueprint(pipeline_bp)
 
     return app
 

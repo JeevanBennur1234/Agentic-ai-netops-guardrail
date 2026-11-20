@@ -8,9 +8,15 @@ from netops_guardrail.controller.human_verifier import ApprovalError, HumanAppro
 from netops_guardrail.executor.remediation_executor import RemediationExecutor
 from netops_guardrail.netops_paths import NETOPS_HOME
 from netops_guardrail.verifier.safety_verifier import (
+    MUTATION_ACTIONS,
     build_topology,
     run_safety_checks,
+    simulate_disable_port,
+    simulate_rate_limit_port,
+    simulate_remove_flow,
+    simulate_restore_port,
     test_port_removal,
+    validate_intent_schema,
 )
 
 DEFAULT_TELEMETRY_PATH = str(NETOPS_HOME / "telemetry" / "data" / "latest.json")
@@ -28,11 +34,23 @@ def build_graph_from_json(telemetry_path):
     return build_topology(telemetry)
 
 
-def apply_intent_to_graph(graph, intent):
+def apply_intent_to_graph(graph, intent, incident_context=None):
     """
     Apply a proposed intent against a simulated copy of the topology graph.
     Returns a verifier result dict with at least a 'safe' boolean.
     """
+    if not isinstance(intent, dict):
+        return {
+            "safe": False,
+            "reason": "Invalid intent schema: malformed intent: payload must be a dictionary"
+        }
+
+    if "incident_context" in intent or "is_guardrail_rule" in intent:
+        return {
+            "safe": False,
+            "reason": "Invalid intent schema: Intent contains unauthorized unknown keys: ['incident_context']"
+        }
+
     sim_graph = graph.copy()
     action = intent.get("action")
 
@@ -63,14 +81,45 @@ def apply_intent_to_graph(graph, intent):
 
         return test_port_removal(sim_graph, port_node)
 
+    elif action == "disable_port":
+        valid, schema_err = validate_intent_schema(intent)
+        if not valid:
+            return {"safe": False, "reason": f"Invalid intent schema: {schema_err}"}
+        switch = intent.get("target_switch") or intent.get("switch")
+        port = intent.get("from_port") or intent.get("port")
+        return simulate_disable_port(sim_graph, switch, port)
+
+    elif action == "restore_port":
+        valid, schema_err = validate_intent_schema(intent)
+        if not valid:
+            return {"safe": False, "reason": f"Invalid intent schema: {schema_err}"}
+        switch = intent.get("target_switch") or intent.get("switch")
+        port = intent.get("from_port") or intent.get("port")
+        return simulate_restore_port(sim_graph, switch, port)
+
+    elif action == "remove_flow":
+        valid, schema_err = validate_intent_schema(intent)
+        if not valid:
+            return {"safe": False, "reason": f"Invalid intent schema: {schema_err}"}
+        return simulate_remove_flow(sim_graph, intent, incident_context=incident_context)
+
+    elif action == "rate_limit_port":
+        valid, schema_err = validate_intent_schema(intent)
+        if not valid:
+            return {"safe": False, "reason": f"Invalid intent schema: {schema_err}"}
+        return simulate_rate_limit_port(sim_graph, intent)
+
     elif action == "no_action":
         return run_safety_checks(sim_graph)
 
     else:
         return {
             "safe": False,
-            "reason": f"Unhandled action type: {action}"
+            "reason": f"Unhandled action type: '{action}'. Failing closed."
         }
+
+
+EXECUTABLE_REMEDIATION_ACTIONS = MUTATION_ACTIONS
 
 
 def decide(
@@ -109,10 +158,12 @@ def decide(
             result = {"safe": False, "reason": "Human approval expired; a fresh review is required"}
         else:
             intent = pending_proposal.get("intent", {})
-            result = apply_intent_to_graph(graph, intent)
+            if incident_context is None:
+                incident_context = pending_proposal.get("incident_context")
+            result = apply_intent_to_graph(graph, intent, incident_context=incident_context)
             try:
                 approval_store.validate_approved(
-                    approval_id, intent, result, telemetry_path
+                    approval_id, intent, result, telemetry_path, incident_context=incident_context
                 )
             except ApprovalError as exc:
                 result = {"safe": False, "reason": f"Human approval no longer matches current state: {exc}"}
@@ -130,7 +181,7 @@ def decide(
                 "action": "no_action",
                 "reason": f"Remediation agent error: {exc}. Defaulted safely to no_action."
             }
-        result = apply_intent_to_graph(graph, intent)
+        result = apply_intent_to_graph(graph, intent, incident_context=incident_context)
 
     print("1. AGENT PROPOSED:")
     print(json.dumps(intent, indent=2))
@@ -141,12 +192,13 @@ def decide(
     human_approval = None
     if not result.get("safe"):
         decision = "REJECTED"
-    elif intent.get("action") == "block" and not approval_id:
+    elif intent.get("action") in EXECUTABLE_REMEDIATION_ACTIONS and not approval_id:
         try:
             human_approval = approval_store.create_proposal(
                 intent=intent,
                 verifier_result=result,
                 telemetry_path=telemetry_path,
+                incident_context=incident_context,
             )
             decision = "PENDING_HUMAN_APPROVAL"
         except ApprovalError as exc:
@@ -194,6 +246,7 @@ def decide(
                 decision=decision,
                 verifier_result=result,
                 approval_id=approval_id,
+                incident_context=incident_context,
             )
         print("\n4. EXECUTION RESULT:")
         print(json.dumps(execution_res, indent=2))
